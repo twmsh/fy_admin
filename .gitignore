@@ -9,3 +9,5 @@
 bin/
 pkg/
 wasm-pack.log
+
+.back_*
