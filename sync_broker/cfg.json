@@ -1,0 +1,28 @@
+{
+  "version": {
+    "product": "sync_broker",
+    "ver": "0.1.0",
+    "api_ver": "0.1.0"
+  },
+  "log": {
+    "app": "logs/app.log",
+    "web": "logs/web.log",
+    "level": "debug",
+    "lib_level": "warn"
+  },
+  "db": {
+    "url": "mysql://root:cf123456@192.168.1.26:3306",
+    "tz": "+08:00",
+    "max_conn": 20,
+    "min_conn": 4,
+    "idle": 600
+  },
+  "http": {
+    "port": 8090,
+    "max_conn": 1000
+  },
+  "rabbitmq": {
+    "url": "amqp://127.0.0.1:5672/%2f",
+    "queue": "device_log"
+  }
+}
