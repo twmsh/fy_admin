@@ -11,8 +11,14 @@ tokio = { version = "1.18.2", features = ["full"] }
 tokio-stream = "0.1"
 tokio-util = { version = "0.7", features = ["full"] }
 
-axum = { version = "0.5.6", features = ["multipart", "ws"] }
+axum = {version="0.5", features=["ws","multipart","headers"]}
+tracing = { version = "0.1", features = ["log"] }
 
+tower = { version = "0.4", features = ["full"] }
+tower-http = {version= "0.3",features = ["full"]}
+headers="0.3"
+
+log = "0.4"
 log4rs = "1.1.1"
 
 clap = "3.1.18"
@@ -21,3 +27,13 @@ clap = "3.1.18"
 chrono = { version = "0.4", features = ["serde"] }
 serde = { version = "1.0", features = ["derive"] }
 serde_json = { version = "1", features = ["preserve_order"] }
+
+## 条件判断
+[target.'cfg(not(any(target_os = "windows", target_os = "macos", target_os = "ios")))'.dependencies]
+openssl = { version = "0.10", features = ["vendored"] }
+
+[target.'cfg(windows)'.dependencies]
+ipconfig="0.3.0"
+
+[target.'cfg(not(windows))'.dependencies]
+pnet="0.28.0"
