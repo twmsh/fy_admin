@@ -51,7 +51,7 @@ impl<T> DelayQueueChan<T> for DelayQueue<T> {
                         // dq 为空的时候，next()会一直返回none，在这种情况下，disable这个分支
                         if let Some(item) = delay_item {
                             // 检查out_rx通道是否关闭
-                             if out_tx.send(item).await.is_err() {
+                             if out_tx.send(Ok(item)).await.is_err() {
                                 out_closed = true;
                             }
                         }else{
