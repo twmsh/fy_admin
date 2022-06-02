@@ -1,14 +1,14 @@
-use std::path::Path;
+use chrono::LocalResult;
 use chrono::prelude::*;
-use chrono::{LocalResult};
-use url::form_urlencoded;
 use deadqueue::unlimited::Queue;
+use std::path::Path;
+use url::form_urlencoded;
 
 pub const DATETIME_FMT_SHORT: &str = "%Y-%m-%d %H:%M:%S";
 pub const DATETIME_FMT_LONG: &str = "%Y-%m-%d %H:%M:%S%.3f";
 
 
-pub fn parse_localtime_str(ts: &str, fmt: &str) -> std::result::Result<DateTime<Local>, String> {
+pub fn parse_localtime_str(ts: &str, fmt: &str) -> Result<DateTime<Local>, String> {
     let dt = match NaiveDateTime::parse_from_str(ts, fmt) {
         Ok(v) => v,
         Err(e) => {

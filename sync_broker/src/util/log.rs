@@ -6,7 +6,7 @@ use axum::http::{Request, StatusCode};
 use axum::middleware::Next;
 use axum::response::IntoResponse;
 use chrono::Local;
-use headers::{HeaderMapExt};
+use headers::HeaderMapExt;
 
 pub async fn access_log<B>(req: Request<B>, next: Next<B>, f: fn(String))
                            -> Result<impl IntoResponse, (StatusCode, String)> {

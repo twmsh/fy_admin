@@ -28,6 +28,10 @@ clap = "3.1.18"
 deadqueue = "0.2"
 build-time = "0.1.1"
 
+mysql = "22.1"
+sqlx = { version = "0.5", features = ["runtime-tokio-native-tls", "mysql", "chrono"] }
+
+url = "2.2.2"
 
 ## common
 chrono = { version = "0.4", features = ["serde"] }

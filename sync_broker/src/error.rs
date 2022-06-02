@@ -1,9 +1,9 @@
 use std::error::Error;
 use std::fmt::{Debug, Display, Formatter};
-use tokio::task::JoinError;
-use box_base::api::bm_api::ApiError;
 
-pub type AppResult<T> = std::result::Result<T, AppError>;
+use tokio::task::JoinError;
+
+pub type AppResult<T> = Result<T, AppError>;
 
 #[derive(Debug)]
 pub struct AppError {
@@ -51,17 +51,13 @@ impl From<serde_json::Error> for AppError {
 }
 
 
-impl From<tokio::task::JoinError> for AppError {
+impl From<JoinError> for AppError {
     fn from(e: JoinError) -> Self {
         AppError::from_debug(e)
     }
 }
 
-impl From<box_base::api::bm_api::ApiError> for AppError {
-    fn from(e: ApiError) -> Self {
-        AppError::from_debug(e)
-    }
-}
+
 
 impl From<String> for AppError {
     fn from(msg: String) -> Self {

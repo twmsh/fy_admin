@@ -1,7 +1,7 @@
 
 pub mod long_ts_format {
     use chrono::prelude::*;
-    use serde::{self, Deserialize, Serializer, Deserializer};
+    use serde::{self, Deserialize, Deserializer, Serializer};
 
     use crate::util::utils;
 
@@ -30,7 +30,7 @@ pub mod long_ts_format {
 
 pub mod short_ts_format {
     use chrono::prelude::*;
-    use serde::{self, Deserialize, Serializer, Deserializer};
+    use serde::{self, Deserialize, Deserializer, Serializer};
 
     use crate::util::utils;
 
