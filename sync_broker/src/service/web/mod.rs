@@ -1,9 +1,11 @@
 use std::net::{AddrParseError, SocketAddr};
 use std::sync::Arc;
-use axum::{middleware, Router, Server};
+use axum::{Extension, middleware, Router, Server};
 use axum::routing::get;
 use hyper::server::Builder;
 use hyper::server::conn::AddrIncoming;
+use sqlx::{MySql, Pool};
+
 use tokio::sync::watch::Receiver;
 use tokio::task::JoinHandle;
 use tower::ServiceBuilder;
@@ -80,9 +82,6 @@ impl WebService {
     }
 }
 
-async fn index() -> String {
-    "hello".to_string()
-}
 
 
 impl Service for WebService {
@@ -102,4 +101,15 @@ impl Service for WebService {
         tokio::spawn(self.run(server, exit_rx))
     }
 }
+
+//-------------------
+async fn index(Extension(state): Extension<Arc<WebState>>) -> String {
+    println!("{:?}",state.ctx.cfg);
+
+    let conn = state.ctx.dao.pool.acquire().await;
+    println!("conn: {:?}",conn);
+
+    "hello".to_string()
+}
+
 

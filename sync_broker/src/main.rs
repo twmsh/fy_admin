@@ -14,6 +14,7 @@ use sync_broker::{app_cfg::AppCfg,
                   },
                   service::signal_service::SignalService,
 };
+use sync_broker::service::web::WebService;
 
 
 const APP_NAME: &str = "sync_broker";
@@ -94,13 +95,14 @@ async fn main() {
     let mut service_repo = ServiceRepo::new(app_context.clone());
 
     // 初始退出信号服务
-    let exit_signal_service = SignalService::new(exit_tx);
+    let exit_service = SignalService::new(exit_tx);
 
     // 初始web服务
+    let web_service = WebService::new(app_context.clone());
 
     // 启动服务
-    service_repo.start_service(exit_signal_service);
-
+    service_repo.start_service(exit_service);
+    service_repo.start_service(web_service);
 
     // 等待退出
     service_repo.join().await;
