@@ -8,6 +8,7 @@ use sqlx::{MySql, Pool};
 
 use tokio::sync::watch::Receiver;
 use tokio::task::JoinHandle;
+use tower::limit::GlobalConcurrencyLimitLayer;
 use tower::ServiceBuilder;
 use tower_http::add_extension::AddExtensionLayer;
 use tower_http::trace::TraceLayer;
@@ -32,6 +33,8 @@ impl WebService {
     }
 
     pub async fn init_router(&self) -> Router {
+        let max_request_conn = self.ctx.cfg.http.max_conn as usize;
+
         let web_state = Arc::new(WebState {
             ctx: self.ctx.clone(),
         });
@@ -40,7 +43,11 @@ impl WebService {
             .route("/", get(index))
             .layer(
                 ServiceBuilder::new()
+                    // 限制请求的并发数量
+                    .layer(GlobalConcurrencyLimitLayer::new(max_request_conn))
+                    // 设置 web state
                     .layer(AddExtensionLayer::new(web_state))
+                    // access log日志
                     .layer(middleware::from_fn(|req, next| async {
                         let f = |line: String| {
                             info!(target:"access_log","{}",line);
@@ -83,7 +90,6 @@ impl WebService {
 }
 
 
-
 impl Service for WebService {
     fn run(self, exit_rx: Receiver<i64>) -> JoinHandle<()> {
 
@@ -104,10 +110,10 @@ impl Service for WebService {
 
 //-------------------
 async fn index(Extension(state): Extension<Arc<WebState>>) -> String {
-    println!("{:?}",state.ctx.cfg);
+    println!("{:?}", state.ctx.cfg);
 
     let conn = state.ctx.dao.pool.acquire().await;
-    println!("conn: {:?}",conn);
+    println!("conn: {:?}", conn);
 
     "hello".to_string()
 }
