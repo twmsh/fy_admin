@@ -70,7 +70,7 @@ pub fn parse_timezone(tz: &str) -> Result<FixedOffset, String> {
 }
 
 //---------------------------------------------------
-pub async fn init_mysql_pool(
+pub fn init_mysql_pool(
     db_url: &str,
     tz: &str,
     max_conn: u32,
@@ -78,7 +78,7 @@ pub async fn init_mysql_pool(
 ) -> Result<Pool<MySql>, sqlx::Error> {
     let tz_str = tz.to_string();
 
-    let pool = MySqlPoolOptions::new()
+    MySqlPoolOptions::new()
         .max_connections(max_conn)
         .min_connections(min_conn)
         .idle_timeout(Duration::from_secs(60 * 10))
@@ -90,9 +90,7 @@ pub async fn init_mysql_pool(
                 Ok(())
             })
         })
-        .connect(db_url)
-        .await?;
-    Ok(pool)
+        .connect_lazy(db_url)
 }
 
 //------------------------------------------------------

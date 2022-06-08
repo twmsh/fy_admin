@@ -15,6 +15,10 @@
 . http handler
 . rabbitmq 消息处理
 
+//-----
+程序启动时，mysql还没启动好，程序启动应该不会报错，后续数据库连接应该能retry
+
+
 
 
 
