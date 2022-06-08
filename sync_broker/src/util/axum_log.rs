@@ -3,12 +3,26 @@ use std::net::SocketAddr;
 use axum::body::HttpBody;
 use axum::extract::ConnectInfo;
 use axum::http::{HeaderValue, Request, StatusCode};
-use axum::http::header::ToStrError;
+use axum::http::header::{USER_AGENT, REFERER, HeaderName};
 use axum::middleware::Next;
 use axum::response::IntoResponse;
 use chrono::Local;
-use headers::HeaderMapExt;
-use hyper::header::REFERER;
+
+use hyper::HeaderMap;
+
+fn get_header_value(headers:  &HeaderMap<HeaderValue>, name: HeaderName) -> String {
+    match headers.get(name) {
+        None => { "-".to_string() }
+        Some(v) => {
+            match v.to_str() {
+                Ok(vv) => {
+                    vv.to_string()
+                }
+                Err(_) => { "-".to_string() }
+            }
+        }
+    }
+}
 
 pub async fn access_log<B>(req: Request<B>, next: Next<B>, f: fn(String))
                            -> Result<impl IntoResponse, (StatusCode, String)> {
@@ -26,23 +40,8 @@ pub async fn access_log<B>(req: Request<B>, next: Next<B>, f: fn(String))
     let method = req.method().clone();
     let uri = req.uri().clone();
     let version = req.version();
-    let ua = match req.headers().typed_get::<headers::UserAgent>() {
-        None => { "-".to_string() }
-        Some(v) => { v.to_string() }
-    };
-
-    let refer = match req.headers().get(REFERER) {
-        None => { "-".to_string() }
-        Some(v) => {
-            match v.to_str() {
-                Ok(vv) => {
-                    vv.to_string()
-                }
-                Err(_) => { "-".to_string() }
-            }
-        }
-    };
-
+    let ua =get_header_value(req.headers(),USER_AGENT);
+    let refer =get_header_value(req.headers(),REFERER);
 
     let res = next.run(req).await;
 

@@ -4,7 +4,6 @@ use axum::{Extension, middleware, Router, Server};
 use axum::routing::get;
 use hyper::server::Builder;
 use hyper::server::conn::AddrIncoming;
-use sqlx::{MySql, Pool};
 
 use tokio::sync::watch::Receiver;
 use tokio::task::JoinHandle;
