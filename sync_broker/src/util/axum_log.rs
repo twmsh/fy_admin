@@ -3,6 +3,7 @@ use std::net::SocketAddr;
 use axum::body::HttpBody;
 use axum::extract::ConnectInfo;
 use axum::http::{Request, StatusCode};
+use axum::http::header::ToStrError;
 use axum::middleware::Next;
 use axum::response::IntoResponse;
 use chrono::Local;
@@ -31,7 +32,7 @@ pub async fn access_log<B>(req: Request<B>, next: Next<B>, f: fn(String))
 
     let refer = match req.headers().typed_get::<headers::Referer>() {
         None => { "-".to_string() }
-        Some(v) => { format!("{:?}", v) }
+        Some(v) => { v.to_string() }
     };
 
     let res = next.run(req).await;
