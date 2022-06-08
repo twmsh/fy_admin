@@ -2,12 +2,13 @@ use std::net::SocketAddr;
 
 use axum::body::HttpBody;
 use axum::extract::ConnectInfo;
-use axum::http::{Request, StatusCode};
+use axum::http::{HeaderValue, Request, StatusCode};
 use axum::http::header::ToStrError;
 use axum::middleware::Next;
 use axum::response::IntoResponse;
 use chrono::Local;
 use headers::HeaderMapExt;
+use hyper::header::REFERER;
 
 pub async fn access_log<B>(req: Request<B>, next: Next<B>, f: fn(String))
                            -> Result<impl IntoResponse, (StatusCode, String)> {
@@ -30,10 +31,18 @@ pub async fn access_log<B>(req: Request<B>, next: Next<B>, f: fn(String))
         Some(v) => { v.to_string() }
     };
 
-    let refer = match req.headers().typed_get::<headers::Referer>() {
+    let refer = match req.headers().get(REFERER) {
         None => { "-".to_string() }
-        Some(v) => { v.to_string() }
+        Some(v) => {
+            match v.to_str() {
+                Ok(vv) => {
+                    vv.to_string()
+                }
+                Err(_) => { "-".to_string() }
+            }
+        }
     };
+
 
     let res = next.run(req).await;
 
