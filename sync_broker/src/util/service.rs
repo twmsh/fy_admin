@@ -43,7 +43,7 @@ impl<T: SignalProduce> ServiceRepo<T> {
     pub async fn join(self) {
         for h in self.handles {
             let _ = h.await;
-            info!("service handle joined.");
+            info!("service handles joined.");
         }
     }
 }
