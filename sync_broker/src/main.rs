@@ -10,7 +10,7 @@ use sync_broker::{app_cfg::AppCfg,
                   dao::Dao,
                   util::{
                       logger, mysql_util,
-                      service::ServiceRepo
+                      service::ServiceRepo,
                   },
                   service::signal_service::SignalService,
 };
@@ -84,20 +84,25 @@ async fn main() {
 
     // 初始化 context
     let (exit_tx, exit_rx) = watch::channel(0);
-    let app_context = AppCtx {
-        cfg: app_config,
-        exit_rx,
-        dao,
-    };
+    let app_context = Arc::new(
+        AppCtx::new(
+            app_config,
+            exit_rx,
+            dao));
 
     // 创建服务集
-    let mut service_repo = ServiceRepo::new(app_context);
+    let mut service_repo = ServiceRepo::new(app_context.clone());
 
-    // 退出信号服务
+    // 初始退出信号服务
     let exit_signal_service = SignalService::new(exit_tx);
 
+    // 初始web服务
+
+    // 启动服务
     service_repo.start_service(exit_signal_service);
 
+
+    // 等待退出
     service_repo.join().await;
 
     info!("app end.");

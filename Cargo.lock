@@ -2800,6 +2800,7 @@ dependencies = [
  "clap",
  "deadqueue",
  "headers",
+ "hyper",
  "ipconfig",
  "lapin",
  "log",

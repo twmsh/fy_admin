@@ -30,17 +30,24 @@ pub struct AppCfgDb {
 }
 
 #[derive(Serialize, Deserialize, Debug)]
+pub struct AppCfgHttp {
+    pub addr: String,
+    pub max_conn: u64,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
 pub struct AppCfgRabbitMq {
     pub url: String,
     pub queue: String,
 }
+
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct AppCfg {
     pub version: AppCfgVersion,
     pub log: AppCfgLog,
     pub db: AppCfgDb,
-
+    pub http: AppCfgHttp,
     pub rabbitmq: AppCfgRabbitMq,
 }
 
