@@ -1,9 +1,8 @@
 use std::fs;
 use std::path::Path;
-
 use serde::{Deserialize, Serialize};
-
 use crate::error::AppResult;
+use crate::util::mysql_util;
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct AppCfgVersion {
@@ -59,7 +58,7 @@ impl AppCfg {
     }
 
     pub fn validate(&self) -> AppResult<()> {
-
+        let _ = mysql_util::parse_timezone(self.db.tz.as_str())?;
 
         Ok(())
     }

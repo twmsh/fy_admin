@@ -1,2 +1,2 @@
 [workspace]
-members =["box_agent","sync_broker","track_warehouse"]
+members =["mysql_codegen","box_agent","sync_server","track_warehouse"]

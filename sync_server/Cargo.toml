@@ -1,11 +1,12 @@
 [package]
-name = "sync_broker"
+name = "sync_server"
 version = "0.1.0"
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+mysql_codegen = {path = "../mysql_codegen"}
 
 tokio = { version = "1.18.2", features = ["full"] }
 tokio-stream = "0.1"
@@ -19,17 +20,17 @@ hyper ={version = "0.14",features = [ "server"]}
 tower-http = {version= "0.3",features = ["full"]}
 headers="0.3"
 
+# rabbitmq
 lapin="2.1"
 
 log = "0.4"
 log4rs = "1.1.1"
-
 clap = "3.1.18"
 
 deadqueue = "0.2"
 build-time = "0.1.1"
 
-mysql = "22.1"
+#mysql = "22.1"
 sqlx = { version = "0.5", features = ["runtime-tokio-native-tls", "mysql", "chrono"] }
 
 url = "2.2.2"

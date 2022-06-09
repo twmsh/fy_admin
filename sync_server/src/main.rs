@@ -4,18 +4,19 @@ use clap::{arg, Command};
 use tokio::sync::watch;
 use tracing::{error, info};
 
-
-use sync_broker::{app_cfg::AppCfg,
-                  app_ctx::AppCtx,
-                  dao::Dao,
-                  util::{
-                      logger, mysql_util,
-                      service::ServiceRepo,
-                  },
-                  service::signal_service::SignalService,
+use sync_server::{
+    app_cfg::AppCfg,
+    app_ctx::AppCtx,
+    dao::Dao,
+    util::{
+        logger, mysql_util,
+        service::ServiceRepo,
+    },
+    service::{
+        signal_service::SignalService,
+        web::WebService
+    },
 };
-use sync_broker::service::web::WebService;
-
 
 const APP_NAME: &str = "sync_broker";
 const APP_VER_NUM: &str = "0.1.0";
@@ -79,8 +80,18 @@ async fn main() {
             return;
         }
     };
+
+    let tz = match mysql_util::parse_timezone(app_config.db.tz.as_str()) {
+        Ok(v) =>  v,
+        Err(e) => {
+            error!("error, parse_timezone {}, err: {:?}",app_config.db.tz, e);
+            return;
+        }
+    };
+
     let dao = Dao {
-        pool: Arc::new(db_pool)
+        pool: Arc::new(db_pool),
+        tz,
     };
 
     // 初始化 context

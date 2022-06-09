@@ -29,7 +29,7 @@ rabbitmq消息消费，日志入库。
 
 
 
-
+~/tools/bin/mysql_gen.exe --db_url mysql://cf_user:cf123456@192.168.1.26:3306  --db_name cf_rs --file_path base_model.rs
 
 
 依赖库

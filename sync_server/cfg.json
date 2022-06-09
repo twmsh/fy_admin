@@ -11,7 +11,7 @@
     "lib_level": "warn"
   },
   "db": {
-    "url": "mysql://root:cf123456@192.168.1.26:3306/fy_admin",
+    "url": "mysql://cf_user:cf123456@192.168.1.26:3306/cf_rs",
     "tz": "+08:00",
     "max_conn": 20,
     "min_conn": 4,
