@@ -1,0 +1,76 @@
+
+last_update
+device_id
+
+http://xxx:8090/camera_sync?device_id=xxx&last_update=xxxx
+http://xxx:8090/db_sync?device_id=xxx&last_update=xxxx
+http://xxx:8090/person_sync?device_id=xxx&last_update=xxxx
+
+摄像头返回
+{
+    "status": 0,
+    "message": "success",
+    "data": [
+        {
+            "id": "1",      // 只是用来调试，对应服务端数据的id
+            "uuid": "xxxx",
+            "op": 1,        // 1：增加或修改 2：删除
+            "last_update": "xxxxx",
+            "type": 1,      // 采集类型 1：人脸 2：车辆 3：人脸+车辆
+            "detail": {
+                "uuid": "xxxx",
+                "url": "xxxxx",
+                "config": "xxxx"
+            }
+        }
+    ]
+}
+
+db返回
+{
+    "status": 0,
+    "message": "success",
+    "data": [
+        {
+            "id": "1",        // 只是用来调试，对应服务端数据的id
+            "uuid": "xxxx",
+            "op": 1,        // 1：增加或修改 2：删除
+            "last_update": "xxxxx",
+            "detail": {
+                "uuid": "xxxx",
+                "capacity": 50000
+            }
+        }
+    ]
+}
+
+
+person返回
+{
+    "status": 0,
+    "message": "success",
+    "data": [
+        {
+            "id": "1",        // 只是用来调试，对应服务端数据的id
+            "uuid": "xxxx",
+            "db_id": "xxxx",
+            "op": 1,        // 1：增加或修改 2：删除
+            "last_update": "xxxxx",
+            "detail": {
+                "uuid": "xxxx",
+                "db_id": "xxx",
+                "faces": [
+                    {
+                        "fea": "base64",
+                        "quality": 0.85
+                    },
+                    {
+                        "fea": "base64",
+                        "quality": 0.85
+                    }
+                ]
+            }
+        }
+    ]
+}
+

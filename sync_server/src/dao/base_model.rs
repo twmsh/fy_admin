@@ -11,7 +11,7 @@ use crate::util::mysql_util;
 pub struct BaseBox {
     /* id */
     #[pk]
-    pub id: i32,
+    pub id: i64,
 
     /* 盒子名称 */
     pub name: Option<String>,
@@ -43,7 +43,7 @@ pub struct BaseBox {
 pub struct BaseBoxLog {
     /* id */
     #[pk]
-    pub id: i32,
+    pub id: i64,
 
     /* 小盒子硬件编号 */
     pub box_hwid: String,
@@ -66,7 +66,7 @@ pub struct BaseBoxLog {
 pub struct BaseCamera {
     /* id */
     #[pk]
-    pub id: i32,
+    pub id: i64,
 
     /* 摄像头名称 */
     pub name: Option<String>,
@@ -95,7 +95,7 @@ pub struct BaseCamera {
 pub struct BaseCameraDel {
     /* id */
     #[pk]
-    pub id: i32,
+    pub id: i64,
 
     /* 原来表中的id */
     pub origin_id: i32,
@@ -127,7 +127,7 @@ pub struct BaseCameraDel {
 pub struct BaseDb {
     /* id */
     #[pk]
-    pub id: i32,
+    pub id: i64,
 
     /* uuid */
     pub uuid: String,
@@ -150,7 +150,7 @@ pub struct BaseDb {
 pub struct BaseDbDel {
     /* id */
     #[pk]
-    pub id: i32,
+    pub id: i64,
 
     /* 原来表中的id */
     pub origin_id: i32,
@@ -176,7 +176,7 @@ pub struct BaseDbDel {
 pub struct BaseFea {
     /* id */
     #[pk]
-    pub id: i32,
+    pub id: i64,
 
     /* uuid */
     pub uuid: String,
@@ -199,7 +199,7 @@ pub struct BaseFea {
 pub struct BaseFeaDel {
     /* id */
     #[pk]
-    pub id: i32,
+    pub id: i64,
 
     /* 原来表中的id */
     pub origin_id: i32,
@@ -216,13 +216,39 @@ pub struct BaseFeaDel {
     /* 更新时间;删除时间 */
     pub modify_time: DateTime<Local>,
 }
+/* 特征值映射表 */
+#[derive(sqlx::FromRow, MysqlEntity, Serialize, Deserialize, Debug, Clone)]
+#[table = "base_fea_map"]
+pub struct BaseFeaMap {
+    /* id */
+    #[pk]
+    pub id: i64,
+
+    /* uuid */
+    pub uuid: String,
+
+    /* 图片编号;调试用，用来对应person的人脸编号 */
+    pub face_id: String,
+
+    /* 特征值 */
+    pub feature: String,
+
+    /* 图片质量 */
+    pub quality: f64,
+
+    /* 创建时间 */
+    pub create_time: DateTime<Local>,
+
+    /* 更新时间 */
+    pub modify_time: DateTime<Local>,
+}
 /* 人脸抓拍记录 */
 #[derive(sqlx::FromRow, MysqlEntity, Serialize, Deserialize, Debug, Clone)]
 #[table = "facetrack"]
 pub struct Facetrack {
     /* id */
     #[pk]
-    pub id: i32,
+    pub id: i64,
 
     /* uuid */
     pub uuid: String,
