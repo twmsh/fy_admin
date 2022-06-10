@@ -4,7 +4,7 @@
   "avatar": "",
   "version": "4.1.1",
   "createdTime": "2022-5-20 20:11:51",
-  "updatedTime": "2022-6-10 15:37:06",
+  "updatedTime": "2022-6-11 07:00:24",
   "dbConns": [],
   "profile": {
     "default": {
@@ -880,6 +880,23 @@
           "refDict": "",
           "uiHint": "",
           "id": "0C41DCE7-15D9-4433-8C3A-3414FF567C41"
+        },
+        {
+          "defKey": "c_type",
+          "defName": "摄像头采集类型",
+          "comment": "",
+          "type": "",
+          "len": "",
+          "scale": "",
+          "primaryKey": false,
+          "notNull": true,
+          "autoIncrement": false,
+          "defaultValue": "",
+          "hideInGraph": false,
+          "refDict": "",
+          "extProps": {},
+          "domain": "BC3C15EB-D6D4-415F-B0DF-9F4988184595",
+          "id": "4136166B-F555-4244-B0F2-9EB77265767F"
         },
         {
           "defKey": "url",
@@ -2657,6 +2674,23 @@
           "refDict": "",
           "uiHint": "",
           "id": "0C41DCE7-15D9-4433-8C3A-3414FF567C41"
+        },
+        {
+          "defKey": "c_type",
+          "defName": "摄像头采集类型",
+          "comment": "",
+          "type": "",
+          "len": "",
+          "scale": "",
+          "primaryKey": false,
+          "notNull": true,
+          "autoIncrement": false,
+          "defaultValue": "",
+          "hideInGraph": false,
+          "refDict": "",
+          "extProps": {},
+          "domain": "BC3C15EB-D6D4-415F-B0DF-9F4988184595",
+          "id": "E57251AE-F67C-4EC4-BC29-2BA97F655266"
         },
         {
           "defKey": "url",

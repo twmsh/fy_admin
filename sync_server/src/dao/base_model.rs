@@ -77,6 +77,9 @@ pub struct BaseCamera {
     /* 小盒子硬件编号 */
     pub box_hwid: String,
 
+    /* 摄像头采集类型 */
+    pub c_type: i32,
+
     /* 采集地址 */
     pub url: String,
 
@@ -108,6 +111,9 @@ pub struct BaseCameraDel {
 
     /* 小盒子硬件编号 */
     pub box_hwid: String,
+
+    /* 摄像头采集类型 */
+    pub c_type: i32,
 
     /* 采集地址 */
     pub url: String,

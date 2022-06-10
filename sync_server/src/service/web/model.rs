@@ -3,7 +3,7 @@ use axum::response::{IntoResponse, Response};
 use crate::util::time_format::long_ts_format;
 use chrono::prelude::*;
 use serde::{Deserialize, Serialize};
-use crate::dao::base_model::{BaseDb, BaseDbDel};
+use crate::dao::base_model::{BaseCamera, BaseCameraDel, BaseDb, BaseDbDel};
 use crate::error::AppError;
 
 //----------------------------------
@@ -179,6 +179,40 @@ impl Into<Db> for BaseDbDel {
             op: SYNC_OP_DEL,
             last_update: self.modify_time,
             capacity: self.capacity,
+        }
+    }
+}
+
+
+impl Into<Camera> for BaseCamera {
+    fn into(self) -> Camera {
+        Camera {
+            id: self.id.to_string(),
+            uuid: self.uuid.clone(),
+            op: SYNC_OP_MODIFY,
+            last_update: self.modify_time,
+            c_type: self.c_type as i64,
+
+            detail: Some(CameraInfo {
+                uuid: self.uuid,
+                url: self.url,
+                config: self.config,
+            }),
+        }
+    }
+}
+
+
+impl Into<Camera> for BaseCameraDel {
+    fn into(self) -> Camera {
+        Camera {
+            id: self.origin_id.to_string(),
+            uuid: self.uuid.clone(),
+            op: SYNC_OP_DEL,
+            last_update: self.modify_time,
+            c_type: self.c_type as i64,
+
+            detail: None,
         }
     }
 }
