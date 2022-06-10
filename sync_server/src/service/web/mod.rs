@@ -12,10 +12,18 @@ use tower::ServiceBuilder;
 use tower_http::add_extension::AddExtensionLayer;
 use tower_http::trace::TraceLayer;
 use tracing::{error, info};
-use crate::app_ctx::AppCtx;
-use crate::service::web::sync::get_db_update;
-use crate::util::axum_log::access_log;
-use crate::util::service::Service;
+use crate::{
+    app_ctx::AppCtx,
+    util::{
+        axum_log::access_log,
+        service::Service,
+    },
+    service::web::sync::{
+        get_db_update,
+        get_person_update,
+        get_camera_update,
+    },
+};
 
 pub mod sync;
 pub mod model;
@@ -44,6 +52,9 @@ impl WebService {
 
         Router::new()
             .route("/db_sync", get(get_db_update))
+            .route("/person_sync", get(get_person_update))
+            .route("/camera_sync", get(get_camera_update))
+
             .layer(
                 ServiceBuilder::new()
                     // 限制请求的并发数量

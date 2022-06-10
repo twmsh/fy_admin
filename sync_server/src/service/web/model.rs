@@ -73,6 +73,22 @@ pub struct CameraInfo {
     pub config: String,
 }
 
+#[derive(Serialize, Deserialize, Debug)]
+pub struct Db {
+    pub id: String,
+    pub uuid: String,
+
+    // 1：增加或修改 2：删除
+    pub op: i8,
+
+    #[serde(with = "long_ts_format")]
+    pub last_update: DateTime<Local>,
+
+    pub capacity: i32,
+
+}
+
+
 //----------------------------------
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -81,6 +97,7 @@ pub struct ResponseData<T> {
     pub message: Option<String>,
 
     #[serde(bound(serialize = "T: Serialize", deserialize = "T: Deserialize<'de>"))]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub data: Option<Vec<T>>,
 }
 
