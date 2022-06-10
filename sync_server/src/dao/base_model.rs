@@ -184,8 +184,8 @@ pub struct BaseFea {
     /* db uuid */
     pub db_uuid: String,
 
-    /* 特征值 */
-    pub feature: String,
+    /* 特征值(聚合) */
+    pub feature: Option<String>,
 
     /* 创建时间 */
     pub create_time: DateTime<Local>,

@@ -4,7 +4,7 @@
   "avatar": "",
   "version": "4.1.1",
   "createdTime": "2022-5-20 20:11:51",
-  "updatedTime": "2022-6-10 01:03:15",
+  "updatedTime": "2022-6-10 12:34:08",
   "dbConns": [],
   "profile": {
     "default": {
@@ -1358,14 +1358,14 @@
         },
         {
           "defKey": "feature",
-          "defName": "特征值",
+          "defName": "特征值(聚合)",
           "comment": "",
           "domain": "",
           "type": "TEXT",
           "len": "",
           "scale": "",
           "primaryKey": false,
-          "notNull": true,
+          "notNull": false,
           "autoIncrement": false,
           "defaultValue": "",
           "hideInGraph": true,

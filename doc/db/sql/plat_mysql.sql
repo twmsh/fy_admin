@@ -53,7 +53,7 @@ CREATE TABLE base_fea(
     id BIGINT NOT NULL AUTO_INCREMENT  COMMENT 'id' ,
     uuid VARCHAR(50) NOT NULL   COMMENT 'uuid' ,
     db_uuid VARCHAR(50) NOT NULL   COMMENT 'db uuid' ,
-    feature TEXT NOT NULL   COMMENT '特征值' ,
+    feature TEXT    COMMENT '特征值(聚合)' ,
     create_time DATETIME(3) NOT NULL   COMMENT '创建时间' ,
     modify_time DATETIME(3) NOT NULL   COMMENT '更新时间' ,
     PRIMARY KEY (id)
