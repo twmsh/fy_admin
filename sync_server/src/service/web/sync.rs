@@ -74,12 +74,30 @@ pub async fn get_db_update(
 
     let limit = state.ctx.cfg.sync_batch;
     let db_update = state.ctx.dao.get_db_list(last_update,limit).await?;
+    let db_del_update = state.ctx.dao.get_dbdel_list(last_update,limit).await?;
 
+    // 合并 db和 db_del的记录
+    let mut list:Vec<Db> =vec![];
+    for v in db_update {
+        list.push(v.into());
+    }
+    for v in db_del_update {
+        list.push(v.into());
+    }
 
+    // 根据 last_update排序
+    list.sort_by(|a,b|{
+        a.last_update.cmp(&b.last_update)
+    });
+
+    // 取前N条记录
+    list.truncate(limit as usize);
+
+    // 返回值
     Ok(ResponseData {
         status: 0,
         message: Some("success".to_string()),
-        data: Some(vec![]),
+        data: Some(list),
     })
 }
 
