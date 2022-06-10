@@ -3,12 +3,18 @@ use axum::response::{IntoResponse, Response};
 use crate::util::time_format::long_ts_format;
 use chrono::prelude::*;
 use serde::{Deserialize, Serialize};
+use crate::dao::base_model::{BaseDb, BaseDbDel};
 use crate::error::AppError;
 
 //----------------------------------
 
 pub const SYNC_OP_MODIFY: i8 = 1;
 pub const SYNC_OP_DEL: i8 = 2;
+
+pub const RES_STATUS_OK: i32 = 0;
+pub const RES_STATUS_ERROR: i32 = 500;
+pub const RES_STATUS_INVALID_PARA: i32 = 1;
+
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct PersonInfoFace {
@@ -110,6 +116,16 @@ impl<T> ResponseData<T> {
     }
 }
 
+impl From<AppError> for ResponseData<()> {
+    fn from(e: AppError) -> Self {
+        ResponseData {
+            status: RES_STATUS_ERROR,
+            message: Some(e.msg),
+            data: None,
+        }
+    }
+}
+
 //-------------------------------
 impl<T> IntoResponse for ResponseData<T>
     where T: Serialize,
@@ -120,27 +136,49 @@ impl<T> IntoResponse for ResponseData<T>
 }
 
 //-------------------------
-pub const RES_STATUS_OK: i32 = 0;
-pub const RES_STATUS_ERROR: i32 = 500;
-pub const RES_STATUS_INVALID_PARA: i32 = 1;
 
 
-impl IntoResponse for AppError
-{
-    fn into_response(self) -> Response {
-        ResponseData::<String> {
-            status: RES_STATUS_ERROR,
-            message: Some(self.msg),
-            data: None,
-        }.into_response()
-    }
-}
+// impl IntoResponse for AppError
+// {
+//     fn into_response(self) -> Response {
+//         ResponseData::<String> {
+//             status: RES_STATUS_ERROR,
+//             message: Some(self.msg),
+//             data: None,
+//         }.into_response()
+//     }
+// }
 
 //-----------------
-pub fn build_fail_response_data( status: i32, message: &str)-> ResponseData<()> {
+pub fn build_fail_response_data(status: i32, message: &str) -> ResponseData<()> {
     ResponseData {
         status,
         message: Some(message.to_string()),
         data: None,
+    }
+}
+
+//---------------------------------------------
+impl Into<Db> for BaseDb {
+    fn into(self) -> Db {
+        Db {
+            id: self.id.to_string(),
+            uuid: self.uuid,
+            op: SYNC_OP_MODIFY,
+            last_update: self.modify_time,
+            capacity: self.capacity,
+        }
+    }
+}
+
+impl Into<Db> for BaseDbDel {
+    fn into(self) -> Db {
+        Db {
+            id: self.origin_id.to_string(),
+            uuid: self.uuid,
+            op: SYNC_OP_DEL,
+            last_update: self.modify_time,
+            capacity: self.capacity,
+        }
     }
 }

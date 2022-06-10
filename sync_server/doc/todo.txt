@@ -6,6 +6,11 @@ rabbitmq，队列定义
 rabbitmq消息消费，日志入库。
 
 
+bind，位置参数和命名参数
+query as
+fix_dt问题
+
+
 【需解决问题】
 删除bea的时候，trigger里面，自动将bea_map也清除掉？
 删除trigger // ok

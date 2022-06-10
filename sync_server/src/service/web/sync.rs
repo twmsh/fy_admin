@@ -15,6 +15,7 @@ fn build_invalid_paras_response(msg: &str) -> ResponseData<()> {
     build_fail_response_data(RES_STATUS_INVALID_PARA, msg)
 }
 
+//--------------------------------------------
 fn check_para_exist(para: &Option<String>) -> bool {
     match para {
         None => false,
@@ -70,6 +71,10 @@ pub async fn get_db_update(
         paras.last_update.unwrap().as_str(), DATETIME_FMT_LONG).unwrap();
 
     debug!("last_update: {}",last_update);
+
+    let limit = state.ctx.cfg.sync_batch;
+    let db_update = state.ctx.dao.get_db_list(last_update,limit).await?;
+
 
     Ok(ResponseData {
         status: 0,

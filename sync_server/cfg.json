@@ -17,6 +17,7 @@
     "min_conn": 4,
     "idle": 600
   },
+  "sync_batch": 100,
   "http": {
     "addr": "0.0.0.0:8090",
     "max_conn": 1000

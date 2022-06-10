@@ -46,6 +46,7 @@ pub struct AppCfg {
     pub version: AppCfgVersion,
     pub log: AppCfgLog,
     pub db: AppCfgDb,
+    pub sync_batch: u32,
     pub http: AppCfgHttp,
     pub rabbitmq: AppCfgRabbitMq,
 }
