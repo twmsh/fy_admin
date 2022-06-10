@@ -66,3 +66,4 @@ impl From<String> for AppError {
         }
     }
 }
+

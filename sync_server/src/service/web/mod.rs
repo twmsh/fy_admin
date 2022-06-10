@@ -13,8 +13,12 @@ use tower_http::add_extension::AddExtensionLayer;
 use tower_http::trace::TraceLayer;
 use tracing::{error, info};
 use crate::app_ctx::AppCtx;
+use crate::service::web::sync::get_db_update;
 use crate::util::axum_log::access_log;
 use crate::util::service::Service;
+
+pub mod sync;
+pub mod model;
 
 pub struct WebState {
     pub ctx: Arc<AppCtx>,
@@ -39,7 +43,7 @@ impl WebService {
         });
 
         Router::new()
-            .route("/", get(index))
+            .route("/db_sync", get(get_db_update))
             .layer(
                 ServiceBuilder::new()
                     // 限制请求的并发数量

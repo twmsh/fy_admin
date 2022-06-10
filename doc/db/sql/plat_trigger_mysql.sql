@@ -37,4 +37,7 @@ BEGIN
   INSERT INTO base_fea_del(origin_id,uuid,db_uuid,create_time,modify_time)
   VALUES(OLD.id, OLD.uuid,OLD.db_uuid,OLD.create_time,now(3));
 
+  DELETE FROM base_fea_map WHERE uuid =  OLD.uuid;
+
+
 END;
