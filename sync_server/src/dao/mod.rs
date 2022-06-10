@@ -3,7 +3,7 @@ use std::sync::Arc;
 use chrono::{DateTime, FixedOffset, Local};
 
 use sqlx::{MySql, Pool};
-use crate::dao::base_model::{BaseDb, BaseDbDel};
+use crate::dao::base_model::{BaseCamera, BaseCameraDel, BaseDb, BaseDbDel};
 use crate::error::AppError;
 use crate::util::mysql_util;
 
@@ -28,7 +28,7 @@ impl Dao {
             .bind(last_update)
             .bind(limit)
             .fetch_all(self.pool.deref()).await?;
-        ;
+
         for v in list.iter_mut() {
             mysql_util::fix_read_dt(&mut v.modify_time, &self.tz);
         }
@@ -45,7 +45,7 @@ impl Dao {
             .bind(last_update)
             .bind(limit)
             .fetch_all(self.pool.deref()).await?;
-        ;
+
         for v in list.iter_mut() {
             mysql_util::fix_read_dt(&mut v.modify_time, &self.tz);
         }
@@ -53,5 +53,39 @@ impl Dao {
         Ok(list)
     }
 
+    //------------------------------------------------
+    pub async fn get_camera_list(&self, last_update: DateTime<Local>, limit: u32)
+                             -> Result<Vec<BaseCamera>, AppError> {
+        let sql = "select * from base_camera where modify_time > ? order by modify_time asc limit ?";
+        let last_update = mysql_util::fix_write_dt(&last_update, &self.tz);
+
+        let mut list = sqlx::query_as::<_, BaseCamera>(sql)
+            .bind(last_update)
+            .bind(limit)
+            .fetch_all(self.pool.deref()).await?;
+
+        for v in list.iter_mut() {
+            mysql_util::fix_read_dt(&mut v.modify_time, &self.tz);
+        }
+
+        Ok(list)
+    }
+
+    pub async fn get_cameradel_list(&self, last_update: DateTime<Local>, limit: u32)
+                                -> Result<Vec<BaseCameraDel>, AppError> {
+        let sql = "select * from base_camera_del where modify_time > ? order by modify_time asc limit ?";
+        let last_update = mysql_util::fix_write_dt(&last_update, &self.tz);
+
+        let mut list = sqlx::query_as::<_, BaseCameraDel>(sql)
+            .bind(last_update)
+            .bind(limit)
+            .fetch_all(self.pool.deref()).await?;
+
+        for v in list.iter_mut() {
+            mysql_util::fix_read_dt(&mut v.modify_time, &self.tz);
+        }
+
+        Ok(list)
+    }
 }
 
