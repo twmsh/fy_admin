@@ -3,6 +3,7 @@ use axum::Json;
 use axum::response::{IntoResponse, Response};
 use crate::util::time_format::long_ts_format;
 use chrono::prelude::*;
+use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
 use crate::dao::base_model::{BaseCamera, BaseCameraDel, BaseDb, BaseDbDel, BaseFeaDel};
 use crate::error::AppError;
@@ -22,7 +23,7 @@ pub const RES_STATUS_BIZ_ERR: i32 = 2;
 pub struct PersonInfoFace {
     //base64
     pub fea: String,
-    pub quality: f64,
+    pub quality: rust_decimal::Decimal,
     //base64
     pub id: String, // face num
 }
@@ -126,7 +127,7 @@ pub struct BaseFeaMapRow {
     pub uuid: String,
     pub face_id: String,
     pub feature: String,
-    pub quality: f64,
+    pub quality: Decimal,
     pub modify_time: DateTime<Local>,
 }
 
@@ -137,6 +138,9 @@ pub struct BaseFeaMapRow {
 pub struct ResponseData<T> {
     pub status: i32,
     pub message: Option<String>,
+
+    #[serde(with = "long_ts_format")]
+    pub ts: DateTime<Local>,
 
     #[serde(bound(serialize = "T: Serialize", deserialize = "T: Deserialize<'de>"))]
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -157,6 +161,7 @@ impl From<AppError> for ResponseData<()> {
         ResponseData {
             status: RES_STATUS_ERROR,
             message: Some(e.msg),
+            ts: Local::now(),
             data: None,
         }
     }
@@ -190,6 +195,7 @@ pub fn build_fail_response_data(status: i32, message: &str) -> ResponseData<()> 
     ResponseData {
         status,
         message: Some(message.to_string()),
+        ts: Local::now(),
         data: None,
     }
 }
@@ -294,6 +300,7 @@ pub fn get_personinfo_from_map(rows: Vec<BaseFeaMapRow>) -> Vec<Person> {
                     detail: None
                 };
                 person_new.add_face(face);
+                map.insert(v.uuid.clone(),person_new);
             }
             Some(vv) => {
                 // 已经存在

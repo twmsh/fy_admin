@@ -1,4 +1,5 @@
 use std::net::SocketAddr;
+use std::time::Instant;
 
 use axum::body::HttpBody;
 use axum::extract::ConnectInfo;
@@ -10,7 +11,7 @@ use chrono::Local;
 
 use hyper::HeaderMap;
 
-fn get_header_value(headers:  &HeaderMap<HeaderValue>, name: HeaderName) -> String {
+fn get_header_value(headers: &HeaderMap<HeaderValue>, name: HeaderName) -> String {
     match headers.get(name) {
         None => { "-".to_string() }
         Some(v) => {
@@ -40,8 +41,8 @@ pub async fn access_log<B>(req: Request<B>, next: Next<B>, f: fn(String))
     let method = req.method().clone();
     let uri = req.uri().clone();
     let version = req.version();
-    let ua =get_header_value(req.headers(),USER_AGENT);
-    let refer =get_header_value(req.headers(),REFERER);
+    let ua = get_header_value(req.headers(), USER_AGENT);
+    let refer = get_header_value(req.headers(), REFERER);
 
     let res = next.run(req).await;
 
@@ -56,3 +57,11 @@ pub async fn access_log<B>(req: Request<B>, next: Next<B>, f: fn(String))
 }
 
 
+pub async fn time_use<B>(req: Request<B>, next: Next<B>)
+                         -> impl IntoResponse {
+    let ts = Instant::now();
+    let mut res = next.run(req).await;
+    let used = ts.elapsed().as_millis().to_string();
+    res.headers_mut().insert("x-fy-use", HeaderValue::from_str(used.as_str()).unwrap());
+    res
+}

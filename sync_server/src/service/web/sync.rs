@@ -1,21 +1,24 @@
-
-use crate::service::web::model::{build_fail_response_data, Camera, Db, PersonInfo, ResponseData, RES_STATUS_BIZ_ERR, RES_STATUS_INVALID_PARA, get_personinfo_from_map, Person};
+use crate::service::web::model::{
+    build_fail_response_data, get_personinfo_from_map, Camera, Db, Person, ResponseData,
+    RES_STATUS_BIZ_ERR, RES_STATUS_INVALID_PARA,
+};
 use crate::service::web::WebState;
 use crate::util::utils;
 use crate::util::utils::DATETIME_FMT_LONG;
 use axum::extract::Query;
 
 use axum::Extension;
-use chrono::NaiveDateTime;
-use serde::{Deserialize};
+use chrono::{Local, NaiveDateTime};
+use serde::Deserialize;
 
 use std::sync::Arc;
-use tracing::debug;
+use tracing::{debug, error};
 
 fn build_success_response<T>(list: Vec<T>) -> ResponseData<T> {
     ResponseData {
         status: 0,
         message: Some("success".to_string()),
+        ts: Local::now(),
         data: Some(list),
     }
 }
@@ -84,7 +87,13 @@ pub async fn get_db_update(
         utils::parse_localtime_str(paras.last_update.unwrap().as_str(), DATETIME_FMT_LONG).unwrap();
 
     // 检查 box，是否需要同步 db
-    let base_box = state.ctx.dao.find_box(device_id.clone()).await?;
+    let base_box = match state.ctx.dao.find_box(device_id.clone()).await {
+        Ok(v) => v,
+        Err(e) => {
+            error!("error, find_box({}), err: {:?}", device_id, e);
+            return Err(e.into());
+        }
+    };
     match base_box {
         None => {
             // 不在硬件表中
@@ -101,8 +110,20 @@ pub async fn get_db_update(
     debug!("last_update: {}", last_update);
 
     let limit = state.ctx.cfg.sync_batch;
-    let db_update = state.ctx.dao.get_db_list(last_update, limit).await?;
-    let db_del_update = state.ctx.dao.get_dbdel_list(last_update, limit).await?;
+    let db_update = match state.ctx.dao.get_db_list(last_update, limit).await {
+        Ok(v) => v,
+        Err(e) => {
+            error!("error, get_db_list({}), err: {:?}", device_id, e);
+            return Err(e.into());
+        }
+    };
+    let db_del_update = match state.ctx.dao.get_dbdel_list(last_update, limit).await {
+        Ok(v) => v,
+        Err(e) => {
+            error!("error, get_dbdel_list({}), err: {:?}", device_id, e);
+            return Err(e.into());
+        }
+    };
 
     // 合并 db和 db_del的记录
     let mut list: Vec<Db> = vec![];
@@ -144,7 +165,7 @@ fn check_personupdate_paras(paras: &PersonUpdateParas) -> Result<(), ResponseDat
 pub async fn get_person_update(
     Extension(state): Extension<Arc<WebState>>,
     Query(paras): Query<PersonUpdateParas>,
-) -> Result<ResponseData<PersonInfo>, ResponseData<()>> {
+) -> Result<ResponseData<Person>, ResponseData<()>> {
     debug!("get_person_update, paras: {:?}", paras);
 
     // 检查参数
@@ -157,7 +178,13 @@ pub async fn get_person_update(
     debug!("last_update: {}", last_update);
 
     // 检查 box，是否需要同步 person
-    let base_box = state.ctx.dao.find_box(device_id.clone()).await?;
+    let base_box = match state.ctx.dao.find_box(device_id.clone()).await {
+        Ok(v) => v,
+        Err(e) => {
+            error!("error, find_box({}), err: {:?}", device_id, e);
+            return Err(e.into());
+        }
+    };
     match base_box {
         None => {
             // 不在硬件表中
@@ -172,20 +199,28 @@ pub async fn get_person_update(
     };
 
     let limit = state.ctx.cfg.sync_batch;
-    let list_update = state
-        .ctx
-        .dao
-        .get_feamap_row_list(last_update,  limit)
-        .await?;
+    let list_update = match state.ctx.dao.get_feamap_row_list(last_update, limit).await {
+        Ok(v) => v,
+        Err(e) => {
+            error!("error, get_feamap_row_list({}), err: {:?}", last_update, e);
+            return Err(e.into());
+        }
+    };
+
+    debug!("list_update: {:?}", list_update);
 
     // 从fea_map 转成 Person
     let mut list_update = get_personinfo_from_map(list_update);
+    debug!("list_update: {:?}", list_update);
 
-    let list_del_update = state
-        .ctx
-        .dao
-        .get_feadel_list(last_update, limit)
-        .await?;
+    let list_del_update = match state.ctx.dao.get_feadel_list(last_update, limit).await {
+        Ok(v) => v,
+        Err(e) => {
+            error!("error, get_feadel_list({}), err: {:?}", last_update, e);
+            return Err(e.into());
+        }
+    };
+    debug!("list_del_update: {:?}", list_del_update);
 
     // 合并 db和 db_del的记录
     let mut list: Vec<Person> = vec![];
@@ -202,11 +237,7 @@ pub async fn get_person_update(
     // 取前N条记录
     list.truncate(limit as usize);
 
-    Ok(ResponseData {
-        status: 0,
-        message: Some("success".to_string()),
-        data: Some(vec![]),
-    })
+    Ok(build_success_response(list))
 }
 
 //----------------------------- camera sync  --------------------------------------
@@ -243,7 +274,13 @@ pub async fn get_camera_update(
     debug!("last_update: {}", last_update);
 
     // 检查 box，是否需要同步 camera
-    let base_box = state.ctx.dao.find_box(device_id.clone()).await?;
+    let base_box = match state.ctx.dao.find_box(device_id.clone()).await {
+        Ok(v) => v,
+        Err(e) => {
+            error!("error, find_box({}), err: {:?}", device_id, e);
+            return Err(e.into());
+        }
+    };
     match base_box {
         None => {
             // 不在硬件表中
@@ -258,16 +295,30 @@ pub async fn get_camera_update(
     };
 
     let limit = state.ctx.cfg.sync_batch;
-    let list_update = state
+    let list_update = match state
         .ctx
         .dao
         .get_camera_list(last_update, &device_id, limit)
-        .await?;
-    let list_del_update = state
+        .await
+    {
+        Ok(v) => v,
+        Err(e) => {
+            error!("error, get_camera_list({}), err: {:?}", device_id, e);
+            return Err(e.into());
+        }
+    };
+    let list_del_update = match state
         .ctx
         .dao
         .get_cameradel_list(last_update, &device_id, limit)
-        .await?;
+        .await
+    {
+        Ok(v) => v,
+        Err(e) => {
+            error!("error, get_cameradel_list({}), err: {:?}", device_id, e);
+            return Err(e.into());
+        }
+    };
 
     // 合并 db和 db_del的记录
     let mut list: Vec<Camera> = vec![];
@@ -285,9 +336,5 @@ pub async fn get_camera_update(
     list.truncate(limit as usize);
 
     // 返回值
-    Ok(ResponseData {
-        status: 0,
-        message: Some("success".to_string()),
-        data: Some(list),
-    })
+    Ok(build_success_response(list))
 }

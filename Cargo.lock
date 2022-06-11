@@ -104,6 +104,12 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c5d78ce20460b82d3fa150275ed9d55e21064fc7951177baacf86a145c4a4b1f"
 
 [[package]]
+name = "arrayvec"
+version = "0.7.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "8da52d66c7071e2e3fa2a1e5c6d088fec47b593032b254f5e980de8ea54454d6"
+
+[[package]]
 name = "async-channel"
 version = "1.6.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1902,6 +1908,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "rust_decimal"
+version = "1.24.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e2ee7337df68898256ad0d4af4aad178210d9e44d2ff900ce44064a97cd86530"
+dependencies = [
+ "arrayvec",
+ "num-traits",
+ "serde",
+]
+
+[[package]]
 name = "rustls"
 version = "0.20.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2212,6 +2229,7 @@ dependencies = [
  "percent-encoding",
  "rand",
  "rsa",
+ "rust_decimal",
  "sha-1",
  "sha2",
  "smallvec",
@@ -2305,6 +2323,7 @@ dependencies = [
  "mysql_codegen",
  "openssl",
  "pnet",
+ "rust_decimal",
  "serde",
  "serde_json",
  "sqlx",

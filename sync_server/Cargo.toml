@@ -31,9 +31,12 @@ deadqueue = "0.2"
 build-time = "0.1.1"
 
 #mysql = "22.1"
-sqlx = { version = "0.5", features = ["runtime-tokio-native-tls", "mysql", "chrono"] }
+sqlx = { version = "0.5", features = ["runtime-tokio-native-tls", "mysql", "chrono","decimal"] }
 
 url = "2.2.2"
+
+rust_decimal = "1.24"
+#rust_decimal_macros = "1.24"
 
 ## common
 chrono = { version = "0.4", features = ["serde"] }

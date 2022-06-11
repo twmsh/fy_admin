@@ -5,6 +5,7 @@ api接口实现
 rabbitmq，队列定义
 rabbitmq消息消费，日志入库。
 
+service用时记录
 ?错误抛出时候，log记录的问题
 
 bind，位置参数和命名参数
