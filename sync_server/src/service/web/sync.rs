@@ -1,4 +1,5 @@
-use crate::service::web::model::{build_fail_response_data, Db, ResponseData, RES_STATUS_INVALID_PARA, PersonInfo, Camera};
+use std::fmt::format;
+use crate::service::web::model::{build_fail_response_data, Db, ResponseData, RES_STATUS_INVALID_PARA, PersonInfo, Camera, RES_STATUS_BIZ_ERR};
 use crate::service::web::WebState;
 use crate::util::utils::DATETIME_FMT_LONG;
 use axum::extract::Query;
@@ -8,12 +9,26 @@ use chrono::NaiveDateTime;
 use serde::{Deserialize, Serialize};
 use std::sync::Arc;
 use tracing::debug;
+use crate::dao::base_model::BaseBox;
 use crate::util::utils;
 
+
+fn build_success_response<T>(list: Vec<T>) -> ResponseData<T> {
+    ResponseData{
+        status: 0,
+        message: Some("success".to_string()),
+        data: Some(list)
+    }
+}
 
 fn build_invalid_paras_response(msg: &str) -> ResponseData<()> {
     build_fail_response_data(RES_STATUS_INVALID_PARA, msg)
 }
+
+fn build_device_notfound_response(hw_id: &str) -> ResponseData<()> {
+    build_fail_response_data(RES_STATUS_BIZ_ERR, &format!("box:{} not found",hw_id))
+}
+
 
 //--------------------------------------------
 fn check_para_exist(para: &Option<String>) -> bool {
@@ -70,6 +85,22 @@ pub async fn get_db_update(
     let last_update = utils::parse_localtime_str(
         paras.last_update.unwrap().as_str(), DATETIME_FMT_LONG).unwrap();
 
+
+    // 检查 box，是否需要同步 db
+    let base_box = state.ctx.dao.find_box(device_id.clone()).await?;
+    match base_box {
+        None => {
+            // 不在硬件表中
+            return Err(build_device_notfound_response(device_id.as_str()));
+        }
+        Some(ref v) => {
+            // 不需要同步
+            if v.has_db == 0 {
+                return Ok(build_success_response(vec![]));
+            }
+        }
+    };
+
     debug!("last_update: {}",last_update);
 
     let limit = state.ctx.cfg.sync_batch;
@@ -94,11 +125,7 @@ pub async fn get_db_update(
     list.truncate(limit as usize);
 
     // 返回值
-    Ok(ResponseData {
-        status: 0,
-        message: Some("success".to_string()),
-        data: Some(list),
-    })
+    Ok(build_success_response(list))
 }
 
 //----------------------------- person sync  --------------------------------------
@@ -133,6 +160,21 @@ pub async fn get_person_update(
         paras.last_update.unwrap().as_str(), DATETIME_FMT_LONG).unwrap();
 
     debug!("last_update: {}",last_update);
+
+    // 检查 box，是否需要同步 person
+    let base_box = state.ctx.dao.find_box(device_id.clone()).await?;
+    match base_box {
+        None => {
+            // 不在硬件表中
+            return Err(build_device_notfound_response(device_id.as_str()));
+        }
+        Some(ref v) => {
+            // 不需要同步 person
+            if v.has_db == 0 {
+                return Ok(build_success_response(vec![]));
+            }
+        }
+    };
 
     Ok(ResponseData {
         status: 0,
@@ -174,6 +216,22 @@ pub async fn get_camera_update(
         paras.last_update.unwrap().as_str(), DATETIME_FMT_LONG).unwrap();
 
     debug!("last_update: {}",last_update);
+
+    // 检查 box，是否需要同步 camera
+    let base_box = state.ctx.dao.find_box(device_id.clone()).await?;
+    match base_box {
+        None => {
+            // 不在硬件表中
+            return Err(build_device_notfound_response(device_id.as_str()));
+        }
+        Some(ref v) => {
+            // 不需要同步camera
+            if v.has_camera == 0 {
+                return Ok(build_success_response(vec![]));
+            }
+        }
+    };
+
 
     let limit = state.ctx.cfg.sync_batch;
     let list_update = state.ctx.dao.get_camera_list(last_update,limit).await?;

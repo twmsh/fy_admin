@@ -14,6 +14,8 @@ pub const SYNC_OP_DEL: i8 = 2;
 pub const RES_STATUS_OK: i32 = 0;
 pub const RES_STATUS_ERROR: i32 = 500;
 pub const RES_STATUS_INVALID_PARA: i32 = 1;
+pub const RES_STATUS_BIZ_ERR: i32 = 2;
+
 
 
 #[derive(Serialize, Deserialize, Debug)]
