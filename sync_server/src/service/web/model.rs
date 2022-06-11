@@ -171,58 +171,58 @@ pub fn build_fail_response_data(status: i32, message: &str) -> ResponseData<()> 
 }
 
 //---------------------------------------------
-impl Into<Db> for BaseDb {
-    fn into(self) -> Db {
+impl From<BaseDb> for Db {
+    fn from(obj: BaseDb) -> Db {
         Db {
-            id: self.id.to_string(),
-            uuid: self.uuid,
+            id: obj.id.to_string(),
+            uuid: obj.uuid,
             op: SYNC_OP_MODIFY,
-            last_update: self.modify_time,
-            capacity: self.capacity,
+            last_update: obj.modify_time,
+            capacity: obj.capacity,
         }
     }
 }
 
-impl Into<Db> for BaseDbDel {
-    fn into(self) -> Db {
+impl From<BaseDbDel> for Db {
+    fn from(obj: BaseDbDel) -> Db {
         Db {
-            id: self.origin_id.to_string(),
-            uuid: self.uuid,
+            id: obj.origin_id.to_string(),
+            uuid: obj.uuid,
             op: SYNC_OP_DEL,
-            last_update: self.modify_time,
-            capacity: self.capacity,
+            last_update: obj.modify_time,
+            capacity: obj.capacity,
         }
     }
 }
 
 
-impl Into<Camera> for BaseCamera {
-    fn into(self) -> Camera {
+impl From<BaseCamera> for Camera {
+    fn from(obj: BaseCamera) -> Camera {
         Camera {
-            id: self.id.to_string(),
-            uuid: self.uuid.clone(),
+            id: obj.id.to_string(),
+            uuid: obj.uuid.clone(),
             op: SYNC_OP_MODIFY,
-            last_update: self.modify_time,
-            c_type: self.c_type as i64,
+            last_update: obj.modify_time,
+            c_type: obj.c_type as i64,
 
             detail: Some(CameraInfo {
-                uuid: self.uuid,
-                url: self.url,
-                config: self.config,
+                uuid: obj.uuid,
+                url: obj.url,
+                config: obj.config,
             }),
         }
     }
 }
 
 
-impl Into<Camera> for BaseCameraDel {
-    fn into(self) -> Camera {
+impl From<BaseCameraDel> for Camera {
+    fn from(obj:BaseCameraDel) -> Camera {
         Camera {
-            id: self.origin_id.to_string(),
-            uuid: self.uuid.clone(),
+            id: obj.origin_id.to_string(),
+            uuid: obj.uuid.clone(),
             op: SYNC_OP_DEL,
-            last_update: self.modify_time,
-            c_type: self.c_type as i64,
+            last_update: obj.modify_time,
+            c_type: obj.c_type as i64,
 
             detail: None,
         }
@@ -232,14 +232,14 @@ impl Into<Camera> for BaseCameraDel {
 //----------------------------
 
 
-impl Into<Person> for BaseFeaDel {
-    fn into(self) -> Person {
+impl From<BaseFeaDel> for Person {
+    fn from(obj: BaseFeaDel) -> Person {
         Person {
-            id: self.origin_id.to_string(),
-            uuid: self.uuid,
-            db_id: self.db_uuid,
+            id: obj.origin_id.to_string(),
+            uuid: obj.uuid,
+            db_id: obj.db_uuid,
             op: SYNC_OP_DEL,
-            last_update: self.modify_time,
+            last_update: obj.modify_time,
 
             detail: None,
         }
