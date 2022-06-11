@@ -1,6 +1,6 @@
 use std::net::{AddrParseError, SocketAddr};
 use std::sync::Arc;
-use axum::{Extension, middleware, Router, Server};
+use axum::{middleware, Router, Server};
 use axum::routing::get;
 use hyper::server::Builder;
 use hyper::server::conn::AddrIncoming;
@@ -121,15 +121,3 @@ impl Service for WebService {
         tokio::spawn(self.run(server, exit_rx))
     }
 }
-
-//-------------------
-async fn index(Extension(state): Extension<Arc<WebState>>) -> String {
-    println!("{:?}", state.ctx.cfg);
-
-    let conn = state.ctx.dao.pool.acquire().await;
-    println!("conn: {:?}", conn);
-
-    "hello".to_string()
-}
-
-

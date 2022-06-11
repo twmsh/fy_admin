@@ -3,7 +3,7 @@ use axum::response::{IntoResponse, Response};
 use crate::util::time_format::long_ts_format;
 use chrono::prelude::*;
 use serde::{Deserialize, Serialize};
-use crate::dao::base_model::{BaseCamera, BaseCameraDel, BaseDb, BaseDbDel, BaseFea, BaseFeaDel};
+use crate::dao::base_model::{BaseCamera, BaseCameraDel, BaseDb, BaseDbDel, BaseFeaDel};
 use crate::error::AppError;
 
 //----------------------------------
@@ -94,6 +94,16 @@ pub struct Db {
 
     pub capacity: i32,
 
+}
+
+//----------------------------------
+#[derive(sqlx::FromRow,  Serialize, Deserialize, Debug, Clone)]
+pub struct BaseFeaMapRow {
+    pub id: i64,
+    pub uuid: String,
+    pub face_id: String,
+    pub fea: String,
+    pub modify_time: DateTime<Local>,
 }
 
 
@@ -234,4 +244,9 @@ impl Into<Person> for BaseFeaDel {
             detail: None,
         }
     }
+}
+
+//----------------------------------
+pub fn get_personinfo_from_map(_row: Vec<BaseFeaMapRow>) -> Vec<Person> {
+    vec![]
 }
