@@ -3,7 +3,7 @@ use axum::Json;
 use axum::response::{IntoResponse, Response};
 use crate::util::time_format::long_ts_format;
 use chrono::prelude::*;
-use rust_decimal::Decimal;
+
 use serde::{Deserialize, Serialize};
 use crate::dao::base_model::{BaseCamera, BaseCameraDel, BaseDb, BaseDbDel, BaseFeaDel};
 use crate::error::AppError;
@@ -23,7 +23,7 @@ pub const RES_STATUS_BIZ_ERR: i32 = 2;
 pub struct PersonInfoFace {
     //base64
     pub fea: String,
-    pub quality: rust_decimal::Decimal,
+    pub quality: f32,
     //base64
     pub id: String, // face num
 }
@@ -33,7 +33,8 @@ pub struct PersonInfo {
     pub uuid: String,
     pub db_id: String,
 
-    //base64 是否需要
+    //base64 是否需要?
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub aggregate: Option<String>,
     pub faces: Vec<PersonInfoFace>,
 }
@@ -127,7 +128,7 @@ pub struct BaseFeaMapRow {
     pub uuid: String,
     pub face_id: String,
     pub feature: String,
-    pub quality: Decimal,
+    pub quality: f32,
     pub modify_time: DateTime<Local>,
 }
 

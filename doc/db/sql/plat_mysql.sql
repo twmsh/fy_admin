@@ -160,7 +160,7 @@ CREATE TABLE base_fea_map(
     uuid VARCHAR(50) NOT NULL   COMMENT 'uuid' ,
     face_id VARCHAR(10) NOT NULL   COMMENT '图片编号;调试用，用来对应person的人脸编号' ,
     feature TEXT NOT NULL   COMMENT '特征值' ,
-    quality DECIMAL(6,3) NOT NULL   COMMENT '图片质量' ,
+    quality FLOAT(6,3) NOT NULL   COMMENT '图片质量' ,
     create_time DATETIME(3) NOT NULL   COMMENT '创建时间' ,
     modify_time DATETIME(3) NOT NULL   COMMENT '更新时间' ,
     PRIMARY KEY (id)

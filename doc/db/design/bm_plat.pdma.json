@@ -4,7 +4,7 @@
   "avatar": "",
   "version": "4.1.1",
   "createdTime": "2022-5-20 20:11:51",
-  "updatedTime": "2022-6-11 07:00:24",
+  "updatedTime": "2022-6-11 22:49:43",
   "dbConns": [],
   "profile": {
     "default": {
@@ -2967,7 +2967,7 @@
           "defName": "图片质量",
           "comment": "",
           "domain": "",
-          "type": "DECIMAL",
+          "type": "FLOAT",
           "len": 6,
           "scale": 3,
           "primaryKey": false,

@@ -240,7 +240,7 @@ pub struct BaseFeaMap {
     pub feature: String,
 
     /* 图片质量 */
-    pub quality: rust_decimal::Decimal,
+    pub quality: f64,
 
     /* 创建时间 */
     pub create_time: DateTime<Local>,

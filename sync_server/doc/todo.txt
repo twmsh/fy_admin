@@ -5,12 +5,19 @@ api接口实现
 rabbitmq，队列定义
 rabbitmq消息消费，日志入库。
 
+
+mysql float 是几字节存储？ 用 rust f64 会崩掉
+
 service用时记录
 ?错误抛出时候，log记录的问题
 
 bind，位置参数和命名参数
 query as
 fix_dt问题
+
+[约束]
+fea主表里面有的记录，fea_map应该有对应的数据，不然在limit比较小的时候，person_sync取不到数据
+因为sql查询时候，用的左连接+右边不为空
 
 
 【需解决问题】
