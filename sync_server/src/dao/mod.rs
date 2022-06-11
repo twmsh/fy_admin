@@ -188,7 +188,7 @@ impl Dao {
         ORDER BY a.modify_time, a.uuid
                  */
 
-        let sql = r#"select a.id, a.uuid,a.modify_time, b.face_id,b.feature from (
+        let sql = r#"select a.id,a.db_uuid,a.uuid,b.face_id,b.feature,b.quality,a.modify_time from (
 	select * from base_fea where modify_time > ?
 	ORDER BY modify_time asc limit ?
     ) a  LEFT JOIN base_fea_map b on a.uuid = b.uuid where b.id is NOT NULL

@@ -1,3 +1,4 @@
+use std::collections::HashMap;
 use axum::Json;
 use axum::response::{IntoResponse, Response};
 use crate::util::time_format::long_ts_format;
@@ -17,12 +18,13 @@ pub const RES_STATUS_INVALID_PARA: i32 = 1;
 pub const RES_STATUS_BIZ_ERR: i32 = 2;
 
 
-
 #[derive(Serialize, Deserialize, Debug)]
 pub struct PersonInfoFace {
     //base64
     pub fea: String,
-    pub quality: f64, //base64
+    pub quality: f64,
+    //base64
+    pub id: String, // face num
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -48,6 +50,26 @@ pub struct Person {
     pub last_update: DateTime<Local>,
 
     pub detail: Option<PersonInfo>,
+}
+
+impl Person {
+
+    pub fn add_face(&mut self, face: PersonInfoFace)  {
+        match self.detail {
+            None => {
+                let info = PersonInfo{
+                    uuid: self.uuid.clone(),
+                    db_id: self.db_id.clone(),
+                    aggregate: None,
+                    faces: vec![face],
+                };
+                self.detail = Some(info);
+            }
+            Some(ref mut v) => {
+                v.faces.push(face);
+            }
+        }
+    }
 }
 
 //----------------------------------
@@ -97,12 +119,14 @@ pub struct Db {
 }
 
 //----------------------------------
-#[derive(sqlx::FromRow,  Serialize, Deserialize, Debug, Clone)]
+#[derive(sqlx::FromRow, Serialize, Deserialize, Debug, Clone)]
 pub struct BaseFeaMapRow {
     pub id: i64,
+    pub db_uuid: String,
     pub uuid: String,
     pub face_id: String,
-    pub fea: String,
+    pub feature: String,
+    pub quality: f64,
     pub modify_time: DateTime<Local>,
 }
 
@@ -216,7 +240,7 @@ impl From<BaseCamera> for Camera {
 
 
 impl From<BaseCameraDel> for Camera {
-    fn from(obj:BaseCameraDel) -> Camera {
+    fn from(obj: BaseCameraDel) -> Camera {
         Camera {
             id: obj.origin_id.to_string(),
             uuid: obj.uuid.clone(),
@@ -247,6 +271,36 @@ impl From<BaseFeaDel> for Person {
 }
 
 //----------------------------------
-pub fn get_personinfo_from_map(_row: Vec<BaseFeaMapRow>) -> Vec<Person> {
-    vec![]
+// 需要合并多个fea到一个person中
+pub fn get_personinfo_from_map(rows: Vec<BaseFeaMapRow>) -> Vec<Person> {
+    let mut map: HashMap<String, Person> = HashMap::new();
+
+    for v in rows.iter() {
+        let face = PersonInfoFace {
+            fea: v.feature.clone(),
+            quality: v.quality,
+            id: v.face_id.to_string(),
+        };
+        let person = map.get_mut(&v.uuid);
+        match person {
+            None => {
+                // 不存在，new一个
+                let mut person_new = Person{
+                    id: v.id.to_string(),
+                    uuid: v.uuid.clone(),
+                    db_id: v.db_uuid.clone(),
+                    op: SYNC_OP_MODIFY,
+                    last_update: v.modify_time,
+                    detail: None
+                };
+                person_new.add_face(face);
+            }
+            Some(vv) => {
+                // 已经存在
+                vv.add_face(face);
+            }
+        }
+    }
+
+    map.into_values().collect()
 }
