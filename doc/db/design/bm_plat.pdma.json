@@ -4,7 +4,7 @@
   "avatar": "",
   "version": "4.1.1",
   "createdTime": "2022-5-20 20:11:51",
-  "updatedTime": "2022-6-11 22:49:43",
+  "updatedTime": "2022-6-12 16:08:28",
   "dbConns": [],
   "profile": {
     "default": {
@@ -2968,8 +2968,8 @@
           "comment": "",
           "domain": "",
           "type": "FLOAT",
-          "len": 6,
-          "scale": 3,
+          "len": "",
+          "scale": "",
           "primaryKey": false,
           "notNull": true,
           "autoIncrement": false,

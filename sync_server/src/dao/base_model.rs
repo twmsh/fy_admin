@@ -20,13 +20,13 @@ pub struct BaseBox {
     pub hw_id: String,
 
     /* 同步状态开关;0:同步关闭 1:同步开启 */
-    pub sync_flag: i32,
+    pub sync_flag: i16,
 
     /* 是否保存db;0: 不需同步db 1:需要同步db */
-    pub has_db: i32,
+    pub has_db: i16,
 
     /* 是否有摄像头;0: 不需要同步摄像头 1:需要同步摄像头 */
-    pub has_camera: i32,
+    pub has_camera: i16,
 
     /* 最新上线时间 */
     pub latest_online: Option<DateTime<Local>>,
@@ -52,7 +52,7 @@ pub struct BaseBoxLog {
     pub log_type: String,
 
     /* 日志级别;0:debug, 1: info, 2: warn, 3: error */
-    pub log_level: i32,
+    pub log_level: i16,
 
     /* 日志内容 */
     pub log_payload: Option<String>,
@@ -78,7 +78,7 @@ pub struct BaseCamera {
     pub box_hwid: String,
 
     /* 摄像头采集类型 */
-    pub c_type: i32,
+    pub c_type: i16,
 
     /* 采集地址 */
     pub url: String,
@@ -113,7 +113,7 @@ pub struct BaseCameraDel {
     pub box_hwid: String,
 
     /* 摄像头采集类型 */
-    pub c_type: i32,
+    pub c_type: i16,
 
     /* 采集地址 */
     pub url: String,
@@ -240,7 +240,7 @@ pub struct BaseFeaMap {
     pub feature: String,
 
     /* 图片质量 */
-    pub quality: f64,
+    pub quality: f32,
 
     /* 创建时间 */
     pub create_time: DateTime<Local>,
@@ -269,13 +269,13 @@ pub struct Facetrack {
     pub feature_ids: String,
 
     /* 性别 */
-    pub gender: i32,
+    pub gender: i16,
 
     /* 年龄 */
-    pub age: i32,
+    pub age: i16,
 
     /* 眼镜 */
-    pub glasses: i32,
+    pub glasses: i16,
 
     /* TOP-N匹配到的人列表;uuid:score,uuid:score */
     pub most_persons: Option<String>,
