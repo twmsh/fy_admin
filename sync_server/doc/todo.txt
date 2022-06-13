@@ -5,8 +5,25 @@ api接口实现
 rabbitmq，队列定义
 rabbitmq消息消费，日志入库。
 
+//---------------------
+exchange和queue(正式队列)，都设置成持久化(durable=true)
+防止rabbitmq重启后，exchange和queue丢失。
 
-mysql float 是几字节存储？ 用 rust f64 会崩掉
+a) rabbitmq 发送方, 定义exchange(durable=true) + queue（正式队列,durable=true）+ bind
+发送消息时候设置ttl，防止没有接收者时候，队列溢出
+
+b） 防止bind错误，接收方也需要定义exchange，防止发送方没有运行，exchange没有定义。
+b1) rabbitmq 接收方 定义exchange(durable=true) + queue（正式队列,durable=true）+ bind
+接收信息，接收方停掉一短时间后，还可以从queue(正式队列）中读取，防止错过消息
+
+b2) rabbitmq 接收方, 定义exchange + queue（独占队列或auto_delete）+ bind
+这种方式，接收程序，运行bind后，从exchange接收新发的信息，旧的信息收不到，不关心，程序退出后，队列自动删除。
+
+//--------------------
+
+
+mysql float是4字节，double是8字节
+用 rust f64 读取float字段 会崩掉
 
 service用时记录
 ?错误抛出时候，log记录的问题
