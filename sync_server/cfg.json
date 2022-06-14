@@ -24,6 +24,7 @@
   },
   "rabbitmq": {
     "url": "amqp://127.0.0.1:5672/%2f",
-    "queue": "device_log"
+    "queue": "device_log",
+    "exchange": ""
   }
 }

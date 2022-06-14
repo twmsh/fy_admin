@@ -48,6 +48,9 @@ pub struct BaseBoxLog {
     /* 小盒子硬件编号 */
     pub box_hwid: String,
 
+    /* 小盒子ip列表;逗号分隔 */
+    pub box_ips: String,
+
     /* 日志类别 */
     pub log_type: String,
 
@@ -55,7 +58,7 @@ pub struct BaseBoxLog {
     pub log_level: i16,
 
     /* 日志内容 */
-    pub log_payload: Option<String>,
+    pub log_payload: String,
 
     /* 创建时间 */
     pub create_time: DateTime<Local>,

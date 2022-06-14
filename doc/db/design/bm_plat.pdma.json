@@ -4,7 +4,7 @@
   "avatar": "",
   "version": "4.1.1",
   "createdTime": "2022-5-20 20:11:51",
-  "updatedTime": "2022-6-12 16:08:28",
+  "updatedTime": "2022-6-14 11:12:35",
   "dbConns": [],
   "profile": {
     "default": {
@@ -1593,6 +1593,23 @@
           "id": "7BD17285-AD82-4BF8-BE19-8B31E6F021B6"
         },
         {
+          "defKey": "box_ips",
+          "defName": "小盒子ip列表",
+          "comment": "逗号分隔",
+          "type": "",
+          "len": "",
+          "scale": "",
+          "primaryKey": false,
+          "notNull": true,
+          "autoIncrement": false,
+          "defaultValue": "",
+          "hideInGraph": false,
+          "refDict": "",
+          "extProps": {},
+          "domain": "9092C4E0-1A54-4859-ABBB-5B62DBC27573",
+          "id": "A3EBA07D-14C6-4446-A550-FE7999C36A4E"
+        },
+        {
           "defKey": "log_type",
           "defName": "日志类别",
           "comment": "",
@@ -1635,7 +1652,7 @@
           "len": "",
           "scale": "",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "autoIncrement": false,
           "defaultValue": "",
           "hideInGraph": true,

@@ -2306,6 +2306,10 @@ dependencies = [
 ]
 
 [[package]]
+name = "sync_client"
+version = "0.1.0"
+
+[[package]]
 name = "sync_server"
 version = "0.1.0"
 dependencies = [
@@ -2328,6 +2332,8 @@ dependencies = [
  "serde_json",
  "sqlx",
  "tokio",
+ "tokio-executor-trait",
+ "tokio-reactor-trait",
  "tokio-stream",
  "tokio-util",
  "tower",
@@ -2460,6 +2466,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "tokio-executor-trait"
+version = "2.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "4b78630814cbcdf383c949bd8f17c3cfe3142e93b0d5801bdcae4b2a5275db7e"
+dependencies = [
+ "async-trait",
+ "executor-trait",
+ "tokio",
+]
+
+[[package]]
 name = "tokio-macros"
 version = "1.7.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2478,6 +2495,20 @@ checksum = "f7d995660bd2b7f8c1568414c1126076c13fbb725c40112dc0120b78eb9b717b"
 dependencies = [
  "native-tls",
  "tokio",
+]
+
+[[package]]
+name = "tokio-reactor-trait"
+version = "1.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e9481a72f36bd9cbb8d6dd349227c4783e234e4332cfe806225bc929c4b92486"
+dependencies = [
+ "async-trait",
+ "futures-core",
+ "futures-io",
+ "reactor-trait",
+ "tokio",
+ "tokio-stream",
 ]
 
 [[package]]

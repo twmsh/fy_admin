@@ -69,9 +69,10 @@ DROP TABLE IF EXISTS base_box_log;
 CREATE TABLE base_box_log(
     id BIGINT NOT NULL AUTO_INCREMENT  COMMENT 'id' ,
     box_hwid VARCHAR(50) NOT NULL   COMMENT '小盒子硬件编号' ,
+    box_ips VARCHAR(255) NOT NULL   COMMENT '小盒子ip列表;逗号分隔' ,
     log_type VARCHAR(50) NOT NULL   COMMENT '日志类别' ,
     log_level SMALLINT NOT NULL   COMMENT '日志级别;0:debug, 1: info, 2: warn, 3: error' ,
-    log_payload TEXT    COMMENT '日志内容' ,
+    log_payload TEXT NOT NULL   COMMENT '日志内容' ,
     create_time DATETIME(3) NOT NULL   COMMENT '创建时间' ,
     PRIMARY KEY (id)
 )  COMMENT = '小盒子日志';

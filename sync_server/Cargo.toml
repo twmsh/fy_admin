@@ -22,6 +22,8 @@ headers="0.3"
 
 # rabbitmq
 lapin="2.1"
+tokio-executor-trait="2.1"
+tokio-reactor-trait="1.1"
 
 log = "0.4"
 log4rs = "1.1.1"

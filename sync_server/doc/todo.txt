@@ -20,8 +20,10 @@ b2) rabbitmq 接收方, 定义exchange + queue（独占队列或auto_delete）+ 
 这种方式，接收程序，运行bind后，从exchange接收新发的信息，旧的信息收不到，不关心，程序退出后，队列自动删除。
 
 //--------------------
+device.log
 
 
+//--------------------------------
 mysql float是4字节，double是8字节
 用 rust f64 读取float字段 会崩掉
 
