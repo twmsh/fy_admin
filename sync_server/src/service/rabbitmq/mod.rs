@@ -35,7 +35,11 @@ impl RabbitmqService {
     }
 
     fn increate_wait(&mut self) -> u64 {
+        let max = 60 * 3;
         self.wait *= 2;
+        if self.wait > max {
+            self.wait = max;
+        }
         self.wait
     }
 
