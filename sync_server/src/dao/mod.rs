@@ -2,9 +2,7 @@ use chrono::{DateTime, FixedOffset, Local};
 use std::ops::Deref;
 use std::sync::Arc;
 
-use crate::dao::base_model::{
-    BaseBox, BaseCamera, BaseCameraDel, BaseDb, BaseDbDel, BaseFeaDel
-};
+use crate::dao::base_model::{BaseBox, BaseCamera, BaseCameraDel, BaseDb, BaseDbDel, BaseFeaDel};
 use crate::error::AppError;
 use crate::service::web::model::BaseFeaMapRow;
 use crate::util::mysql_util;

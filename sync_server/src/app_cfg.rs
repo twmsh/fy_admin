@@ -1,8 +1,8 @@
-use std::fs;
-use std::path::Path;
-use serde::{Deserialize, Serialize};
 use crate::error::AppResult;
 use crate::util::mysql_util;
+use serde::{Deserialize, Serialize};
+use std::fs;
+use std::path::Path;
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct AppCfgVersion {
@@ -41,7 +41,6 @@ pub struct AppCfgRabbitMq {
     pub exchange: String,
     pub route_key: String,
 }
-
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct AppCfg {

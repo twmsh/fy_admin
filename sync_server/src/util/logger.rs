@@ -117,7 +117,6 @@ pub fn init_console_logger(level_filter: LevelFilter) -> Result<(), InitLoggerEr
 
 //---------------------------------------
 
-
 pub fn init_app_logger_str(
     path: &str,
     app_target: &str,
@@ -150,7 +149,6 @@ pub fn init_app_logger_with_web_str(
     )
 }
 
-
 //--------------------------------------------------------------------------
 pub fn init_app_logger_with_web(
     app_log_path: &str,
@@ -160,9 +158,8 @@ pub fn init_app_logger_with_web(
     web_log_path: &str,
     web_target: &str,
 ) -> Result<(), InitLoggerErr> {
-    let pattern = "{d(%Y/%m/%d %H:%M:%S%.3f)} {l} - {m}{n}";
+    let pattern = "{d(%Y/%m/%d %H:%M:%S%.3f)} {M} {l} - {m}{n}";
     let pattern_web = "{m}{n}";
-
 
     let stdout = ConsoleAppender::builder()
         .target(Target::Stdout)
@@ -197,7 +194,6 @@ pub fn init_app_logger_with_web(
         }
     };
 
-
     let config = Config::builder()
         .appender(Appender::builder().build("stdout", Box::new(stdout)))
         .appender(
@@ -211,7 +207,12 @@ pub fn init_app_logger_with_web(
         // app log, 继承root的logger
         .logger(Logger::builder().build(app_target, app_level))
         // web access log，不需要从root继承 logger
-        .logger(Logger::builder().additive(false).appender("web").build(web_target, app_level))
+        .logger(
+            Logger::builder()
+                .additive(false)
+                .appender("web")
+                .build(web_target, app_level),
+        )
         .build(
             Root::builder()
                 .appenders(vec!["stdout", "stderr", "file"])
@@ -230,7 +231,6 @@ pub fn init_app_logger_with_web(
         Err(_) => Err(InitLoggerErr),
     }
 }
-
 
 //--------------------------------------------------------------------------
 pub fn init_app_logger(
@@ -262,7 +262,6 @@ pub fn init_app_logger(
             return Err(InitLoggerErr);
         }
     };
-
 
     let config = Config::builder()
         .appender(Appender::builder().build("stdout", Box::new(stdout)))

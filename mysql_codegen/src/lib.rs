@@ -7,7 +7,6 @@ use syn::{
     GenericArgument, Lit, LitStr, Meta, MetaNameValue, PathArguments, Result, Type, TypePath,
 };
 
-
 //--------------------------------------
 
 // #[derive(MysqlEntity)]
@@ -53,10 +52,7 @@ fn get_non_pk_fields(st: &DeriveInput) -> syn::Result<Vec<&Field>> {
     let mut normal_fields = Vec::new();
 
     for field in fields.iter() {
-        let is_pk = field
-            .attrs
-            .iter()
-            .any(|f| f.path.is_ident("pk") );
+        let is_pk = field.attrs.iter().any(|f| f.path.is_ident("pk"));
 
         if !is_pk {
             normal_fields.push(field);
@@ -531,8 +527,11 @@ fn generate_update_function(st: &syn::DeriveInput) -> syn::Result<TokenStream2> 
         nonpk_columns.push(column);
     }
 
-    let columns_str = nonpk_columns.iter().map(|f| format!("{} = ?",f))
-                            .collect::<Vec<String>>().join(",");
+    let columns_str = nonpk_columns
+        .iter()
+        .map(|f| format!("{} = ?", f))
+        .collect::<Vec<String>>()
+        .join(",");
     let mut question_marks = "?,".repeat(nonpk_columns.len());
     let _ = question_marks.split_off(question_marks.len() - 1);
     let sql_str = format!(
@@ -583,7 +582,6 @@ fn generate_update_function(st: &syn::DeriveInput) -> syn::Result<TokenStream2> 
     };
     Ok(piece)
 }
-
 
 /*
 fn get_fields_from_derive_input(st: &syn::DeriveInput) -> syn::Result<&StructFields> {

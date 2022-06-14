@@ -14,7 +14,6 @@ pub struct AppCtx {
 
 impl AppCtx {
     pub fn new(app_cfg: AppCfg, exit_rx: Receiver<i64>, dao: Dao) -> Self {
-
         Self {
             cfg: app_cfg,
             exit_rx,
@@ -23,7 +22,6 @@ impl AppCtx {
     }
 
     //------------------
-
 
     //------------------
     pub fn is_exit(&self) -> bool {

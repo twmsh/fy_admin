@@ -23,7 +23,7 @@
     "max_conn": 1000
   },
   "rabbitmq": {
-    "url": "amqp://127.0.0.1:5672/%2f",
+    "url": "amqp://admin:admin123@192.168.1.220:5672/%2f",
     "queue": "device_log_queue",
     "exchange": "device_log_exchange",
     "route_key": "box.log"

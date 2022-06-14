@@ -1,12 +1,12 @@
-use std::collections::HashMap;
-use axum::Json;
-use axum::response::{IntoResponse, Response};
 use crate::util::time_format::long_ts_format;
+use axum::response::{IntoResponse, Response};
+use axum::Json;
 use chrono::prelude::*;
+use std::collections::HashMap;
 
-use serde::{Deserialize, Serialize};
 use crate::dao::base_model::{BaseCamera, BaseCameraDel, BaseDb, BaseDbDel, BaseFeaDel};
 use crate::error::AppError;
+use serde::{Deserialize, Serialize};
 
 //----------------------------------
 
@@ -17,7 +17,6 @@ pub const RES_STATUS_OK: i32 = 0;
 pub const RES_STATUS_ERROR: i32 = 500;
 pub const RES_STATUS_INVALID_PARA: i32 = 1;
 pub const RES_STATUS_BIZ_ERR: i32 = 2;
-
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct PersonInfoFace {
@@ -55,11 +54,10 @@ pub struct Person {
 }
 
 impl Person {
-
-    pub fn add_face(&mut self, face: PersonInfoFace)  {
+    pub fn add_face(&mut self, face: PersonInfoFace) {
         match self.detail {
             None => {
-                let info = PersonInfo{
+                let info = PersonInfo {
                     uuid: self.uuid.clone(),
                     db_id: self.db_id.clone(),
                     aggregate: None,
@@ -117,7 +115,6 @@ pub struct Db {
     pub last_update: DateTime<Local>,
 
     pub capacity: i32,
-
 }
 
 //----------------------------------
@@ -131,7 +128,6 @@ pub struct BaseFeaMapRow {
     pub quality: f32,
     pub modify_time: DateTime<Local>,
 }
-
 
 //----------------------------------
 
@@ -170,7 +166,8 @@ impl From<AppError> for ResponseData<()> {
 
 //-------------------------------
 impl<T> IntoResponse for ResponseData<T>
-    where T: Serialize,
+where
+    T: Serialize,
 {
     fn into_response(self) -> Response {
         Json(self).into_response()
@@ -178,7 +175,6 @@ impl<T> IntoResponse for ResponseData<T>
 }
 
 //-------------------------
-
 
 // impl IntoResponse for AppError
 // {
@@ -226,7 +222,6 @@ impl From<BaseDbDel> for Db {
     }
 }
 
-
 impl From<BaseCamera> for Camera {
     fn from(obj: BaseCamera) -> Camera {
         Camera {
@@ -245,7 +240,6 @@ impl From<BaseCamera> for Camera {
     }
 }
 
-
 impl From<BaseCameraDel> for Camera {
     fn from(obj: BaseCameraDel) -> Camera {
         Camera {
@@ -261,7 +255,6 @@ impl From<BaseCameraDel> for Camera {
 }
 
 //----------------------------
-
 
 impl From<BaseFeaDel> for Person {
     fn from(obj: BaseFeaDel) -> Person {
@@ -292,16 +285,16 @@ pub fn get_personinfo_from_map(rows: Vec<BaseFeaMapRow>) -> Vec<Person> {
         match person {
             None => {
                 // 不存在，new一个
-                let mut person_new = Person{
+                let mut person_new = Person {
                     id: v.id.to_string(),
                     uuid: v.uuid.clone(),
                     db_id: v.db_uuid.clone(),
                     op: SYNC_OP_MODIFY,
                     last_update: v.modify_time,
-                    detail: None
+                    detail: None,
                 };
                 person_new.add_face(face);
-                map.insert(v.uuid.clone(),person_new);
+                map.insert(v.uuid.clone(), person_new);
             }
             Some(vv) => {
                 // 已经存在

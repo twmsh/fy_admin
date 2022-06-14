@@ -1,21 +1,16 @@
-use std::sync::Arc;
 use build_time::build_time_local;
 use clap::{arg, Command};
+use std::sync::Arc;
 use tokio::sync::watch;
 use tracing::{error, info};
 
+use sync_server::service::rabbitmq::RabbitmqService;
 use sync_server::{
     app_cfg::AppCfg,
     app_ctx::AppCtx,
     dao::Dao,
-    util::{
-        logger, mysql_util,
-        service::ServiceRepo,
-    },
-    service::{
-        signal_service::SignalService,
-        web::WebService
-    },
+    service::{signal_service::SignalService, web::WebService},
+    util::{logger, mysql_util, service::ServiceRepo},
 };
 
 const APP_NAME: &str = "sync_broker";
@@ -30,11 +25,17 @@ async fn main() {
     let cli_matches = Command::new(APP_NAME)
         .version(app_ver_text.as_str())
         .about("a server provides sync service for box agent")
-        .arg(arg!(-c --config <config>).required(false).default_value("cfg.json"))
+        .arg(
+            arg!(-c --config <config>)
+                .required(false)
+                .default_value("cfg.json"),
+        )
         .get_matches();
 
     // 读取config参数
-    let config_file = cli_matches.value_of("config").expect("can't find config argument");
+    let config_file = cli_matches
+        .value_of("config")
+        .expect("can't find config argument");
 
     // 加载config文件内容
     println!("read config: {}", config_file);
@@ -66,7 +67,6 @@ async fn main() {
         }
     };
 
-
     // 初始化数据库连接
     let db_pool = match mysql_util::init_mysql_pool(
         app_config.db.url.as_str(),
@@ -76,15 +76,15 @@ async fn main() {
     ) {
         Ok(v) => v,
         Err(e) => {
-            error!("error, connect db, err: {:?}",e);
+            error!("error, connect db, err: {:?}", e);
             return;
         }
     };
 
     let tz = match mysql_util::parse_timezone(app_config.db.tz.as_str()) {
-        Ok(v) =>  v,
+        Ok(v) => v,
         Err(e) => {
-            error!("error, parse_timezone {}, err: {:?}",app_config.db.tz, e);
+            error!("error, parse_timezone {}, err: {:?}", app_config.db.tz, e);
             return;
         }
     };
@@ -96,11 +96,7 @@ async fn main() {
 
     // 初始化 context
     let (exit_tx, exit_rx) = watch::channel(0);
-    let app_context = Arc::new(
-        AppCtx::new(
-            app_config,
-            exit_rx,
-            dao));
+    let app_context = Arc::new(AppCtx::new(app_config, exit_rx, dao));
 
     // 创建服务集
     let mut service_repo = ServiceRepo::new(app_context.clone());
@@ -111,9 +107,13 @@ async fn main() {
     // 初始web服务
     let web_service = WebService::new(app_context.clone());
 
+    // 初始化rabbitmq服务
+    let rabbitmq_service = RabbitmqService::new(app_context.clone());
+
     // 启动服务
     service_repo.start_service(exit_service);
     service_repo.start_service(web_service);
+    service_repo.start_service(rabbitmq_service);
 
     // 等待退出
     service_repo.join().await;

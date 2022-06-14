@@ -3,19 +3,22 @@ use std::time::Duration;
 use tokio::sync::mpsc::{channel, Receiver, Sender};
 use tokio::time::error::Error;
 use tokio_stream::StreamExt;
-use tokio_util::time::{delay_queue::{DelayQueue, Expired}};
+use tokio_util::time::delay_queue::{DelayQueue, Expired};
 
 pub type DSender<T> = Sender<(T, Duration)>;
 pub type DReceiver<T> = Receiver<Result<Expired<T>, Error>>;
 
 pub trait DelayQueueChan<T> {
     fn channel(self) -> (DSender<T>, DReceiver<T>)
-        where T: Send + 'static;
+    where
+        T: Send + 'static;
 }
 
 impl<T> DelayQueueChan<T> for DelayQueue<T> {
     fn channel(self) -> (DSender<T>, DReceiver<T>)
-        where T: Send + 'static {
+    where
+        T: Send + 'static,
+    {
         let (in_tx, mut in_rx) = channel::<(T, Duration)>(64);
         let (out_tx, out_rx) = channel::<Result<Expired<T>, Error>>(64);
         let mut dq = self;

@@ -15,16 +15,13 @@ pub trait SignalProduce {
 
 impl<T: SignalProduce> SignalProduce for Arc<T> {
     fn clone_receiver(&self) -> Receiver<i64> {
-
         self.deref().clone_receiver()
     }
 }
 
-
 pub struct ServiceRepo<T: SignalProduce> {
     pub signaler: T,
     pub handles: Vec<JoinHandle<()>>,
-
 }
 
 impl<T: SignalProduce> ServiceRepo<T> {
@@ -47,4 +44,3 @@ impl<T: SignalProduce> ServiceRepo<T> {
         }
     }
 }
-

@@ -1,19 +1,17 @@
-use tokio::sync::watch::Receiver;
-use tokio::task::JoinHandle;
 use crate::util::service::Service;
 use tokio::sync::watch;
+use tokio::sync::watch::Receiver;
+use tokio::task::JoinHandle;
 
-use log::{debug,info};
+use log::{debug, info};
 
 pub struct SignalService {
-    pub exit_tx : watch::Sender<i64>,
+    pub exit_tx: watch::Sender<i64>,
 }
 
 impl SignalService {
     pub fn new(exit_tx: watch::Sender<i64>) -> Self {
-        Self{
-            exit_tx,
-        }
+        Self { exit_tx }
     }
 }
 
@@ -27,7 +25,6 @@ impl Service for SignalService {
         })
     }
 }
-
 
 #[cfg(unix)]
 pub async fn shutdown_signal() {

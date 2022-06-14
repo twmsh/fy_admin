@@ -1,12 +1,11 @@
-use chrono::LocalResult;
 use chrono::prelude::*;
+use chrono::LocalResult;
 use deadqueue::unlimited::Queue;
 use std::path::Path;
 use url::form_urlencoded;
 
 pub const DATETIME_FMT_SHORT: &str = "%Y-%m-%d %H:%M:%S";
 pub const DATETIME_FMT_LONG: &str = "%Y-%m-%d %H:%M:%S%.3f";
-
 
 pub fn parse_localtime_str(ts: &str, fmt: &str) -> Result<DateTime<Local>, String> {
     let dt = match NaiveDateTime::parse_from_str(ts, fmt) {
@@ -30,7 +29,8 @@ pub fn file_exists<P: AsRef<Path>>(path: P) -> bool {
 
 pub fn add_url_query(url: &str, name: &str, value: &str) -> String {
     let query = form_urlencoded::Serializer::new(String::new())
-        .append_pair(name, value).finish();
+        .append_pair(name, value)
+        .finish();
 
     if !url.contains('?') {
         return format!("{}?{}", url, query);
