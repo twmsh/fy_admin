@@ -7,3 +7,4 @@ pub mod utils;
 pub mod time_format;
 
 pub mod logger;
+pub mod rabbitmq;

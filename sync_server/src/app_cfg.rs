@@ -38,6 +38,8 @@ pub struct AppCfgHttp {
 pub struct AppCfgRabbitMq {
     pub url: String,
     pub queue: String,
+    pub exchange: String,
+    pub route_key: String,
 }
 
 

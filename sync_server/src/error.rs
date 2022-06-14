@@ -50,7 +50,6 @@ impl From<serde_json::Error> for AppError {
     }
 }
 
-
 impl From<JoinError> for AppError {
     fn from(e: JoinError) -> Self {
         AppError::from_debug(e)
@@ -63,13 +62,20 @@ impl From<sqlx::Error> for AppError {
     }
 }
 
-
-
-impl From<String> for AppError {
-    fn from(msg: String) -> Self {
-        Self {
-            msg,
-        }
+impl From<lapin::Error> for AppError {
+    fn from(e: lapin::Error) -> Self {
+        AppError::from_debug(e)
     }
 }
 
+impl From<String> for AppError {
+    fn from(msg: String) -> Self {
+        Self { msg }
+    }
+}
+
+impl From<&str> for AppError {
+    fn from(msg: &str) -> Self {
+        Self { msg: msg.into() }
+    }
+}
