@@ -2,7 +2,7 @@ use crate::dao::base_model::BaseBoxLog;
 use crate::dao::Dao;
 use crate::service::rabbitmq::model::BoxLogMessage;
 use lapin::message::Delivery;
-use lapin::options::BasicAckOptions;
+
 use tracing::error;
 
 pub async fn process_boxlog_message(dao: Dao, delivery: Delivery) -> Result<(), lapin::Error> {

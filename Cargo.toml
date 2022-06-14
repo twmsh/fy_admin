@@ -1,5 +1,6 @@
 [workspace]
 members = [
+    "fy_base",
     "mysql_codegen",
     "box_agent",
     "sync_client",
