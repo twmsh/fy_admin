@@ -10,8 +10,9 @@ use sync_server::{
     app_ctx::AppCtx,
     dao::Dao,
     service::{signal_service::SignalService, web::WebService},
-    util::{logger, mysql_util, service::ServiceRepo},
 };
+
+use fy_base::util::{logger, mysql_util, service::ServiceRepo};
 
 const APP_NAME: &str = "sync_broker";
 const APP_VER_NUM: &str = "0.1.0";

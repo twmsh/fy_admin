@@ -1,5 +1,5 @@
 use crate::error::AppResult;
-use crate::util::mysql_util;
+use fy_base::util::mysql_util;
 use serde::{Deserialize, Serialize};
 use std::fs;
 use std::path::Path;

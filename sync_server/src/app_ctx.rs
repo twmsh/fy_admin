@@ -2,7 +2,7 @@ use tokio::sync::watch::Receiver;
 
 use crate::app_cfg::AppCfg;
 use crate::dao::Dao;
-use crate::util::service::SignalProduce;
+use fy_base::util::service::SignalProduce;
 
 //---------------------
 

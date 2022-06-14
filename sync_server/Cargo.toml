@@ -6,24 +6,26 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-mysql_codegen = {path = "../mysql_codegen"}
+mysql_codegen = { path = "../mysql_codegen" }
+fy_base = { path = "../fy_base" }
+
 
 tokio = { version = "1.18.2", features = ["full"] }
 tokio-stream = "0.1"
 tokio-util = { version = "0.7", features = ["full"] }
 tracing = { version = "0.1", features = ["log"] }
 
-axum = {version="0.5", features=["ws","multipart","headers"]}
+axum = { version = "0.5", features = ["ws", "multipart", "headers"] }
 tower = { version = "0.4", features = ["full"] }
-hyper ={version = "0.14",features = [ "server"]}
+hyper = { version = "0.14", features = ["server"] }
 
-tower-http = {version= "0.3",features = ["full"]}
-headers="0.3"
+tower-http = { version = "0.3", features = ["full"] }
+headers = "0.3"
 
 # rabbitmq
-lapin="2.1"
-tokio-executor-trait="2.1"
-tokio-reactor-trait="1.1"
+lapin = "2.1"
+tokio-executor-trait = "2.1"
+tokio-reactor-trait = "1.1"
 
 log = "0.4"
 log4rs = "1.1.1"
@@ -33,7 +35,7 @@ deadqueue = "0.2"
 build-time = "0.1.1"
 
 #mysql = "22.1"
-sqlx = { version = "0.5", features = ["runtime-tokio-native-tls", "mysql", "chrono","decimal"] }
+sqlx = { version = "0.5", features = ["runtime-tokio-native-tls", "mysql", "chrono", "decimal"] }
 
 url = "2.2.2"
 
@@ -50,7 +52,7 @@ serde_json = { version = "1", features = ["preserve_order"] }
 openssl = { version = "0.10", features = ["vendored"] }
 
 [target.'cfg(windows)'.dependencies]
-ipconfig="0.3.0"
+ipconfig = "0.3.0"
 
 [target.'cfg(not(windows))'.dependencies]
-pnet="0.28.0"
+pnet = "0.28.0"

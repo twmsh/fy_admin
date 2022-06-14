@@ -5,7 +5,7 @@ use std::sync::Arc;
 use crate::dao::base_model::{BaseBox, BaseCamera, BaseCameraDel, BaseDb, BaseDbDel, BaseFeaDel};
 use crate::error::AppError;
 use crate::service::web::model::BaseFeaMapRow;
-use crate::util::mysql_util;
+use fy_base::util::mysql_util;
 use sqlx::{MySql, Pool};
 
 pub mod base_model;

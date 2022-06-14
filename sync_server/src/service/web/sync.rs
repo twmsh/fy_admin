@@ -3,8 +3,7 @@ use crate::service::web::model::{
     RES_STATUS_BIZ_ERR, RES_STATUS_INVALID_PARA,
 };
 use crate::service::web::WebState;
-use crate::util::utils;
-use crate::util::utils::DATETIME_FMT_LONG;
+use fy_base::util::utils::{self,DATETIME_FMT_LONG};
 use axum::extract::Query;
 
 use axum::Extension;

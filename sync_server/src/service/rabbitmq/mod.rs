@@ -23,7 +23,9 @@ use tracing::{error, info};
 
 use crate::error::AppError;
 use crate::{
-    app_ctx::AppCtx,
+    app_ctx::AppCtx
+};
+use fy_base::{
     util::{rabbitmq::init_conn_props, service::Service},
 };
 use crate::service::rabbitmq::process_message::process_boxlog_message;

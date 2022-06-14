@@ -2348,6 +2348,7 @@ dependencies = [
  "chrono",
  "clap",
  "deadqueue",
+ "fy_base",
  "headers",
  "hyper",
  "ipconfig",

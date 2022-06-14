@@ -1,4 +1,4 @@
-use crate::util::service::Service;
+use fy_base::util::service::Service;
 use tokio::sync::watch;
 use tokio::sync::watch::Receiver;
 use tokio::task::JoinHandle;

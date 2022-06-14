@@ -3,7 +3,7 @@ use mysql_codegen::MysqlEntity;
 use serde::{Deserialize, Serialize};
 use sqlx::Arguments;
 
-use crate::util::mysql_util;
+use fy_base::util::mysql_util;
 
 /* 小盒子 */
 #[derive(sqlx::FromRow, MysqlEntity, Serialize, Deserialize, Debug, Clone)]

@@ -5,11 +5,13 @@ use hyper::server::Builder;
 use std::net::{AddrParseError, SocketAddr};
 use std::sync::Arc;
 
-use crate::util::axum_log::time_use;
+use fy_base::util::{
+    axum_log::time_use,
+    axum_log::access_log, service::Service
+};
 use crate::{
     app_ctx::AppCtx,
-    service::web::sync::{get_camera_update, get_db_update, get_person_update},
-    util::{axum_log::access_log, service::Service},
+    service::web::sync::{get_camera_update, get_db_update, get_person_update}
 };
 use tokio::sync::watch::Receiver;
 use tokio::task::JoinHandle;
