@@ -1,7 +1,10 @@
+pub mod process_message;
+pub mod model;
+
 use std::sync::Arc;
 
 use lapin::message::Delivery;
-use lapin::options::BasicConsumeOptions;
+use lapin::options::{BasicAckOptions, BasicConsumeOptions};
 use lapin::{
     options::{ExchangeDeclareOptions, QueueBindOptions, QueueDeclareOptions},
     types::FieldTable,
@@ -23,6 +26,8 @@ use crate::{
     app_ctx::AppCtx,
     util::{rabbitmq::init_conn_props, service::Service},
 };
+
+
 
 pub struct RabbitmqService {
     pub ctx: Arc<AppCtx>,
@@ -87,7 +92,7 @@ impl RabbitmqService {
                 queue_name,
                 QueueDeclareOptions {
                     passive: false,
-                    durable: true, // 持久化，rabbitmq重启后，还存在
+                    durable: false, // 持久化，rabbitmq重启后，还存在
                     exclusive: false,
                     auto_delete: false,
                     nowait: false,
@@ -125,8 +130,13 @@ impl RabbitmqService {
     }
 
     // 除了ack出错外，其他错误需要catch住。
-    async fn process_msg(&mut self, _delivery: Delivery) -> Result<(), lapin::Error> {
-        println!("delivery: {:?}", _delivery);
+    async fn process_msg(&mut self, delivery: Delivery) -> Result<(), lapin::Error> {
+        // println!("delivery: {:?}", delivery);
+
+        let content = String::from_utf8_lossy(&delivery.data).to_string();
+        info!("<-- {}", content);
+
+        let _ = delivery.ack(BasicAckOptions::default()).await?;
 
         Ok(())
     }
@@ -150,7 +160,7 @@ impl RabbitmqService {
                             return Err(e.into());
                         }
                         None => {
-                            return Err("".into());
+                            return Err("consume.next() return none".into());
                         }
                     }
                 }

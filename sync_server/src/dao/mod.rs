@@ -10,6 +10,7 @@ use sqlx::{MySql, Pool};
 
 pub mod base_model;
 
+#[derive(Clone)]
 pub struct Dao {
     pub pool: Arc<Pool<MySql>>,
     pub tz: FixedOffset,
