@@ -14,7 +14,7 @@ use sync_server::{
 
 use fy_base::util::{logger, mysql_util, service::ServiceRepo};
 
-const APP_NAME: &str = "sync_broker";
+const APP_NAME: &str = "sync_server";
 const APP_VER_NUM: &str = "0.1.0";
 
 #[tokio::main]

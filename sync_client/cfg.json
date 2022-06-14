@@ -1,6 +1,6 @@
 {
   "version": {
-    "product": "sync_server",
+    "product": "sync_client",
     "ver": "0.1.0",
     "api_ver": "0.1.0"
   },
