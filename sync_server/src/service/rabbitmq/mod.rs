@@ -26,7 +26,7 @@ use crate::{
     app_ctx::AppCtx,
     util::{rabbitmq::init_conn_props, service::Service},
 };
-
+use crate::service::rabbitmq::process_message::process_boxlog_message;
 
 
 pub struct RabbitmqService {
@@ -137,6 +137,8 @@ impl RabbitmqService {
         info!("<-- {}", content);
 
         let _ = delivery.ack(BasicAckOptions::default()).await?;
+
+        let _ = process_boxlog_message(self.ctx.dao.clone(),delivery).await?;
 
         Ok(())
     }

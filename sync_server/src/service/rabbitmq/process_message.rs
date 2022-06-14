@@ -6,8 +6,6 @@ use lapin::options::BasicAckOptions;
 use tracing::error;
 
 pub async fn process_boxlog_message(dao: Dao, delivery: Delivery) -> Result<(), lapin::Error> {
-    // ack it
-    let _ = delivery.ack(BasicAckOptions::default()).await?;
 
     // save to db
     let message = match serde_json::from_reader::<_, BoxLogMessage>(delivery.data.as_slice()) {
