@@ -859,6 +859,32 @@ dependencies = [
 [[package]]
 name = "fy_base"
 version = "0.1.0"
+dependencies = [
+ "axum",
+ "chrono",
+ "deadqueue",
+ "headers",
+ "hyper",
+ "ipconfig",
+ "lapin",
+ "log",
+ "log4rs",
+ "openssl",
+ "pnet",
+ "rust_decimal",
+ "serde",
+ "serde_json",
+ "sqlx",
+ "tokio",
+ "tokio-executor-trait",
+ "tokio-reactor-trait",
+ "tokio-stream",
+ "tokio-util",
+ "tower",
+ "tower-http",
+ "tracing",
+ "url",
+]
 
 [[package]]
 name = "generic-array"
