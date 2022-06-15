@@ -19,7 +19,7 @@ use tokio::{
 
 use tokio_stream::StreamExt;
 
-use tracing::{error, info};
+use tracing::{debug, error, info};
 
 use crate::error::AppError;
 use crate::{
@@ -136,11 +136,11 @@ impl RabbitmqService {
         // println!("delivery: {:?}", delivery);
 
         let content = String::from_utf8_lossy(&delivery.data).to_string();
-        info!("<-- {}", content);
+        debug!("<-- {}", content);
 
         let _ = delivery.ack(BasicAckOptions::default()).await?;
 
-        let _ = process_boxlog_message(self.ctx.dao.clone(),delivery).await?;
+        process_boxlog_message(self.ctx.dao.clone(),delivery).await;
 
         Ok(())
     }
@@ -179,7 +179,7 @@ impl RabbitmqService {
 
     // rabbitmq报错要重新开始，要等待一定时长
     // 等待时候，需要关注退出信号
-    async fn run(mut self, conn_props: ConnectionProperties, exit_rx: Receiver<i64>) {
+    async fn do_run(mut self, conn_props: ConnectionProperties, exit_rx: Receiver<i64>) {
         loop {
             // 创建connection
             let conn = self.init_rabbitmq_connection(conn_props.clone()).await;
@@ -254,6 +254,6 @@ impl Service for RabbitmqService {
     fn run(self, exit_rx: Receiver<i64>) -> JoinHandle<()> {
         let conn_props = init_conn_props();
         let this = self;
-        tokio::spawn(this.run(conn_props, exit_rx))
+        tokio::spawn(this.do_run(conn_props, exit_rx))
     }
 }

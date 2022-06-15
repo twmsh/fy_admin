@@ -13,6 +13,7 @@ use sync_server::{
 };
 
 use fy_base::util::{logger, mysql_util, service::ServiceRepo};
+use sync_server::service::clean::CleanService;
 
 const APP_NAME: &str = "sync_server";
 const APP_VER_NUM: &str = "0.1.0";
@@ -111,10 +112,14 @@ async fn main() {
     // 初始化rabbitmq服务
     let rabbitmq_service = RabbitmqService::new(app_context.clone());
 
+    // 初始化 clean服务
+    let clean_service = CleanService::new(app_context.clone());
+
     // 启动服务
     service_repo.start_service(exit_service);
     service_repo.start_service(web_service);
     service_repo.start_service(rabbitmq_service);
+    service_repo.start_service(clean_service);
 
     // 等待退出
     service_repo.join().await;

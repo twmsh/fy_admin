@@ -29,6 +29,13 @@ pub struct AppCfgDb {
 }
 
 #[derive(Serialize, Deserialize, Debug)]
+pub struct AppCfgClean {
+    pub ttl_day: u64,       // 保留多少天的box_log
+    pub interval_hour: u64,  // 多少秒执行一次
+}
+
+
+#[derive(Serialize, Deserialize, Debug)]
 pub struct AppCfgHttp {
     pub addr: String,
     pub max_conn: u64,
@@ -47,6 +54,7 @@ pub struct AppCfg {
     pub version: AppCfgVersion,
     pub log: AppCfgLog,
     pub db: AppCfgDb,
+    pub clean: AppCfgClean,
     pub sync_batch: u32,
     pub http: AppCfgHttp,
     pub rabbitmq: AppCfgRabbitMq,

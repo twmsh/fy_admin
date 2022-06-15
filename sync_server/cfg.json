@@ -17,6 +17,10 @@
     "min_conn": 4,
     "idle": 600
   },
+  "clean": {
+    "ttl_day": 14,
+    "interval_hour": 6
+  },
   "sync_batch": 100,
   "http": {
     "addr": "0.0.0.0:8090",
