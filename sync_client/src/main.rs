@@ -87,6 +87,8 @@ async fn main() {
     // 创建服务集
     let mut service_repo = ServiceRepo::new(app_context.clone());
 
+    // let task_queue =
+
     // 初始退出信号服务
     let exit_service = SignalService::new(exit_tx);
 
