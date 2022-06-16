@@ -16,7 +16,7 @@ pub struct TaskItem {
 
 #[derive(Debug,Serialize,Deserialize)]
 pub enum TaskItemType {
-    SyncTimer,  // 定时器触发，取同步
+    SyncTimer,  // 定时器触发，去同步
     HeartBeat,  // 心跳信息
     ServerCmd,  // 服务端的命令
 }
@@ -35,7 +35,16 @@ pub struct RabbitmqInMessage {
     pub ts: DateTime<Local>,    // 时间戳
 }
 
-// 发送到 rabbitmq的消息
-pub struct RabbitmqOutMessage {
+// 发送到 rabbitmq的消息，等同于sync_server中的BoxLogMessage
+pub struct RabbitmqItem {
+    pub hwid: String,
+    pub ips: String,
 
+    #[serde(rename = "type")]
+    pub c_type: String,
+    pub level: i16,
+    pub payload: String,
+
+    #[serde(with = "long_ts_format")]
+    pub ts: DateTime<Local>,
 }
