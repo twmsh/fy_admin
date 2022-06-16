@@ -50,6 +50,12 @@ async fn main() {
     };
     println!("config: {:?}", app_config);
 
+    // 检查app_cfg的字段是否合法
+    if let Err(e) = app_config.validate() {
+        eprintln!("error, validate config, err: {:?}", e);
+        return;
+    }
+
     // 初始化日志
     let log_config = &app_config.log;
     let web_log_target = "access_log";

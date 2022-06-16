@@ -1,7 +1,7 @@
-use chrono::prelude::*;
-use serde::{Serialize, Deserialize};
 use crate::dao::base_model::BaseBoxLog;
+use chrono::prelude::*;
 use fy_base::util::time_format::long_ts_format;
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct BoxLogMessage {

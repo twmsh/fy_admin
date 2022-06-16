@@ -1,23 +1,34 @@
 use tokio::sync::watch::Receiver;
 
 use crate::app_cfg::AppCfg;
-use crate::dao::Dao;
-use fy_base::util::service::SignalProduce;
+use fy_base::{
+    api::bm_api::{AnalysisApi, RecognitionApi},
+    util::service::SignalProduce,
+};
 
 //---------------------
 
 pub struct AppCtx {
     pub cfg: AppCfg,
     pub exit_rx: Receiver<i64>,
-    pub dao: Dao,
+
+    pub ana_api: AnalysisApi,
+    pub recg_api: RecognitionApi,
+    pub hw_id: String,
 }
 
 impl AppCtx {
-    pub fn new(app_cfg: AppCfg, exit_rx: Receiver<i64>, dao: Dao) -> Self {
+    pub fn new(app_cfg: AppCfg, exit_rx: Receiver<i64>, hw_id: String) -> Self {
+        let ana_api = AnalysisApi::new(&app_cfg.api.grab_url);
+        let recg_api = RecognitionApi::new(&app_cfg.api.recg_url);
+
         Self {
             cfg: app_cfg,
             exit_rx,
-            dao,
+            ana_api,
+            recg_api,
+
+            hw_id,
         }
     }
 

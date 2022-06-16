@@ -5,9 +5,7 @@ use lapin::message::Delivery;
 
 use tracing::{error, warn};
 
-
-pub async fn process_boxlog_message(dao: Dao, delivery: Delivery)  {
-
+pub async fn process_boxlog_message(dao: Dao, delivery: Delivery) {
     // payload 转成 BoxLogMessage
     let message = match serde_json::from_reader::<_, BoxLogMessage>(delivery.data.as_slice()) {
         Ok(v) => v,
@@ -36,23 +34,23 @@ pub async fn process_boxlog_message(dao: Dao, delivery: Delivery)  {
         }
     };
 
-    match dao.update_latest_online(obj.box_hwid.as_str(), obj.create_time).await {
+    match dao
+        .update_latest_online(obj.box_hwid.as_str(), obj.create_time)
+        .await
+    {
         Ok(saved) => {
             if !saved {
                 warn!(
-                "warn, RabbitmqService, update_latest_online({}), return: false",
-                obj.box_hwid
+                    "warn, RabbitmqService, update_latest_online({}), return: false",
+                    obj.box_hwid
                 );
             }
         }
         Err(e) => {
             error!(
                 "error, RabbitmqService, update_latest_online({}), err: {:?}",
-                obj.box_hwid,
-                e
+                obj.box_hwid, e
             );
         }
     };
-
-
 }

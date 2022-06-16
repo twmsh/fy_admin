@@ -31,9 +31,8 @@ pub struct AppCfgDb {
 #[derive(Serialize, Deserialize, Debug)]
 pub struct AppCfgClean {
     pub ttl_day: u64,       // 保留多少天的box_log
-    pub interval_hour: u64,  // 多少秒执行一次
+    pub interval_hour: u64, // 多少秒执行一次
 }
-
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct AppCfgHttp {

@@ -1,5 +1,5 @@
-pub mod process_message;
 pub mod model;
+pub mod process_message;
 
 use std::sync::Arc;
 
@@ -21,15 +21,10 @@ use tokio_stream::StreamExt;
 
 use tracing::{debug, error, info};
 
+use crate::app_ctx::AppCtx;
 use crate::error::AppError;
-use crate::{
-    app_ctx::AppCtx
-};
-use fy_base::{
-    util::{rabbitmq::init_conn_props, service::Service},
-};
 use crate::service::rabbitmq::process_message::process_boxlog_message;
-
+use fy_base::util::{rabbitmq::init_conn_props, service::Service};
 
 pub struct RabbitmqService {
     pub ctx: Arc<AppCtx>,
@@ -140,7 +135,7 @@ impl RabbitmqService {
 
         let _ = delivery.ack(BasicAckOptions::default()).await?;
 
-        process_boxlog_message(self.ctx.dao.clone(),delivery).await;
+        process_boxlog_message(self.ctx.dao.clone(), delivery).await;
 
         Ok(())
     }

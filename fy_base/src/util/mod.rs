@@ -8,3 +8,4 @@ pub mod utils;
 
 pub mod logger;
 pub mod rabbitmq;
+pub mod se5;

@@ -1,5 +1,4 @@
 use crate::error::AppResult;
-use fy_base::util::mysql_util;
 use serde::{Deserialize, Serialize};
 use std::fs;
 use std::path::Path;
@@ -14,42 +13,46 @@ pub struct AppCfgVersion {
 #[derive(Serialize, Deserialize, Debug)]
 pub struct AppCfgLog {
     pub app: String,
-    pub web: String,
     pub level: String,
     pub lib_level: String,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-pub struct AppCfgDb {
-    pub url: String,
-    pub tz: String,
-    pub max_conn: u64,
-    pub min_conn: u64,
-    pub idle: u64,
+pub struct AppCfgApi {
+    pub grab_url: String,
+    pub recg_url: String,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-pub struct AppCfgHttp {
-    pub addr: String,
-    pub max_conn: u64,
+pub struct AppCfgServer {
+    pub db_sync: String,
+    pub person_sync: String,
+    pub camera_sync: String,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-pub struct AppCfgRabbitMq {
-    pub url: String,
+pub struct AppCfgRabbitMqItem {
     pub queue: String,
     pub exchange: String,
     pub route_key: String,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
+pub struct AppCfgRabbitMq {
+    pub url: String,
+    pub log: AppCfgRabbitMqItem,
+    pub cmd: AppCfgRabbitMqItem,
+}
+
+//----------------------------
+#[derive(Serialize, Deserialize, Debug)]
 pub struct AppCfg {
     pub version: AppCfgVersion,
     pub log: AppCfgLog,
-    pub db: AppCfgDb,
-    pub sync_batch: u32,
-    pub http: AppCfgHttp,
+    pub api: AppCfgApi,
+    pub server: AppCfgServer,
     pub rabbitmq: AppCfgRabbitMq,
+    pub hw_id: Option<String>,
 }
 
 impl AppCfg {
@@ -60,8 +63,6 @@ impl AppCfg {
     }
 
     pub fn validate(&self) -> AppResult<()> {
-        let _ = mysql_util::parse_timezone(self.db.tz.as_str())?;
-
         Ok(())
     }
 }

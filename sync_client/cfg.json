@@ -6,26 +6,30 @@
   },
   "log": {
     "app": "logs/app.log",
-    "web": "logs/web.log",
     "level": "debug",
     "lib_level": "warn"
   },
-  "db": {
-    "url": "mysql://cf_user:cf123456@192.168.1.26:3306/cf_rs",
-    "tz": "+08:00",
-    "max_conn": 20,
-    "min_conn": 4,
-    "idle": 600
+  "api": {
+    "grab_url": "http://localhost:7001",
+    "recg_url": "http://localhost:7002"
   },
-  "sync_batch": 100,
-  "http": {
-    "addr": "0.0.0.0:8090",
-    "max_conn": 1000
+  "server": {
+    "db_sync": "http://127.0.0.1:8090/db_sync",
+    "person_sync": "http://127.0.0.1:8090/person_sync",
+    "camera_sync": "http://127.0.0.1:8090/camera_sync"
   },
   "rabbitmq": {
     "url": "amqp://admin:admin123@192.168.1.26:5672/%2f",
-    "queue": "device_log_queue",
-    "exchange": "device_log_exchange",
-    "route_key": "box.log"
-  }
+    "log": {
+      "queue": "device_log_queue",
+      "exchange": "device_log_exchange",
+      "route_key": "box.log"
+    },
+    "cmd": {
+      "queue": "device_cmd_queue",
+      "exchange": "device_cmd_exchange",
+      "route_key": "box.cmd"
+    }
+  },
+  "hw_id": "111"
 }

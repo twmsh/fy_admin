@@ -4,15 +4,9 @@ use std::sync::Arc;
 use tokio::sync::watch;
 use tracing::{error, info};
 
-use sync_server::service::rabbitmq::RabbitmqService;
-use sync_server::{
-    app_cfg::AppCfg,
-    app_ctx::AppCtx,
-    dao::Dao,
-    service::{signal_service::SignalService, web::WebService},
-};
+use sync_client::{app_cfg::AppCfg, app_ctx::AppCtx, service::signal_service::SignalService};
 
-use fy_base::util::{logger, mysql_util, service::ServiceRepo};
+use fy_base::util::{logger, se5, service::ServiceRepo};
 
 const APP_NAME: &str = "sync_client";
 const APP_VER_NUM: &str = "0.1.0";
@@ -25,7 +19,7 @@ async fn main() {
     // 命令行解析
     let cli_matches = Command::new(APP_NAME)
         .version(app_ver_text.as_str())
-        .about("a server provides sync service for box agent")
+        .about("sync client for box agent")
         .arg(
             arg!(-c --config <config>)
                 .required(false)
@@ -49,17 +43,20 @@ async fn main() {
     };
     println!("config: {:?}", app_config);
 
+    // 检查app_cfg的字段是否合法
+    if let Err(e) = app_config.validate() {
+        eprintln!("error, validate config, err: {:?}", e);
+        return;
+    }
+
     // 初始化日志
     let log_config = &app_config.log;
-    let web_log_target = "access_log";
     let app_log_target = module_path!();
-    match logger::init_app_logger_with_web_str(
+    match logger::init_app_logger_str(
         log_config.app.as_str(),
         app_log_target,
         log_config.level.as_str(),
         log_config.lib_level.as_str(),
-        log_config.web.as_str(),
-        web_log_target,
     ) {
         Ok(_) => {}
         Err(e) => {
@@ -68,36 +65,24 @@ async fn main() {
         }
     };
 
-    // 初始化数据库连接
-    let db_pool = match mysql_util::init_mysql_pool(
-        app_config.db.url.as_str(),
-        app_config.db.tz.as_str(),
-        app_config.db.max_conn as u32,
-        app_config.db.min_conn as u32,
-    ) {
-        Ok(v) => v,
-        Err(e) => {
-            error!("error, connect db, err: {:?}", e);
-            return;
+    //  获取设备SN，1）先从cfg.json文件读取，2）没有的话，从设备读取。
+    let hw_id = match app_config.hw_id {
+        None => {
+            // 从设备读取
+            match se5::get_device_sn() {
+                Ok(v) => v,
+                Err(e) => {
+                    error!("error, read device sn, err:{:?}", e);
+                    return;
+                }
+            }
         }
-    };
-
-    let tz = match mysql_util::parse_timezone(app_config.db.tz.as_str()) {
-        Ok(v) => v,
-        Err(e) => {
-            error!("error, parse_timezone {}, err: {:?}", app_config.db.tz, e);
-            return;
-        }
-    };
-
-    let dao = Dao {
-        pool: Arc::new(db_pool),
-        tz,
+        Some(ref v) => v.clone(),
     };
 
     // 初始化 context
     let (exit_tx, exit_rx) = watch::channel(0);
-    let app_context = Arc::new(AppCtx::new(app_config, exit_rx, dao));
+    let app_context = Arc::new(AppCtx::new(app_config, exit_rx, hw_id));
 
     // 创建服务集
     let mut service_repo = ServiceRepo::new(app_context.clone());
@@ -105,16 +90,8 @@ async fn main() {
     // 初始退出信号服务
     let exit_service = SignalService::new(exit_tx);
 
-    // 初始web服务
-    let web_service = WebService::new(app_context.clone());
-
-    // 初始化rabbitmq服务
-    let rabbitmq_service = RabbitmqService::new(app_context.clone());
-
     // 启动服务
     service_repo.start_service(exit_service);
-    service_repo.start_service(web_service);
-    service_repo.start_service(rabbitmq_service);
 
     // 等待退出
     service_repo.join().await;

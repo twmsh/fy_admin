@@ -209,7 +209,6 @@ impl Dao {
         Ok(list)
     }
 
-
     pub async fn update_latest_online(
         &self,
         hw_id: &str,
@@ -221,21 +220,17 @@ impl Dao {
         let rst = sqlx::query(sql)
             .bind(ts)
             .bind(hw_id)
-            .execute(self.pool.deref()).await?;
+            .execute(self.pool.deref())
+            .await?;
 
         Ok(rst.rows_affected() == 1)
     }
 
-    pub async fn clean_boxlog(
-        &self,
-        ts: DateTime<Local>,
-    ) -> Result<u64, AppError> {
+    pub async fn clean_boxlog(&self, ts: DateTime<Local>) -> Result<u64, AppError> {
         let sql = "delete from base_box_log where create_time < ?";
 
         let ts = mysql_util::fix_write_dt(&ts, &self.tz);
-        let rst = sqlx::query(sql)
-            .bind(ts)
-            .execute(self.pool.deref()).await?;
+        let rst = sqlx::query(sql).bind(ts).execute(self.pool.deref()).await?;
 
         Ok(rst.rows_affected())
     }
