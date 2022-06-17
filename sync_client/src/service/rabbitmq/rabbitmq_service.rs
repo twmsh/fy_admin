@@ -1,21 +1,24 @@
+use deadqueue::unlimited::Queue;
 use std::sync::Arc;
 use std::time::Duration;
-use deadqueue::unlimited::Queue;
 
-use tokio::sync::watch::Receiver;
-use tokio::task::JoinHandle;
-use fy_base::util::rabbitmq::init_conn_props;
-use fy_base::util::service::Service;
 use crate::app_ctx::AppCtx;
 use crate::model::queue_item::{RabbitmqItem, TaskItem};
-
+use fy_base::util::rabbitmq::init_conn_props;
+use fy_base::util::service::Service;
+use tokio::sync::watch::Receiver;
+use tokio::task::JoinHandle;
 
 use lapin::message::Delivery;
 use lapin::options::{BasicAckOptions, BasicConsumeOptions};
-use lapin::{options::{ExchangeDeclareOptions, QueueBindOptions, QueueDeclareOptions}, types::FieldTable, Channel, Connection, ConnectionProperties, Consumer, ExchangeKind};
+use lapin::{
+    options::{ExchangeDeclareOptions, QueueBindOptions, QueueDeclareOptions},
+    types::FieldTable,
+    Channel, Connection, ConnectionProperties, Consumer, ExchangeKind,
+};
 use tokio::time::sleep;
-use tracing::{error, info};
 use tokio_stream::StreamExt;
+use tracing::{error, info};
 
 pub struct RabbitmqService {
     pub ctx: Arc<AppCtx>,
@@ -68,7 +71,6 @@ impl RabbitmqService {
         queue_name: &str,
         route_key: &str,
     ) -> Result<lapin::Queue, lapin::Error> {
-
         // 声明 exchange
         let _ = channel
             .exchange_declare(
@@ -120,19 +122,23 @@ impl RabbitmqService {
     ) -> Result<(Channel, lapin::Queue), lapin::Error> {
         let channel = conn.create_channel().await?;
 
-        let _log_queue = self.init_rabbitmq_queue(
-            &channel,
-            self.ctx.cfg.rabbitmq.log.exchange.as_str(),
-            self.ctx.cfg.rabbitmq.log.queue.as_str(),
-            self.ctx.cfg.rabbitmq.log.route_key.as_str(),
-        ).await?;
+        let _log_queue = self
+            .init_rabbitmq_queue(
+                &channel,
+                self.ctx.cfg.rabbitmq.log.exchange.as_str(),
+                self.ctx.cfg.rabbitmq.log.queue.as_str(),
+                self.ctx.cfg.rabbitmq.log.route_key.as_str(),
+            )
+            .await?;
 
-        let cmd_queue = self.init_rabbitmq_queue(
-            &channel,
-            self.ctx.cfg.rabbitmq.cmd.exchange.as_str(),
-            self.ctx.cfg.rabbitmq.cmd.queue.as_str(),
-            self.ctx.cfg.rabbitmq.cmd.route_key.as_str(),
-        ).await?;
+        let cmd_queue = self
+            .init_rabbitmq_queue(
+                &channel,
+                self.ctx.cfg.rabbitmq.cmd.exchange.as_str(),
+                self.ctx.cfg.rabbitmq.cmd.queue.as_str(),
+                self.ctx.cfg.rabbitmq.cmd.route_key.as_str(),
+            )
+            .await?;
 
         Ok((channel, cmd_queue))
     }
@@ -162,11 +168,7 @@ impl RabbitmqService {
                 (0, Some(v))
             }
             Err(e) => {
-                error!(
-                    "error, RabbitmqService, {}, err: {:?}",
-                    msg,
-                    e
-                );
+                error!("error, RabbitmqService, {}, err: {:?}", msg, e);
 
                 let wait = self.increate_wait();
                 if Self::wait_a_moment(Duration::from_secs(wait), exit_rx).await {
@@ -180,22 +182,15 @@ impl RabbitmqService {
         }
     }
 
-    pub async fn do_run(
-        mut self, conn_props:
-        ConnectionProperties,
-        exit_rx: Receiver<i64>,
-    ) {
+    pub async fn do_run(mut self, conn_props: ConnectionProperties, exit_rx: Receiver<i64>) {
         let consumer_tag = format!("sync_client-{}", self.ctx.hw_id);
 
         loop {
-
             // init connecton
             let conn = self.init_rabbitmq_connection(conn_props.clone()).await;
-            let (rst, conn) = self.check_rabbitmq_error(
-                "init_rabbitmq_connection",
-                conn,
-                exit_rx.clone(),
-            ).await;
+            let (rst, conn) = self
+                .check_rabbitmq_error("init_rabbitmq_connection", conn, exit_rx.clone())
+                .await;
 
             let conn = match rst {
                 1 => {
@@ -204,18 +199,14 @@ impl RabbitmqService {
                 2 => {
                     continue;
                 }
-                _ => {
-                    conn.unwrap()
-                }
+                _ => conn.unwrap(),
             };
 
             // init exchange, queue
             let queue = self.init_rabbitmq_exchange_queue(&conn).await;
-            let (rst, queue) = self.check_rabbitmq_error(
-                "init_rabbitmq_exchange_queue",
-                queue,
-                exit_rx.clone(),
-            ).await;
+            let (rst, queue) = self
+                .check_rabbitmq_error("init_rabbitmq_exchange_queue", queue, exit_rx.clone())
+                .await;
             let (channel, cmd_queue) = match rst {
                 1 => {
                     break;
@@ -223,9 +214,7 @@ impl RabbitmqService {
                 2 => {
                     continue;
                 }
-                _ => {
-                    queue.unwrap()
-                }
+                _ => queue.unwrap(),
             };
 
             // init consumer
@@ -235,13 +224,12 @@ impl RabbitmqService {
                     consumer_tag.as_str(),
                     BasicConsumeOptions::default(),
                     FieldTable::default(),
-                ).await;
+                )
+                .await;
 
-            let (rst, cmd_consumer) = self.check_rabbitmq_error(
-                "basic_consume",
-                cmd_consumer,
-                exit_rx.clone(),
-            ).await;
+            let (rst, cmd_consumer) = self
+                .check_rabbitmq_error("basic_consume", cmd_consumer, exit_rx.clone())
+                .await;
             let mut cmd_consumer = match rst {
                 1 => {
                     break;
@@ -249,21 +237,15 @@ impl RabbitmqService {
                 2 => {
                     continue;
                 }
-                _ => {
-                    cmd_consumer.unwrap()
-                }
+                _ => cmd_consumer.unwrap(),
             };
 
             // loop message
-            let loop_rst = self.loop_message(
-                &mut cmd_consumer,
-                exit_rx.clone()).await;
+            let loop_rst = self.loop_message(&mut cmd_consumer, exit_rx.clone()).await;
 
-            let (rst, _) = self.check_rabbitmq_error(
-                "loop_message",
-                loop_rst,
-                exit_rx.clone(),
-            ).await;
+            let (rst, _) = self
+                .check_rabbitmq_error("loop_message", loop_rst, exit_rx.clone())
+                .await;
             let _ = match rst {
                 1 => {
                     // wait_a_moment中收到退出信号
@@ -277,7 +259,6 @@ impl RabbitmqService {
                     break;
                 }
             };
-
         }
 
         info!("RabbitmqService exit.");
@@ -333,10 +314,10 @@ impl RabbitmqService {
     }
 }
 
-    impl Service for RabbitmqService {
-        fn run(self, exit_rx: Receiver<i64>) -> JoinHandle<()> {
-            let conn_props = init_conn_props();
-            let this = self;
-            tokio::spawn(this.do_run(conn_props, exit_rx))
-        }
+impl Service for RabbitmqService {
+    fn run(self, exit_rx: Receiver<i64>) -> JoinHandle<()> {
+        let conn_props = init_conn_props();
+        let this = self;
+        tokio::spawn(this.do_run(conn_props, exit_rx))
     }
+}

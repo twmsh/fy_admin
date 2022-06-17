@@ -1,7 +1,12 @@
 use crate::service::web::model::{
-    build_fail_response_data, get_personinfo_from_map, Camera, Db, Person, ResponseData,
+    build_fail_response_data, get_personinfo_from_map,
+};
+
+use fy_base::sync::response_type::{
+    Camera, Db, Person, ResponseData,
     RES_STATUS_BIZ_ERR, RES_STATUS_INVALID_PARA,
 };
+
 use crate::service::web::WebState;
 use axum::extract::Query;
 use fy_base::util::utils::{self, DATETIME_FMT_LONG};

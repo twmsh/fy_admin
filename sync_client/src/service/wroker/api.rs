@@ -1,17 +1,17 @@
 
 use std::time::Duration;
-use http::StatusCode;
+use axum::http::StatusCode;
+
 use reqwest::{Client, Error as Reqwest_Error};
 use reqwest::header;
 use bytes::Buf;
 
 use serde::{de::DeserializeOwned};
 use serde_json::{Error as Serde_Error};
-
-use super::{ResponseData, Camera};
+use fy_base::sync::response_type::{Camera, Db, Person, ResponseData};
 
 use fy_base::util::utils;
-use crate::bm_sync::Person;
+
 
 //-----------------------
 #[derive(Debug)]
@@ -73,15 +73,25 @@ impl Default for Api {
 
 impl Api {
 
-    pub async fn fetch_db_updated(&self, url: &str, last_update_ts: &str,device_id:&str) -> ApiResult<ResponseData<Person>> {
+    pub async fn fetch_db_updated(&self, url: &str, last_update_ts: &str,hw_id:&str)
+        -> ApiResult<ResponseData<Db>> {
         let dst_url = utils::add_url_query(url,"last_update",last_update_ts);
-        let dst_url =  utils::add_url_query(&dst_url,"hw_id",device_id);
+        let dst_url =  utils::add_url_query(&dst_url,"hw_id",hw_id);
         do_get(&self.client, &dst_url).await
     }
 
-    pub async fn fetch_camera_updated(&self, url: &str, last_update_ts: &str,device_id:&str) -> ApiResult<ResponseData<Camera>> {
+    pub async fn fetch_person_updated(&self, url: &str, last_update_ts: &str,hw_id:&str)
+                                  -> ApiResult<ResponseData<Person>> {
         let dst_url = utils::add_url_query(url,"last_update",last_update_ts);
-        let dst_url =  utils::add_url_query(&dst_url,"hw_id",device_id);
+        let dst_url =  utils::add_url_query(&dst_url,"hw_id",hw_id);
+        do_get(&self.client, &dst_url).await
+    }
+
+
+    pub async fn fetch_camera_updated(&self, url: &str, last_update_ts: &str,hw_id:&str)
+        -> ApiResult<ResponseData<Camera>> {
+        let dst_url = utils::add_url_query(url,"last_update",last_update_ts);
+        let dst_url =  utils::add_url_query(&dst_url,"hw_id",hw_id);
         do_get(&self.client, &dst_url).await
     }
 

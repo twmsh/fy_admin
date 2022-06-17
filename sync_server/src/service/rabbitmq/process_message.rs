@@ -1,6 +1,6 @@
 use crate::dao::base_model::BaseBoxLog;
 use crate::dao::Dao;
-use crate::service::rabbitmq::model::BoxLogMessage;
+use fy_base::sync::rabbitmq_type::BoxLogMessage;
 use lapin::message::Delivery;
 
 use tracing::{error, warn};

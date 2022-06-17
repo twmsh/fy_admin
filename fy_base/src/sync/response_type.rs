@@ -1,4 +1,5 @@
-
+use axum::response::{IntoResponse, Response};
+use axum::Json;
 use chrono::prelude::*;
 use crate::util::time_format::long_ts_format;
 
@@ -139,3 +140,11 @@ impl<T> ResponseData<T> {
 }
 
 
+impl<T> IntoResponse for ResponseData<T>
+    where
+        T: Serialize,
+{
+    fn into_response(self) -> Response {
+        Json(self).into_response()
+    }
+}

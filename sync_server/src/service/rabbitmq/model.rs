@@ -1,21 +1,6 @@
+use chrono::Local;
+use fy_base::sync::rabbitmq_type::BoxLogMessage;
 use crate::dao::base_model::BaseBoxLog;
-use chrono::prelude::*;
-use fy_base::util::time_format::long_ts_format;
-use serde::{Deserialize, Serialize};
-
-#[derive(Serialize, Deserialize, Debug)]
-pub struct BoxLogMessage {
-    pub hwid: String,
-    pub ips: String,
-
-    #[serde(rename = "type")]
-    pub c_type: String,
-    pub level: i16,
-    pub payload: String,
-
-    #[serde(with = "long_ts_format")]
-    pub ts: DateTime<Local>,
-}
 
 impl From<BoxLogMessage> for BaseBoxLog {
     fn from(msg: BoxLogMessage) -> Self {
