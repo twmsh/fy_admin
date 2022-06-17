@@ -117,17 +117,6 @@ pub struct Db {
     pub capacity: i32,
 }
 
-//----------------------------------
-#[derive(sqlx::FromRow, Serialize, Deserialize, Debug, Clone)]
-pub struct BaseFeaMapRow {
-    pub id: i64,
-    pub db_uuid: String,
-    pub uuid: String,
-    pub face_id: String,
-    pub feature: String,
-    pub quality: f32,
-    pub modify_time: DateTime<Local>,
-}
 
 //----------------------------------
 
@@ -153,6 +142,20 @@ impl<T> ResponseData<T> {
     }
 }
 
+
+//----------------------------------
+#[derive(sqlx::FromRow, Serialize, Deserialize, Debug, Clone)]
+pub struct BaseFeaMapRow {
+    pub id: i64,
+    pub db_uuid: String,
+    pub uuid: String,
+    pub face_id: String,
+    pub feature: String,
+    pub quality: f32,
+    pub modify_time: DateTime<Local>,
+}
+
+//----------------------------------
 impl From<AppError> for ResponseData<()> {
     fn from(e: AppError) -> Self {
         ResponseData {

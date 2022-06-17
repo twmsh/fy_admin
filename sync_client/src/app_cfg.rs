@@ -2,6 +2,8 @@ use crate::error::AppResult;
 use serde::{Deserialize, Serialize};
 use std::fs;
 use std::path::Path;
+use chrono::{DateTime, Local, TimeZone};
+use fy_base::util::time_format::long_ts_format;
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct AppCfgVersion {
@@ -33,6 +35,7 @@ pub struct AppCfgSyncServer {
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct AppCfgSync {
+    pub sync_log: String,
     pub server: AppCfgSyncServer,
     pub heartbeat: u64,     // 心跳间隔
     pub sync_ttl: u64,      // 多久触发同步
@@ -76,3 +79,87 @@ impl AppCfg {
 }
 
 //----------------------------------------------
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct AppSyncLogDb {
+    #[serde(with = "long_ts_format")]
+    pub last_ts: DateTime<Local>,
+    pub last_id: String,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct AppSyncLogPerson {
+    #[serde(with = "long_ts_format")]
+    pub last_ts: DateTime<Local>,
+    pub last_id: String,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct AppSyncLogCamera {
+    #[serde(with = "long_ts_format")]
+    pub last_ts: DateTime<Local>,
+    pub last_id: String,
+}
+//----------------------
+
+impl Default for AppSyncLogDb {
+    fn default() -> Self {
+        Self {
+            last_ts: Local.timestamp(0, 0),
+            last_id: "".into(),
+        }
+    }
+}
+
+impl Default for AppSyncLogPerson {
+    fn default() -> Self {
+        Self {
+            last_ts: Local.timestamp(0, 0),
+            last_id: "".into(),
+        }
+    }
+}
+
+impl Default for AppSyncLogCamera {
+    fn default() -> Self {
+        Self {
+            last_ts: Local.timestamp(0, 0),
+            last_id: "".into(),
+        }
+    }
+}
+
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct AppSyncLog {
+    pub db: AppSyncLogDb,
+    pub person: AppSyncLogPerson,
+    pub camera: AppSyncLogCamera,
+    pub hw_id: String,
+
+}
+
+impl Default for AppSyncLog {
+    fn default() -> Self {
+        Self {
+            db: Default::default(),
+            person: Default::default(),
+            camera: Default::default(),
+            hw_id: "".to_string(),
+        }
+    }
+}
+
+impl AppSyncLog {
+    pub fn load<P: AsRef<Path>>(path: P) -> AppResult<Self> {
+        let file = fs::File::open(path)?;
+        let cfg = serde_json::from_reader(file)?;
+        Ok(cfg)
+    }
+
+    pub fn save<P: AsRef<Path>>(&self, path: P) -> AppResult<()> {
+        let content = serde_json::to_string_pretty(self)?;
+        fs::write(path, content)?;
+        Ok(())
+    }
+}

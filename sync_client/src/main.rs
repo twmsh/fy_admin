@@ -6,8 +6,10 @@ use tracing::{error, info};
 use deadqueue::unlimited::Queue;
 use sync_client::{app_cfg::AppCfg, app_ctx::AppCtx, service::signal_service::SignalService};
 
-use fy_base::util::{logger, se5, service::ServiceRepo};
+use fy_base::util::{utils,logger, se5, service::ServiceRepo};
+use sync_client::app_cfg::AppSyncLog;
 use sync_client::model::queue_item::{RabbitmqItem, TaskItem};
+use sync_client::service::rabbitmq::rabbitmq_service::RabbitmqService;
 use sync_client::service::timer_service::TimerService;
 use sync_client::service::wroker::worker_service::WorkerService;
 
@@ -83,9 +85,43 @@ async fn main() {
         Some(ref v) => v.clone(),
     };
 
+    // 读取同步状态文件, 不存在则生成默认值
+    let persistence_file = app_config.sync.sync_log.as_str();
+    let app_sync_log = if utils::file_exists(persistence_file) {
+        info!("persistence file: {}, read it.", persistence_file);
+        let sync_log = AppSyncLog::load(persistence_file);
+        match sync_log {
+            Ok(mut v) => {
+                v.hw_id = hw_id.clone();
+                v
+            }
+            Err(e) => {
+                error!("error, load file:{}, err:{:?}", persistence_file, e);
+                return;
+            }
+        }
+    } else {
+        info!(
+            "persistence file: {}, not found, create it.",
+            persistence_file
+        );
+
+        let sync_log: AppSyncLog = AppSyncLog {
+            hw_id: hw_id.clone(),
+            ..Default::default()
+        };
+
+        if let Err(e) = sync_log.save(persistence_file) {
+            error!("error, save file:{}, err:{:?}", persistence_file, e);
+            return;
+        }
+        sync_log
+    };
+
+
     // 初始化 context
     let (exit_tx, exit_rx) = watch::channel(0);
-    let app_context = Arc::new(AppCtx::new(app_config, exit_rx, hw_id));
+    let app_context = Arc::new(AppCtx::new(app_config, exit_rx, app_sync_log,hw_id));
 
     // 创建服务集
     let mut service_repo = ServiceRepo::new(app_context.clone());
@@ -106,12 +142,22 @@ async fn main() {
     let worker_service = WorkerService::new(
         app_context.clone(),
         task_queue.clone(),
-        rabbitmq_queue.clone());
+        rabbitmq_queue.clone()
+    );
+
+    // 初始化 rabbitmq 服务
+    let rabbitmq_service = RabbitmqService::new(
+        app_context.clone(),
+        task_queue.clone(),
+        rabbitmq_queue.clone()
+    );
 
     // 启动服务
     service_repo.start_service(exit_service);
     service_repo.start_service(timer_service);
     service_repo.start_service(worker_service);
+    service_repo.start_service(rabbitmq_service);
+
 
     // 等待退出
     service_repo.join().await;

@@ -259,20 +259,22 @@ impl RabbitmqService {
                 &mut cmd_consumer,
                 exit_rx.clone()).await;
 
-            let (rst, loop_rst) = self.check_rabbitmq_error(
+            let (rst, _) = self.check_rabbitmq_error(
                 "loop_message",
                 loop_rst,
                 exit_rx.clone(),
             ).await;
             let _ = match rst {
                 1 => {
+                    // wait_a_moment中收到退出信号
                     break;
                 }
                 2 => {
                     continue;
                 }
                 _ => {
-                    loop_rst.unwrap()
+                    // loop_message里面收到退出信号
+                    break;
                 }
             };
 
