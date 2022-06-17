@@ -1,6 +1,5 @@
-
-use chrono::prelude::*;
 use crate::util::time_format::long_ts_format;
+use chrono::prelude::*;
 use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -16,4 +15,3 @@ pub struct BoxLogMessage {
     #[serde(with = "long_ts_format")]
     pub ts: DateTime<Local>,
 }
-

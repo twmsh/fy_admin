@@ -1,11 +1,11 @@
-use std::sync::Arc;
+use crate::app_ctx::AppCtx;
+use crate::model::queue_item::{RabbitmqItem, TaskItem};
 use deadqueue::unlimited::Queue;
+use fy_base::util::service::Service;
+use std::sync::Arc;
 use tokio::sync::watch::Receiver;
 use tokio::task::JoinHandle;
 use tracing::{debug, info};
-use fy_base::util::service::Service;
-use crate::app_ctx::AppCtx;
-use crate::model::queue_item::{RabbitmqItem, TaskItem};
 
 pub struct WorkerService {
     pub ctx: Arc<AppCtx>,
@@ -27,9 +27,8 @@ impl WorkerService {
     }
 
     async fn process_task(&self, item: TaskItem) {
-        debug!("WorkerService, process_task, {:?}",item);
+        debug!("WorkerService, process_task, {:?}", item);
     }
-
 
     pub async fn do_run(self, mut exit_rx: Receiver<i64>) {
         loop {
@@ -46,7 +45,6 @@ impl WorkerService {
         info!("WorkerService exit.");
     }
 }
-
 
 impl Service for WorkerService {
     fn run(self, exit_rx: Receiver<i64>) -> JoinHandle<()> {

@@ -1,6 +1,6 @@
+use crate::dao::base_model::BaseBoxLog;
 use chrono::Local;
 use fy_base::sync::rabbitmq_type::BoxLogMessage;
-use crate::dao::base_model::BaseBoxLog;
 
 impl From<BoxLogMessage> for BaseBoxLog {
     fn from(msg: BoxLogMessage) -> Self {

@@ -6,9 +6,10 @@ use crate::dao::base_model::{BaseCamera, BaseCameraDel, BaseDb, BaseDbDel, BaseF
 use crate::error::AppError;
 use serde::{Deserialize, Serialize};
 
-
-use fy_base::sync::response_type::{Camera, Person, Db, RES_STATUS_ERROR, ResponseData, SYNC_OP_DEL, SYNC_OP_MODIFY, CameraInfo, PersonInfoFace};
-
+use fy_base::sync::response_type::{
+    Camera, CameraInfo, Db, Person, PersonInfoFace, ResponseData, RES_STATUS_ERROR, SYNC_OP_DEL,
+    SYNC_OP_MODIFY,
+};
 
 //----------------------------------
 #[derive(sqlx::FromRow, Serialize, Deserialize, Debug, Clone)]
@@ -33,7 +34,6 @@ impl From<AppError> for ResponseData<()> {
         }
     }
 }
-
 
 //-------------------------
 

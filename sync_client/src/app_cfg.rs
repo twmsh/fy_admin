@@ -1,9 +1,9 @@
 use crate::error::AppResult;
+use chrono::{DateTime, Local, TimeZone};
+use fy_base::util::time_format::long_ts_format;
 use serde::{Deserialize, Serialize};
 use std::fs;
 use std::path::Path;
-use chrono::{DateTime, Local, TimeZone};
-use fy_base::util::time_format::long_ts_format;
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct AppCfgVersion {
@@ -32,13 +32,12 @@ pub struct AppCfgSyncServer {
     pub camera_sync: String,
 }
 
-
 #[derive(Serialize, Deserialize, Debug)]
 pub struct AppCfgSync {
     pub sync_log: String,
     pub server: AppCfgSyncServer,
-    pub heartbeat: u64,     // 心跳间隔
-    pub sync_ttl: u64,      // 多久触发同步
+    pub heartbeat: u64, // 心跳间隔
+    pub sync_ttl: u64,  // 多久触发同步
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -129,14 +128,12 @@ impl Default for AppSyncLogCamera {
     }
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct AppSyncLog {
     pub db: AppSyncLogDb,
     pub person: AppSyncLogPerson,
     pub camera: AppSyncLogCamera,
     pub hw_id: String,
-
 }
 
 impl Default for AppSyncLog {

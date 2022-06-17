@@ -21,12 +21,7 @@ pub struct AppCtx {
 }
 
 impl AppCtx {
-    pub fn new(
-        cfg: AppCfg,
-        exit_rx: Receiver<i64>,
-        sync_log: AppSyncLog,
-        hw_id: String,
-    ) -> Self {
+    pub fn new(cfg: AppCfg, exit_rx: Receiver<i64>, sync_log: AppSyncLog, hw_id: String) -> Self {
         let ana_api = AnalysisApi::new(&cfg.api.grab_url);
         let recg_api = RecognitionApi::new(&cfg.api.recg_url);
 

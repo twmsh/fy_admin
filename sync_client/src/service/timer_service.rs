@@ -1,13 +1,13 @@
+use crate::app_ctx::AppCtx;
+use crate::model::queue_item::{TaskItem, TaskItemType};
+use chrono::Local;
+use deadqueue::unlimited::Queue;
+use fy_base::util::service::Service;
 use std::sync::Arc;
 use std::time::Duration;
-use chrono::{Local};
-use deadqueue::unlimited::Queue;
 use tokio::sync::watch::Receiver;
 use tokio::task::JoinHandle;
 use tracing::info;
-use fy_base::util::service::Service;
-use crate::app_ctx::AppCtx;
-use crate::model::queue_item::{TaskItem, TaskItemType};
 
 pub struct TimerService {
     pub ctx: Arc<AppCtx>,
@@ -16,10 +16,7 @@ pub struct TimerService {
 
 impl TimerService {
     pub fn new(ctx: Arc<AppCtx>, queue: Arc<Queue<TaskItem>>) -> Self {
-        Self {
-            ctx,
-            queue,
-        }
+        Self { ctx, queue }
     }
 
     fn push_hb_task(&self) {
@@ -43,7 +40,6 @@ impl TimerService {
         });
         info!("TimerService, push_sync_task");
     }
-
 
     pub async fn do_run(self, mut exit_rx: Receiver<i64>) {
         let hb_interval = self.ctx.cfg.sync.heartbeat; // 分钟

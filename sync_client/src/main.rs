@@ -1,12 +1,12 @@
 use build_time::build_time_local;
 use clap::{arg, Command};
+use deadqueue::unlimited::Queue;
 use std::sync::Arc;
+use sync_client::{app_cfg::AppCfg, app_ctx::AppCtx, service::signal_service::SignalService};
 use tokio::sync::watch;
 use tracing::{error, info};
-use deadqueue::unlimited::Queue;
-use sync_client::{app_cfg::AppCfg, app_ctx::AppCtx, service::signal_service::SignalService};
 
-use fy_base::util::{utils,logger, se5, service::ServiceRepo};
+use fy_base::util::{logger, se5, service::ServiceRepo, utils};
 use sync_client::app_cfg::AppSyncLog;
 use sync_client::model::queue_item::{RabbitmqItem, TaskItem};
 use sync_client::service::rabbitmq::rabbitmq_service::RabbitmqService;
@@ -118,10 +118,9 @@ async fn main() {
         sync_log
     };
 
-
     // 初始化 context
     let (exit_tx, exit_rx) = watch::channel(0);
-    let app_context = Arc::new(AppCtx::new(app_config, exit_rx, app_sync_log,hw_id));
+    let app_context = Arc::new(AppCtx::new(app_config, exit_rx, app_sync_log, hw_id));
 
     // 创建服务集
     let mut service_repo = ServiceRepo::new(app_context.clone());
@@ -134,22 +133,20 @@ async fn main() {
     let exit_service = SignalService::new(exit_tx);
 
     // 初始化timer服务
-    let timer_service = TimerService::new(
-        app_context.clone(),
-        task_queue.clone());
+    let timer_service = TimerService::new(app_context.clone(), task_queue.clone());
 
     // 初始化worker服务
     let worker_service = WorkerService::new(
         app_context.clone(),
         task_queue.clone(),
-        rabbitmq_queue.clone()
+        rabbitmq_queue.clone(),
     );
 
     // 初始化 rabbitmq 服务
     let rabbitmq_service = RabbitmqService::new(
         app_context.clone(),
         task_queue.clone(),
-        rabbitmq_queue.clone()
+        rabbitmq_queue.clone(),
     );
 
     // 启动服务
@@ -157,7 +154,6 @@ async fn main() {
     service_repo.start_service(timer_service);
     service_repo.start_service(worker_service);
     service_repo.start_service(rabbitmq_service);
-
 
     // 等待退出
     service_repo.join().await;

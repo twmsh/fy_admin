@@ -1,10 +1,7 @@
-use crate::service::web::model::{
-    build_fail_response_data, get_personinfo_from_map,
-};
+use crate::service::web::model::{build_fail_response_data, get_personinfo_from_map};
 
 use fy_base::sync::response_type::{
-    Camera, Db, Person, ResponseData,
-    RES_STATUS_BIZ_ERR, RES_STATUS_INVALID_PARA,
+    Camera, Db, Person, ResponseData, RES_STATUS_BIZ_ERR, RES_STATUS_INVALID_PARA,
 };
 
 use crate::service::web::WebState;
