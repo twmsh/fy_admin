@@ -2,7 +2,7 @@ use std::sync::Arc;
 use deadqueue::unlimited::Queue;
 use tokio::sync::watch::Receiver;
 use tokio::task::JoinHandle;
-use tracing::info;
+use tracing::{debug, info};
 use fy_base::util::service::Service;
 use crate::app_ctx::AppCtx;
 use crate::model::queue_item::{RabbitmqItem, TaskItem};
@@ -26,11 +26,16 @@ impl WorkerService {
         }
     }
 
+    async fn process_task(&self, item: TaskItem) {
+        debug!("WorkerService, process_task, {:?}",item);
+    }
+
+
     pub async fn do_run(self, mut exit_rx: Receiver<i64>) {
         loop {
             tokio::select! {
                 item = self.task_queue.pop() => {
-
+                    self.process_task(item).await;
                 }
                 _ = exit_rx.changed() => {
                     info!("WorkerService, recv signal, will exit");
