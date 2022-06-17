@@ -6,8 +6,8 @@ AFTER DELETE
 
 BEGIN
 
-  INSERT INTO base_camera_del(origin_id,name,uuid,box_hwid,c_type,url,config,create_time,modify_time)
-  VALUES(OLD.id, OLD.name,OLD.uuid,OLD.box_hwid,OLD.c_type,OLD.url,OLD.config,OLD.create_time,now(3));
+  INSERT INTO base_camera_del(origin_id,name,uuid,box_deviceid,c_type,url,config,create_time,modify_time)
+  VALUES(OLD.id, OLD.name,OLD.uuid,OLD.box_deviceid,OLD.c_type,OLD.url,OLD.config,OLD.create_time,now(3));
 
 END;
 

@@ -19,6 +19,9 @@ pub struct BaseBox {
     /* 硬件编号 */
     pub hw_id: String,
 
+    /* 盒子编号;应用层面分配的 */
+    pub device_id: String,
+
     /* 同步状态开关;0:同步关闭 1:同步开启 */
     pub sync_flag: i16,
 
@@ -77,8 +80,8 @@ pub struct BaseCamera {
     /* uuid */
     pub uuid: String,
 
-    /* 小盒子硬件编号 */
-    pub box_hwid: String,
+    /* 小盒子编号 */
+    pub box_deviceid: String,
 
     /* 摄像头采集类型 */
     pub c_type: i16,
@@ -112,8 +115,8 @@ pub struct BaseCameraDel {
     /* uuid */
     pub uuid: String,
 
-    /* 小盒子硬件编号 */
-    pub box_hwid: String,
+    /* 小盒子编号 */
+    pub box_deviceid: String,
 
     /* 摄像头采集类型 */
     pub c_type: i16,

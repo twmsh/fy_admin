@@ -87,14 +87,14 @@ impl Dao {
     pub async fn get_camera_list(
         &self,
         last_update: DateTime<Local>,
-        box_hwid: &str,
+        box_deviceid: &str,
         limit: u32,
     ) -> Result<Vec<BaseCamera>, AppError> {
-        let sql = "select * from base_camera where box_hwid = ? and modify_time > ? order by modify_time asc limit ?";
+        let sql = "select * from base_camera where box_deviceid = ? and modify_time > ? order by modify_time asc limit ?";
         let last_update = mysql_util::fix_write_dt(&last_update, &self.tz);
 
         let mut list = sqlx::query_as::<_, BaseCamera>(sql)
-            .bind(box_hwid)
+            .bind(box_deviceid)
             .bind(last_update)
             .bind(limit)
             .fetch_all(self.pool.deref())
@@ -111,14 +111,14 @@ impl Dao {
     pub async fn get_cameradel_list(
         &self,
         last_update: DateTime<Local>,
-        box_hwid: &str,
+        box_deviceid: &str,
         limit: u32,
     ) -> Result<Vec<BaseCameraDel>, AppError> {
-        let sql = "select * from base_camera_del where box_hwid = ? and modify_time > ? order by modify_time asc limit ?";
+        let sql = "select * from base_camera_del where box_deviceid = ? and modify_time > ? order by modify_time asc limit ?";
         let last_update = mysql_util::fix_write_dt(&last_update, &self.tz);
 
         let mut list = sqlx::query_as::<_, BaseCameraDel>(sql)
-            .bind(box_hwid)
+            .bind(box_deviceid)
             .bind(last_update)
             .bind(limit)
             .fetch_all(self.pool.deref())

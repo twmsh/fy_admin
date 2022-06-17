@@ -4,7 +4,7 @@
   "avatar": "",
   "version": "4.1.1",
   "createdTime": "2022-5-20 20:11:51",
-  "updatedTime": "2022-6-14 11:12:35",
+  "updatedTime": "2022-6-17 20:13:10",
   "dbConns": [],
   "profile": {
     "default": {
@@ -606,6 +606,23 @@
           "id": "83A2CA2D-2099-48ED-982D-ED9685560D15"
         },
         {
+          "defKey": "device_id",
+          "defName": "盒子编号",
+          "comment": "应用层面分配的",
+          "type": "VARCHAR",
+          "len": 50,
+          "scale": "",
+          "primaryKey": false,
+          "notNull": true,
+          "autoIncrement": false,
+          "defaultValue": "",
+          "hideInGraph": false,
+          "refDict": "",
+          "extProps": {},
+          "domain": "",
+          "id": "1682D178-73C9-4886-9C1E-E680F02450F9"
+        },
+        {
           "defKey": "sync_flag",
           "defName": "同步状态开关",
           "comment": "0:同步关闭 1:同步开启",
@@ -723,6 +740,20 @@
             }
           ],
           "id": "DF744EAB-0B78-42A2-9D66-55CF7B48EBEB"
+        },
+        {
+          "defKey": "idx_box_device_id",
+          "defName": null,
+          "unique": true,
+          "comment": "",
+          "fields": [
+            {
+              "fieldDefKey": "1682D178-73C9-4886-9C1E-E680F02450F9",
+              "ascOrDesc": "A",
+              "id": "254ACC91-A7C9-45E6-8614-A8AB45F3A8D8"
+            }
+          ],
+          "id": "78208809-60FD-471B-8FB7-6937071448CC"
         }
       ]
     },
@@ -865,8 +896,8 @@
           "id": "FA62EDBC-ECAB-4B68-81DD-39E652BCF228"
         },
         {
-          "defKey": "box_hwid",
-          "defName": "小盒子硬件编号",
+          "defKey": "box_deviceid",
+          "defName": "小盒子编号",
           "comment": "",
           "domain": "",
           "type": "VARCHAR",
@@ -2676,8 +2707,8 @@
           "id": "FA62EDBC-ECAB-4B68-81DD-39E652BCF228"
         },
         {
-          "defKey": "box_hwid",
-          "defName": "小盒子硬件编号",
+          "defKey": "box_deviceid",
+          "defName": "小盒子编号",
           "comment": "",
           "domain": "",
           "type": "VARCHAR",
@@ -2795,7 +2826,7 @@
           "id": "D1FD682B-65E8-412B-BED6-33F58D810FDC"
         },
         {
-          "defKey": "idx_camera_del_box_hwid",
+          "defKey": "idx_camera_del_box_deviceid",
           "defName": null,
           "unique": false,
           "comment": "",

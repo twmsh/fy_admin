@@ -3,6 +3,7 @@ CREATE TABLE base_box(
     id BIGINT NOT NULL AUTO_INCREMENT  COMMENT 'id' ,
     name VARCHAR(50)    COMMENT '盒子名称' ,
     hw_id VARCHAR(50) NOT NULL   COMMENT '硬件编号' ,
+    device_id VARCHAR(50) NOT NULL   COMMENT '盒子编号;应用层面分配的' ,
     sync_flag SMALLINT NOT NULL   COMMENT '同步状态开关;0:同步关闭 1:同步开启' ,
     has_db SMALLINT NOT NULL   COMMENT '是否保存db;0: 不需同步db 1:需要同步db' ,
     has_camera SMALLINT NOT NULL   COMMENT '是否有摄像头;0: 不需要同步摄像头 1:需要同步摄像头' ,
@@ -14,13 +15,14 @@ CREATE TABLE base_box(
 
 
 CREATE UNIQUE INDEX idx_box_hw_id ON base_box(hw_id);
+CREATE UNIQUE INDEX idx_box_device_id ON base_box(device_id);
 
 DROP TABLE IF EXISTS base_camera;
 CREATE TABLE base_camera(
     id BIGINT NOT NULL AUTO_INCREMENT  COMMENT 'id' ,
     name VARCHAR(50)    COMMENT '摄像头名称' ,
     uuid VARCHAR(50) NOT NULL   COMMENT 'uuid' ,
-    box_hwid VARCHAR(50) NOT NULL   COMMENT '小盒子硬件编号' ,
+    box_deviceid VARCHAR(50) NOT NULL   COMMENT '小盒子编号' ,
     c_type SMALLINT NOT NULL   COMMENT '摄像头采集类型' ,
     url VARCHAR(255) NOT NULL   COMMENT '采集地址' ,
     config TEXT NOT NULL   COMMENT '摄像头配置' ,
@@ -31,7 +33,7 @@ CREATE TABLE base_camera(
 
 
 CREATE UNIQUE INDEX idx_camera_uuid ON base_camera(uuid);
-CREATE INDEX idx_camera_box_hwid ON base_camera(box_hwid);
+CREATE INDEX idx_camera_box_hwid ON base_camera(box_deviceid);
 CREATE INDEX idx_camera_modify ON base_camera(modify_time);
 
 DROP TABLE IF EXISTS base_db;
@@ -141,7 +143,7 @@ CREATE TABLE base_camera_del(
     origin_id INT NOT NULL   COMMENT '原来表中的id' ,
     name VARCHAR(50)    COMMENT '摄像头名称' ,
     uuid VARCHAR(50) NOT NULL   COMMENT 'uuid' ,
-    box_hwid VARCHAR(50) NOT NULL   COMMENT '小盒子硬件编号' ,
+    box_deviceid VARCHAR(50) NOT NULL   COMMENT '小盒子编号' ,
     c_type SMALLINT NOT NULL   COMMENT '摄像头采集类型' ,
     url VARCHAR(255) NOT NULL   COMMENT '采集地址' ,
     config TEXT NOT NULL   COMMENT '摄像头配置' ,
@@ -152,7 +154,7 @@ CREATE TABLE base_camera_del(
 
 
 CREATE INDEX idx_camera_del_uuid ON base_camera_del(uuid);
-CREATE INDEX idx_camera_del_box_hwid ON base_camera_del(box_hwid);
+CREATE INDEX idx_camera_del_box_deviceid ON base_camera_del(box_deviceid);
 CREATE INDEX idx_camera_del_modify ON base_camera_del(modify_time);
 
 DROP TABLE IF EXISTS base_fea_map;
