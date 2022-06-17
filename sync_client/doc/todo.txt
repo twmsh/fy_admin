@@ -17,6 +17,7 @@ sync_server应该增加一个Service,定时清除box_log表记录。
 
 rabbit发送队列
 从消息队列中，取出消息，进行发送，注意重连问题。
+设置消息的ttl
 //-----------------------------
 service:
 1) TimerService, 定时生成心跳任务，放入到任务队列中

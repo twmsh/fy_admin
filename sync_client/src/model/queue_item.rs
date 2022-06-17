@@ -2,6 +2,7 @@ use chrono::{DateTime, Local};
 use serde::{Serialize,Deserialize};
 use fy_base::util::time_format::long_ts_format;
 
+
 #[derive(Debug,Serialize,Deserialize)]
 pub struct TaskItem {
     pub id: u64,                // timestamp 流水号
@@ -21,21 +22,9 @@ pub enum TaskItemType {
     ServerCmd,  // 服务端的命令
 }
 
-//--------------------------------------
-// 从rabbitmq读取的消息
-pub struct RabbitmqInMessage {
-    pub id: u64,                // 流水号
-
-    #[serde(rename="type")]
-    pub m_type: String,         // 消息类型
-
-    pub payload: String,        // 具体内容
-
-    #[serde(with = "long_ts_format")]
-    pub ts: DateTime<Local>,    // 时间戳
-}
 
 // 发送到 rabbitmq的消息，等同于sync_server中的BoxLogMessage
+#[derive(Debug,Serialize,Deserialize)]
 pub struct RabbitmqItem {
     pub hwid: String,
     pub ips: String,

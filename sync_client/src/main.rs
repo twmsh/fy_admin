@@ -3,10 +3,13 @@ use clap::{arg, Command};
 use std::sync::Arc;
 use tokio::sync::watch;
 use tracing::{error, info};
-
+use deadqueue::unlimited::Queue;
 use sync_client::{app_cfg::AppCfg, app_ctx::AppCtx, service::signal_service::SignalService};
 
 use fy_base::util::{logger, se5, service::ServiceRepo};
+use sync_client::model::queue_item::{RabbitmqItem, TaskItem};
+use sync_client::service::timer_service::TimerService;
+use sync_client::service::wroker::worker_service::WorkerService;
 
 const APP_NAME: &str = "sync_client";
 const APP_VER_NUM: &str = "0.1.0";
@@ -87,13 +90,28 @@ async fn main() {
     // 创建服务集
     let mut service_repo = ServiceRepo::new(app_context.clone());
 
-    // let task_queue =
+    // 创建队列
+    let task_queue: Arc<Queue<TaskItem>> = Arc::new(Queue::new());
+    let rabbitmq_queue: Arc<Queue<RabbitmqItem>> = Arc::new(Queue::new());
 
     // 初始退出信号服务
     let exit_service = SignalService::new(exit_tx);
 
+    // 初始化timer服务
+    let timer_service = TimerService::new(
+        app_context.clone(),
+        task_queue.clone());
+
+    // 初始化worker服务
+    let worker_service = WorkerService::new(
+        app_context.clone(),
+        task_queue.clone(),
+        rabbitmq_queue.clone());
+
     // 启动服务
     service_repo.start_service(exit_service);
+    service_repo.start_service(timer_service);
+    service_repo.start_service(worker_service);
 
     // 等待退出
     service_repo.join().await;

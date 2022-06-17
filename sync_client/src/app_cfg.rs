@@ -24,10 +24,18 @@ pub struct AppCfgApi {
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-pub struct AppCfgServer {
+pub struct AppCfgSyncServer {
     pub db_sync: String,
     pub person_sync: String,
     pub camera_sync: String,
+}
+
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct AppCfgSync {
+    pub server: AppCfgSyncServer,
+    pub heartbeat: u64,     // 心跳间隔
+    pub sync_ttl: u64,      // 多久触发同步
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -50,7 +58,7 @@ pub struct AppCfg {
     pub version: AppCfgVersion,
     pub log: AppCfgLog,
     pub api: AppCfgApi,
-    pub server: AppCfgServer,
+    pub sync: AppCfgSync,
     pub rabbitmq: AppCfgRabbitMq,
     pub hw_id: Option<String>,
 }
