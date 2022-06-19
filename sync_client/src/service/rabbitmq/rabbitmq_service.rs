@@ -10,15 +10,11 @@ use tokio::sync::watch::Receiver;
 use tokio::task::JoinHandle;
 
 use lapin::message::Delivery;
-use lapin::options::{BasicAckOptions, BasicConsumeOptions};
-use lapin::{
-    options::{ExchangeDeclareOptions, QueueBindOptions, QueueDeclareOptions},
-    types::FieldTable,
-    Channel, Connection, ConnectionProperties, Consumer, ExchangeKind,
-};
+use lapin::options::{BasicAckOptions, BasicConsumeOptions, BasicPublishOptions, ConfirmSelectOptions};
+use lapin::{options::{ExchangeDeclareOptions, QueueBindOptions, QueueDeclareOptions}, types::FieldTable, Channel, Connection, ConnectionProperties, Consumer, ExchangeKind, BasicProperties};
 use tokio::time::sleep;
 use tokio_stream::StreamExt;
-use tracing::{error, info};
+use tracing::{debug, error, info};
 
 pub struct RabbitmqService {
     pub ctx: Arc<AppCtx>,
@@ -121,6 +117,10 @@ impl RabbitmqService {
         conn: &Connection,
     ) -> Result<(Channel, lapin::Queue), lapin::Error> {
         let channel = conn.create_channel().await?;
+
+        // 设置发送方确认
+        let _ = channel.confirm_select(ConfirmSelectOptions::default()).await?;
+
 
         let _log_queue = self
             .init_rabbitmq_queue(
@@ -241,7 +241,7 @@ impl RabbitmqService {
             };
 
             // loop message
-            let loop_rst = self.loop_message(&mut cmd_consumer, exit_rx.clone()).await;
+            let loop_rst = self.loop_message(&mut cmd_consumer, exit_rx.clone(),&channel).await;
 
             let (rst, _) = self
                 .check_rabbitmq_error("loop_message", loop_rst, exit_rx.clone())
@@ -268,6 +268,7 @@ impl RabbitmqService {
         &mut self,
         consumer: &mut Consumer,
         mut exit_rx: Receiver<i64>,
+        channel: &Channel
     ) -> Result<(), lapin::Error> {
         loop {
             tokio::select! {
@@ -294,7 +295,7 @@ impl RabbitmqService {
                     break;
                 }
                 item = self.rabbitmq_queue.pop() => {
-                    let _ = self.process_out_rabbitmsg(item).await?;
+                    let _ = self.process_out_rabbitmsg(channel,item).await?;
                 }
 
             }
@@ -309,7 +310,27 @@ impl RabbitmqService {
         Ok(())
     }
 
-    async fn process_out_rabbitmsg(&mut self, item: RabbitmqItem) -> Result<(), lapin::Error> {
+    async fn process_out_rabbitmsg(&mut self, channel: &Channel, item: RabbitmqItem) -> Result<(), lapin::Error> {
+        let exchange = self.ctx.cfg.rabbitmq.log.exchange.as_str();
+        let route_key = self.ctx.cfg.rabbitmq.log.route_key.as_str();
+        let payload = serde_json::to_string(&item);
+        if let Err(e) = payload {
+            error!("error, rabbitmq_service, serde_json::to_string, err: {:?}",e);
+            return Ok(());
+        }
+        let payload = payload.unwrap();
+
+        let expire = self.ctx.cfg.rabbitmq.log.expire * 60 * 1000; // 分钟 * 60* 1000
+
+        let publish_confirm = channel.basic_publish(
+            exchange,
+            route_key,
+            BasicPublishOptions::default(),
+            payload.as_bytes(),
+            BasicProperties::default().with_expiration(expire.to_string().into()),
+        ).await?.await?;
+        debug!("RabbitmqService, publish_confirm, {:?}",publish_confirm);
+
         Ok(())
     }
 }

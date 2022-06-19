@@ -41,16 +41,25 @@ pub struct AppCfgSync {
 }
 
 #[derive(Serialize, Deserialize, Debug)]
+pub struct AppCfgRabbitMqLogItem {
+    pub queue: String,
+    pub exchange: String,
+    pub route_key: String,
+    pub expire: u64,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
 pub struct AppCfgRabbitMqItem {
     pub queue: String,
     pub exchange: String,
     pub route_key: String,
+    pub expire: u64,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct AppCfgRabbitMq {
     pub url: String,
-    pub log: AppCfgRabbitMqItem,
+    pub log: AppCfgRabbitMqLogItem,
     pub cmd: AppCfgRabbitMqItem,
 }
 

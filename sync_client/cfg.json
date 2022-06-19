@@ -28,7 +28,8 @@
     "log": {
       "queue": "device_log_queue",
       "exchange": "device_log_exchange",
-      "route_key": "box.log"
+      "route_key": "box.log",
+      "expire": 720
     },
     "cmd": {
       "queue": "device_cmd_queue",

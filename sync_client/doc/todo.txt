@@ -1,4 +1,6 @@
 
+
+//---------------------------------------
 device_id和hw_id的问题
 
 box上传用 hw_id，服务端将hw_id转成device_id来获取camera信息。
