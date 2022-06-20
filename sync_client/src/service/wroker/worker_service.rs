@@ -60,7 +60,14 @@ impl WorkerService {
         }
     }
 
-    async fn process_task_sync(&self, _item: TaskItem) {}
+    async fn process_task_sync(&self, _item: TaskItem) {
+        // -> camera -> db -> person
+        // 先处理camera，camera数量较少,person数据量最多，最后处理。
+        // camera处理完，无论处理成功与否，继续处理 db，最后处理person
+
+
+
+    }
 
     async fn process_task_status(&self, item: TaskItem) {
         // 获取小盒子上，摄像头和db的数量情况，然后放到rabbitmq_queue中s
