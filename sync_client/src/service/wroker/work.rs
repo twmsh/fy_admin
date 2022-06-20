@@ -1,11 +1,21 @@
+use std::sync::Arc;
+use std::time::Duration;
 use crate::error::AppError;
 use crate::model::queue_item::RabbitmqItem;
 use crate::model::{StatusCamera, StatusDb, StatusPayload};
 use chrono::Local;
-use fy_base::api::bm_api::{AnalysisApi, RecognitionApi};
+use clap::App;
+use fy_base::api::bm_api::{AnalysisApi, CreateSourceReqConfig, RecognitionApi};
 use fy_base::sync::rabbitmq_type::{BOXLOGMESSAGE_LEVEL_INFO, BOXLOGMESSAGE_TYPE_STATUS};
 use log::debug;
+
+
 use tracing::{error, info};
+use fy_base::api::sync_api::{Camera, CameraInfo, SYNC_OP_DEL};
+
+use fy_base::util::utils;
+use crate::app_ctx::AppCtx;
+
 
 #[cfg(unix)]
 pub fn reboot_box() {
@@ -18,6 +28,9 @@ pub fn reboot_box() {
 pub fn reboot_box() {
     info!("WorkerService, reboot_box, non_op");
 }
+
+//-----------------------------
+
 
 //-----------------------------
 pub async fn delete_all_cameras(api_client: &AnalysisApi) -> Result<u64, AppError> {
@@ -186,4 +199,90 @@ pub fn build_rabbitmqitem_from_status(
         payload,
         ts: Local::now(),
     }
+}
+
+
+//----------------------------------------
+pub async fn do_sync_camera(ctx: Arc<AppCtx>) -> Result<bool, AppError> {
+    let max_loop = 100;
+    let mut loop_count = 0;
+
+    let url = ctx.cfg.sync.server.camera_sync.as_str();
+    let hw_id = ctx.hw_id.as_str();
+    let api = &ctx.sync_api;
+
+    loop {
+        let sync_log = ctx.get_sync_log();
+        let last_ts = sync_log.camera.last_ts;
+        let last_ts = last_ts.format(utils::DATETIME_FMT_LONG).to_string();
+
+        let res = api.fetch_camera_updated(url, &last_ts, hw_id).await?;
+        if res.status != 0 {
+            return Err(AppError::new(&format!("fetch_camera_updated, return status: {}", res.status)));
+        }
+
+        // 检查退出信号
+        if ctx.is_exit() {
+            return Ok(true);
+        }
+
+        if res.is_empty() {
+            // 没有更新数据，退出
+            return Ok(false);
+        }
+
+        let res_data = res.data.unwrap();
+        let exited = do_sync_camera_batch(ctx.clone(), res_data).await?;
+        if exited {
+            return Ok(true);
+        }
+
+        loop_count += 1;
+        // 循环次数过多，退出
+        if loop_count >= max_loop {
+            break;
+        }
+
+        // 休眠一会
+        tokio::time::sleep(Duration::from_millis(200)).await;
+    }
+
+    Ok(false)
+}
+
+pub async fn do_sync_camera_batch(ctx: Arc<AppCtx>, list: Vec<Camera>)
+                                  -> Result<bool, AppError> {
+    for camera in list.iter() {
+        if camera.op == SYNC_OP_DEL {
+            // 删除
+            let deled =   ctx.ana_api.delete_source(camera.uuid.clone()).await?;
+            debug!("WorkerService, delete camera:{}, return: {:?}",camera.uuid,deled);
+
+        } else {
+            //新增或修改
+            let config = match camera.detail {
+                None => {
+                    return Err(AppError::new(&format!("camera:{} detail is none",camera.uuid)));
+                }
+                Some(ref v) => v.config.clone()
+            };
+
+            let camera_config = serde_json::from_reader::<_,CreateSourceReqConfig>(config.as_bytes())?;
+
+
+
+        }
+
+
+        // 更新 last_update_ts
+        ctx.update_synclog_for_camera(&camera.id, camera.last_update);
+
+        // 检查退出
+        if ctx.is_exit() {
+            return Ok(true);
+        }
+    }
+
+
+    Ok(false)
 }

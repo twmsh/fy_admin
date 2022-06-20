@@ -7,8 +7,10 @@ use std::sync::Arc;
 use tokio::sync::watch::Receiver;
 use tokio::task::JoinHandle;
 use tracing::{debug, error, info};
+use crate::error::AppError;
 
 use crate::model::ResetPayload;
+use fy_base::api::sync_api::Api;
 use crate::service::wroker::work::{
     build_rabbitmqitem_from_status, delete_all_cameras, delete_all_dbs, get_status_payload,
     reboot_box,
@@ -18,6 +20,7 @@ pub struct WorkerService {
     pub ctx: Arc<AppCtx>,
     pub task_queue: Arc<Queue<TaskItem>>,
     pub rabbitmq_queue: Arc<Queue<RabbitmqItem>>,
+
 }
 
 impl WorkerService {
@@ -30,15 +33,16 @@ impl WorkerService {
             ctx,
             task_queue,
             rabbitmq_queue,
+
         }
     }
 
-    async fn process_task(&self, item: TaskItem) {
+    async fn process_task(&self, item: TaskItem, exit_rx: Receiver<i64>) {
         debug!("WorkerService, process_task, {:?}", item);
 
         match item.t_type {
             TaskItemType::SyncTimer => {
-                self.process_task_sync(item).await;
+                self.process_task_sync(item,exit_rx).await;
             }
             TaskItemType::HeartBeat => {
                 self.process_task_status(item).await;
@@ -46,7 +50,7 @@ impl WorkerService {
             TaskItemType::ServerCmd => {
                 if item.sub_type == 0 {
                     // sync
-                    self.process_task_sync(item).await;
+                    self.process_task_sync(item,exit_rx).await;
                 } else if item.sub_type == 1 {
                     // reset
                     self.process_task_reset(item).await;
@@ -60,13 +64,65 @@ impl WorkerService {
         }
     }
 
-    async fn process_task_sync(&self, _item: TaskItem) {
+
+    async fn process_task_sync(&self, _item: TaskItem, exit_rx: Receiver<i64>) {
         // -> camera -> db -> person
         // 先处理camera，camera数量较少,person数据量最多，最后处理。
         // camera处理完，无论处理成功与否，继续处理 db，最后处理person
 
+       let exited =  match self.sync_camera(&exit_rx).await{
+            Ok(v) => v,
+            Err(e) => {
+                error!("error, Worker_service, sync_camera, err: {}", e);
+                false
+            }
+        };
+        self.ctx.save_sync_log();
+        if exited {
+            // 保存 sync_log
+            return;
+        }
 
+        // 处理 sync db
+        let exited =  match self.sync_db(&exit_rx).await{
+            Ok(v) => v,
+            Err(e) => {
+                error!("error, Worker_service, sync_db, err: {}", e);
+                false
+            }
+        };
+        self.ctx.save_sync_log();
+        if exited {
+            // 保存 sync_log
+            return;
+        }
 
+        // 处理 sync person
+        let exited =  match self.sync_person(&exit_rx).await{
+            Ok(v) => v,
+            Err(e) => {
+                error!("error, Worker_service, sync_person, err: {}", e);
+                false
+            }
+        };
+        self.ctx.save_sync_log();
+
+    }
+
+    // bool 表示是否收到退出信号
+    async fn sync_camera(&self, exit_rx: &Receiver<i64>) -> Result<bool,AppError> {
+
+        Ok(false)
+    }
+
+    async fn sync_db(&self, exit_rx: &Receiver<i64>) -> Result<bool,AppError> {
+
+        Ok(false)
+    }
+
+    async fn sync_person(&self, exit_rx: &Receiver<i64>) -> Result<bool,AppError> {
+
+        Ok(false)
     }
 
     async fn process_task_status(&self, item: TaskItem) {
@@ -134,7 +190,7 @@ impl WorkerService {
         loop {
             tokio::select! {
                 item = self.task_queue.pop() => {
-                    self.process_task(item).await;
+                    self.process_task(item,exit_rx.clone()).await;
                 }
                 _ = exit_rx.changed() => {
                     info!("WorkerService, recv signal, will exit");
