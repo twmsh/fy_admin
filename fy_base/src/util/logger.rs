@@ -239,7 +239,7 @@ pub fn init_app_logger(
     app_level: LevelFilter,
     depends_level: LevelFilter,
 ) -> Result<(), InitLoggerErr> {
-    let pattern = "{d(%Y/%m/%d %H:%M:%S%.3f)} {l} - {m}{n}";
+    let pattern = "{d(%Y/%m/%d %H:%M:%S%.3f)} {M} {l} - {m}{n}";
 
     let stdout = ConsoleAppender::builder()
         .target(Target::Stdout)

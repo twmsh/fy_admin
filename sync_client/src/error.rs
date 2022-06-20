@@ -73,3 +73,9 @@ impl From<&str> for AppError {
         Self { msg: msg.into() }
     }
 }
+
+impl From<fy_base::api::bm_api::ApiError> for AppError {
+    fn from(e: fy_base::api::bm_api::ApiError) -> Self {
+        AppError::from_debug(e)
+    }
+}

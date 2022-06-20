@@ -12,6 +12,8 @@ pub struct TaskItem {
 
     #[serde(with = "long_ts_format")]
     pub ts: DateTime<Local>, // 时间戳
+
+    pub sub_type: u32,   // 子命令类型
     pub payload: String, // 具体内容
 }
 

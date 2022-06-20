@@ -36,8 +36,9 @@ pub struct AppCfgSyncServer {
 pub struct AppCfgSync {
     pub sync_log: String,
     pub server: AppCfgSyncServer,
-    pub heartbeat: u64, // 心跳间隔
-    pub sync_ttl: u64,  // 多久触发同步
+    pub heartbeat: u64,
+    // 心跳间隔
+    pub sync_ttl: u64, // 多久触发同步
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -50,10 +51,8 @@ pub struct AppCfgRabbitMqLogItem {
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct AppCfgRabbitMqItem {
-    pub queue: String,
     pub exchange: String,
     pub route_key: String,
-    pub expire: u64,
 }
 
 #[derive(Serialize, Deserialize, Debug)]

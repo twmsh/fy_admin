@@ -25,6 +25,7 @@ impl TimerService {
             id: now.timestamp_millis() as u64,
             t_type: TaskItemType::HeartBeat,
             ts: now,
+            sub_type: 0,
             payload: "".to_string(),
         });
         info!("TimerService, push_hb_task");
@@ -36,6 +37,7 @@ impl TimerService {
             id: now.timestamp_millis() as u64,
             t_type: TaskItemType::SyncTimer,
             ts: now,
+            sub_type: 0,
             payload: "".to_string(),
         });
         info!("TimerService, push_sync_task");

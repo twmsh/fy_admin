@@ -32,7 +32,6 @@
       "expire": 720
     },
     "cmd": {
-      "queue": "device_cmd_queue",
       "exchange": "device_cmd_exchange",
       "route_key": "box.cmd"
     }
