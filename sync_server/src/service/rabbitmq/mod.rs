@@ -89,7 +89,7 @@ impl RabbitmqService {
                 queue_name,
                 QueueDeclareOptions {
                     passive: false,
-                    durable: false, // 持久化，rabbitmq重启后，还存在
+                    durable: true, // 持久化，rabbitmq重启后，还存在
                     exclusive: false,
                     auto_delete: false,
                     nowait: false,

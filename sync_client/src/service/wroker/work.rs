@@ -123,6 +123,16 @@ pub async fn get_status_payload(
 
     // dbs
     let mut db_list = vec![];
+    let res = rec_api.get_dbs().await?;
+    if res.code != 0 {
+        return Err(AppError::new(&format!("get_dbs, code:{}", res.code)));
+    }
+
+    let uuids = match res.dbs {
+        None => vec![],
+        Some(v) => v.iter().map(|x| x.clone()).collect(),
+    };
+
     for uuid in uuids.iter() {
         let res = rec_api.get_db_info(uuid.clone()).await?;
         if res.code != 0 {
