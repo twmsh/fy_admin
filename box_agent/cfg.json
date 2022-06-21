@@ -1,0 +1,36 @@
+{
+  "version": {
+    "product": "box_agent",
+    "ver": "0.1.0",
+    "api_ver": "0.1.0"
+  },
+  "log": {
+    "app": "logs/app.log",
+    "level": "debug",
+    "lib_level": "warn"
+  },
+  "api": {
+    "grab_url": "http://localhost:7001",
+    "recg_url": "http://localhost:7002"
+  },
+  "track": {
+    "local_address": "127.0.0.1:9090",
+    "face": {
+      "skip_search": false,
+      "clear_delay": 300000,
+      "ready_delay": 3000,
+      "count": 3,
+      "quality": 0.9
+    },
+    "car": {
+      "clear_delay": 300000,
+      "ready_delay": 3000,
+      "count": 3,
+      "conf": 0.9
+    }
+  },
+  "up_link": {
+    "max_queue": 100,
+    "server": "http://127.0.0.1:8091/upload"
+  }
+}

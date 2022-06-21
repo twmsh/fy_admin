@@ -23,7 +23,7 @@
   },
   "sync_batch": 100,
   "http": {
-    "addr": "0.0.0.0:8090",
+    "addr": "0.0.0.0:8091",
     "max_conn": 1000
   },
   "rabbitmq": {

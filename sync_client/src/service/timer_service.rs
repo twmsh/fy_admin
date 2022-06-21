@@ -20,6 +20,12 @@ impl TimerService {
     }
 
     fn push_hb_task(&self) {
+        // 网络中断时候，后续操作卡住，队列没有被消耗，堆积起来了
+        if self.queue.len() > 10 {
+            info!("TimerService, queue full, skip push_hb_task");
+            return;
+        }
+
         let now = Local::now();
         self.queue.push(TaskItem {
             id: now.timestamp_millis() as u64,
@@ -32,6 +38,11 @@ impl TimerService {
     }
 
     fn push_sync_task(&self) {
+        if self.queue.len() > 10 {
+            info!("TimerService, queue full, skip push_sync_task");
+            return;
+        }
+
         let now = Local::now();
         self.queue.push(TaskItem {
             id: now.timestamp_millis() as u64,
