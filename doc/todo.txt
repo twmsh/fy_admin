@@ -1,4 +1,4 @@
-
+sync_server中 rabbitmq reconnect的改写（参照sync_client)
 
 //---------------
 
