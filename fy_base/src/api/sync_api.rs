@@ -1,20 +1,19 @@
 use axum::http::StatusCode;
-use std::time::Duration;
-use axum::Json;
 use axum::response::{IntoResponse, Response};
+use axum::Json;
+use std::time::Duration;
 
 use bytes::Buf;
 use chrono::{DateTime, Local};
 use reqwest::header;
 use reqwest::{Client, Error as Reqwest_Error};
 
-
 use serde::de::DeserializeOwned;
+use serde::{Deserialize, Serialize};
 use serde_json::Error as Serde_Error;
-use serde::{Serialize,Deserialize};
 
-use crate::util::utils;
 use crate::util::time_format::long_ts_format;
+use crate::util::utils;
 
 pub const SYNC_OP_MODIFY: i8 = 1;
 pub const SYNC_OP_DEL: i8 = 2;
@@ -148,15 +147,13 @@ impl<T> ResponseData<T> {
 }
 
 impl<T> IntoResponse for ResponseData<T>
-    where
-        T: Serialize,
+where
+    T: Serialize,
 {
     fn into_response(self) -> Response {
         Json(self).into_response()
     }
 }
-
-
 
 //-----------------------
 #[derive(Debug)]

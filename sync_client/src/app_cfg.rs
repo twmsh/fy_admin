@@ -35,6 +35,7 @@ pub struct AppCfgSyncServer {
 #[derive(Serialize, Deserialize, Debug)]
 pub struct AppCfgSync {
     pub sync_log: String,
+    pub camera_upload: Option<String>,
     pub server: AppCfgSyncServer,
     pub heartbeat: u64,
     // 心跳间隔

@@ -149,7 +149,7 @@ impl RabbitmqService {
                 QueueDeclareOptions {
                     passive: false,
                     durable: false,
-                    exclusive: false,   // 排他
+                    exclusive: false,  // 排他
                     auto_delete: true, // 自动删除
                     nowait: false,
                 },

@@ -15,6 +15,7 @@
   },
   "sync": {
     "sync_log": "sync_log.json",
+    "camera_upload": "http://localhost:8090/trackupload",
     "server": {
       "db_sync": "http://127.0.0.1:8090/db_sync",
       "person_sync": "http://127.0.0.1:8090/person_sync",

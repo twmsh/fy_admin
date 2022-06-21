@@ -1,14 +1,14 @@
-use std::sync::{Arc, Mutex};
 use chrono::{DateTime, Local};
+use std::sync::{Arc, Mutex};
 use tokio::sync::watch::Receiver;
 use tracing::{debug, error};
 
 use crate::app_cfg::{AppCfg, AppSyncLog};
+use fy_base::api::sync_api::Api;
 use fy_base::{
     api::bm_api::{AnalysisApi, RecognitionApi},
     util::service::SignalProduce,
 };
-use fy_base::api::sync_api::Api;
 
 //---------------------
 
@@ -72,7 +72,6 @@ impl AppCtx {
         guard.camera.last_id = last_id.to_string();
         guard.camera.last_ts = last_ts;
     }
-
 
     pub fn save_sync_log(&self) {
         let sync_log = self.get_sync_log();
