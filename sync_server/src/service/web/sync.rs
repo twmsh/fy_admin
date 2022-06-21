@@ -1,6 +1,6 @@
 use crate::service::web::model::{build_fail_response_data, get_personinfo_from_map};
 
-use fy_base::sync::response_type::{
+use fy_base::api::sync_api::{
     Camera, Db, Person, ResponseData, RES_STATUS_BIZ_ERR, RES_STATUS_INVALID_PARA,
 };
 

@@ -66,7 +66,7 @@ pub async fn delete_all_dbs(api_client: &RecognitionApi) -> Result<u64, AppError
 
     let uuids = match res.dbs {
         None => vec![],
-        Some(v) => v.iter().map(|x| x.clone()).collect(),
+        Some(v) => v.clone(),
     };
 
     // 删除
@@ -140,7 +140,7 @@ pub async fn get_status_payload(
 
     let uuids = match res.dbs {
         None => vec![],
-        Some(v) => v.iter().map(|x| x.clone()).collect(),
+        Some(v) => v.clone(),
     };
 
     for uuid in uuids.iter() {

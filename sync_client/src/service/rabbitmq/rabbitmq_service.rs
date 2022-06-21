@@ -382,12 +382,10 @@ impl RabbitmqService {
 
         // 检查是否满足hw_id的限定
         if let Some(ref hw_id) = msg.hw_id {
-            if !hw_id.is_empty() {
-                if hw_id.eq_ignore_ascii_case(self.ctx.hw_id.as_str()) {
-                    // msg中存在hw_id限定，与本box不符合，该消息丢弃
-                    debug!("Rabbitmq_service, process_in_rabbitmsg, skip, {:?}", hw_id);
-                    return Ok(());
-                }
+            if !hw_id.is_empty() && hw_id.eq_ignore_ascii_case(self.ctx.hw_id.as_str()) {
+                // msg中存在hw_id限定，与本box不符合，该消息丢弃
+                debug!("Rabbitmq_service, process_in_rabbitmsg, skip, {:?}", hw_id);
+                return Ok(());
             }
         }
 

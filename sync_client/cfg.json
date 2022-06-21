@@ -21,8 +21,8 @@
       "person_sync": "http://127.0.0.1:8090/person_sync",
       "camera_sync": "http://127.0.0.1:8090/camera_sync"
     },
-    "heartbeat": 5,
-    "sync_ttl": 15
+    "heartbeat": 3,
+    "sync_ttl": 5
   },
   "rabbitmq": {
     "url": "amqp://admin:admin123@192.168.1.26:5672/%2f",

@@ -6,7 +6,7 @@ use crate::dao::base_model::{BaseCamera, BaseCameraDel, BaseDb, BaseDbDel, BaseF
 use crate::error::AppError;
 use serde::{Deserialize, Serialize};
 
-use fy_base::sync::response_type::{
+use fy_base::api::sync_api::{
     Camera, CameraInfo, Db, Person, PersonInfoFace, ResponseData, RES_STATUS_ERROR, SYNC_OP_DEL,
     SYNC_OP_MODIFY,
 };
