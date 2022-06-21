@@ -1,15 +1,18 @@
 use box_agent::app_cfg::AppCfg;
 use box_agent::app_ctx::AppCtx;
 use box_agent::queue_item::{CarQueue, FaceQueue, QI};
+use box_agent::service::car::car_notify::CarNotifyService;
+use box_agent::service::face::face_notify::FaceNotifyService;
+use box_agent::service::face::face_search::FaceSearchService;
 use box_agent::service::signal_service::SignalService;
 use box_agent::service::web::WebService;
+use box_agent::uplink::upload::UplinkService;
 use build_time::build_time_local;
 use clap::{arg, Command};
 use deadqueue::unlimited::Queue;
 use std::sync::Arc;
 use tokio::sync::watch;
 use tracing::info;
-use box_agent::uplink::upload::UplinkService;
 
 use fy_base::util::{logger, service::ServiceRepo};
 
@@ -89,12 +92,32 @@ async fn main() {
     // 初始web服务
     let web_service = WebService::new(app_context.clone(), face_queue.clone(), car_queue.clone());
 
+    // 初始化 人脸track接收 服务
+    let face_notify_service =
+        FaceNotifyService::new(app_context.clone(), face_queue, face_search_queue.clone());
+
+    // 初始化 人脸track 比对 服务
+    let face_search_service = FaceSearchService::new(
+        0,
+        app_context.clone(),
+        face_search_queue,
+        uplink_queue.clone(),
+    );
+
+    // 初始化 车辆track接收 服务
+    let car_notify_service =
+        CarNotifyService::new(app_context.clone(), car_queue.clone(), uplink_queue.clone());
+
     // 创建 uplink服务
-    let uplink_service = UplinkService::new(app_context.clone(),uplink_queue);
+    let uplink_service = UplinkService::new(app_context.clone(), uplink_queue);
 
     // 启动服务
     service_repo.start_service(exit_service);
     service_repo.start_service(web_service);
+    service_repo.start_service(face_notify_service);
+    service_repo.start_service(face_search_service);
+    service_repo.start_service(car_notify_service);
+
     service_repo.start_service(uplink_service);
 
     // 等待退出

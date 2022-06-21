@@ -35,6 +35,8 @@ url = "2.2.2"
 
 image = "0.24"
 indexmap = "1.8"
+dashmap = "5.3"
+base64 = "0.13"
 
 ## common
 chrono = { version = "0.4", features = ["serde"] }

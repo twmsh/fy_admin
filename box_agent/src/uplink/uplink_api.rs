@@ -1,10 +1,10 @@
 use std::{fmt::Debug, time::Duration};
 
+use axum::http::StatusCode;
+use bytes::Buf;
 use reqwest::multipart::{Form, Part};
 use std::fmt::{Display, Formatter};
 use std::ops::Deref;
-use axum::http::StatusCode;
-use bytes::Buf;
 
 use reqwest::header;
 use reqwest::Client;
@@ -140,11 +140,13 @@ impl UplinkApi {
         }
 
         let body = res.bytes().await?;
-        let res_data:ResponseData = serde_json::from_reader(body.reader())?;
+        let res_data: ResponseData = serde_json::from_reader(body.reader())?;
 
         if res_data.status != 0 {
-            return Err(ApiError::BizErr(format!("return status:{}, message:{:?}",
-                                                res_data.status,res_data.message)));
+            return Err(ApiError::BizErr(format!(
+                "return status:{}, message:{:?}",
+                res_data.status, res_data.message
+            )));
         }
 
         Ok(())
@@ -186,11 +188,13 @@ impl UplinkApi {
         }
 
         let body = res.bytes().await?;
-        let res_data:ResponseData = serde_json::from_reader(body.reader())?;
+        let res_data: ResponseData = serde_json::from_reader(body.reader())?;
 
         if res_data.status != 0 {
-            return Err(ApiError::BizErr(format!("return status:{}, message:{:?}",
-                                                res_data.status,res_data.message)));
+            return Err(ApiError::BizErr(format!(
+                "return status:{}, message:{:?}",
+                res_data.status, res_data.message
+            )));
         }
 
         Ok(())

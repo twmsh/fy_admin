@@ -1,6 +1,6 @@
 use deadqueue::unlimited::Queue;
-use tracing::{debug, error, info};
 use std::sync::Arc;
+use tracing::{debug, error, info};
 
 use tokio::sync::watch::Receiver;
 use tokio::task::JoinHandle as TkJoinHandle;
@@ -54,8 +54,6 @@ impl UplinkService {
             }
         }
     }
-
-
 }
 
 impl Service for UplinkService {
