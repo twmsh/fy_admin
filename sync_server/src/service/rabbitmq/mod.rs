@@ -226,6 +226,8 @@ impl RabbitmqService {
                 .await
                 .unwrap();
 
+            debug!("RabbitmqService, rabbitmq inited");
+
             if let Err(e) = self.loop_message(&mut consumer, exit_rx.clone()).await {
                 error!("error, RabbitmqService, loop_message, err: {:?}", e);
                 let wait = self.increate_wait();

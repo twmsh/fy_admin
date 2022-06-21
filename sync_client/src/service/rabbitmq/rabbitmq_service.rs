@@ -302,6 +302,8 @@ impl RabbitmqService {
                 _ => cmd_consumer.unwrap(),
             };
 
+            debug!("RabbitmqService, rabbitmq inited");
+
             // loop message
             let loop_rst = self
                 .loop_message(&mut cmd_consumer, exit_rx.clone(), &channel)
