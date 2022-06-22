@@ -18,6 +18,8 @@
   },
   "api": {
     "need_search": false,
+    "need_dc": false,
+    "facetrack_db": "11111111",
     "grab_url": "http://192.168.1.220:7001",
     "recg_url": "http://192.168.1.220:7002"
   },

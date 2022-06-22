@@ -3,8 +3,9 @@
 2) 根据参数，确定是否要search
 如果要search，调用bm_api进行search
 
-3）track数据（含匹配数据）保存到mysql中
-4）发送消息到 rabbitmq队列中
+3.1）track数据（含匹配数据）保存到mysql中
+3.2) track数据可以保存到倒查底库中去(根据配置要求) ，和 3.1并行运行
+4）发送face/car消息到 rabbitmq队列中，设置expire，供扩展程序使用。
 
 //-------------------
-图片直接用minio的 public url还是写一个接口来返回图片内容？
+图片直接用 minio 的 public url 还是写一个接口来返回图片内容？

@@ -41,7 +41,7 @@ build-time = "0.1.1"
 sqlx = { version = "0.5", features = ["runtime-tokio-native-tls", "mysql", "chrono", "decimal"] }
 
 url = "2.2.2"
-
+bytes = "1.1.0"
 image = "0.24"
 indexmap = "1.8"
 dashmap = "5.3"

@@ -1,11 +1,11 @@
 use crate::error::{AppError, AppResult};
-use chrono::{DateTime, Local, TimeZone};
-use fy_base::util::time_format::long_ts_format;
+
+use fy_base::util::mysql_util;
+
 use serde::{Deserialize, Serialize};
 use std::fs;
 use std::net::SocketAddr;
 use std::path::Path;
-use fy_base::util::mysql_util;
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct AppCfgVersion {
@@ -24,6 +24,10 @@ pub struct AppCfgLog {
 #[derive(Serialize, Deserialize, Debug)]
 pub struct AppCfgApi {
     pub need_search: bool,
+    // 是否倒查，倒查的话，
+    // 需要将track特征值保存到facetrack_db中
+    pub need_dc: bool,
+    pub facetrack_db: String,
     pub grab_url: String,
     pub recg_url: String,
 }
@@ -36,11 +40,10 @@ pub struct AppCfgRabbitMqItem {
     pub expire: u64,
 }
 
-
 #[derive(Serialize, Deserialize, Debug)]
 pub struct AppCfgRabbitMq {
     pub url: String,
-    pub face: AppCfgRabbitMqLogItem,
+    pub face: AppCfgRabbitMqItem,
     pub car: AppCfgRabbitMqItem,
 }
 
@@ -59,7 +62,6 @@ pub struct AppCfgDb {
     pub idle: u64,
 }
 
-
 //----------------------------
 #[derive(Serialize, Deserialize, Debug)]
 pub struct AppCfg {
@@ -69,7 +71,6 @@ pub struct AppCfg {
     pub api: AppCfgApi,
     pub http: AppCfgHttp,
     pub rabbitmq: AppCfgRabbitMq,
-
 }
 
 impl AppCfg {

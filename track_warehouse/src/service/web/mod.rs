@@ -41,7 +41,7 @@ impl WebService {
     }
 
     pub async fn init_router(&self) -> Router {
-        let max_request_conn = 1000;
+        let max_request_conn = 10000;
 
         let web_state = Arc::new(WebState {
             ctx: self.ctx.clone(),
@@ -65,7 +65,7 @@ impl WebService {
     }
 
     pub fn init_socket_addr(&self) -> Result<SocketAddr, AddrParseError> {
-        let addr = self.ctx.cfg.track.local_address.as_str();
+        let addr = self.ctx.cfg.http.addr.as_str();
         addr.parse::<SocketAddr>()
     }
 
@@ -99,7 +99,7 @@ impl Service for WebService {
     fn run(self, exit_rx: Receiver<i64>) -> JoinHandle<()> {
         // 绑定http端口
         let addr = self.init_socket_addr().unwrap_or_else(|_| {
-            panic!("cant parse http addr: {}", self.ctx.cfg.track.local_address)
+            panic!("cant parse http addr: {}", self.ctx.cfg.http.addr)
         });
         info!("http bind: {:?}", addr);
 

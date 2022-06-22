@@ -56,6 +56,12 @@ impl From<JoinError> for AppError {
     }
 }
 
+impl From<sqlx::Error> for AppError {
+    fn from(e: sqlx::Error) -> Self {
+        AppError::from_debug(e)
+    }
+}
+
 impl From<lapin::Error> for AppError {
     fn from(e: lapin::Error) -> Self {
         AppError::from_debug(e)

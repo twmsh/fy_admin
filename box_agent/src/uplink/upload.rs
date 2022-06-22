@@ -6,7 +6,7 @@ use tokio::sync::watch::Receiver;
 use tokio::task::JoinHandle as TkJoinHandle;
 
 use crate::app_ctx::AppCtx;
-use crate::queue_item::QI;
+use fy_base::api::upload_api::QI;
 use crate::uplink::uplink_api::UplinkApi;
 
 use fy_base::util::service::Service;

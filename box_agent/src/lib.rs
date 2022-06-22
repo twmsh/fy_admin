@@ -5,5 +5,4 @@ pub mod error;
 pub mod queue_item;
 pub mod service;
 
-
 pub mod uplink;

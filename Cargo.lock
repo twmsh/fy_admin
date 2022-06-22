@@ -3369,6 +3369,7 @@ dependencies = [
  "axum",
  "base64",
  "build-time",
+ "bytes",
  "chrono",
  "clap",
  "dashmap",

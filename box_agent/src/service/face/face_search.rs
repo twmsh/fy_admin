@@ -10,7 +10,9 @@ use fy_base::api::bm_api::{ApiFeatureQuality, RecognitionApi, SearchResPerson};
 use fy_base::util::utils;
 
 use crate::app_ctx::AppCtx;
-use crate::queue_item::{FaceQueue, MatchPerson, NotifyFaceQueueItem, QI};
+use crate::error::AppError;
+use fy_base::api::upload_api::{MatchPerson, NotifyFaceQueueItem, QI};
+use crate::queue_item::FaceQueue;
 use fy_base::util::service::Service;
 
 pub struct FaceSearchService {
@@ -111,9 +113,30 @@ impl FaceSearchService {
         item.matches = Some(matches);
     }
 
-    fn get_dbs(&self) -> Vec<String> {
-        // todo
-        vec![]
+    async fn get_dbs_from_api(&self) -> Result<Vec<String>, AppError> {
+        let res = self.api.get_dbs().await?;
+        if res.code != 0 {
+            return Err(AppError::new(&format!(
+                "get_dbs return code:{}, msg:{}",
+                res.code, res.msg
+            )));
+        }
+
+        let ids = match res.dbs {
+            None => vec![],
+            Some(v) => v,
+        };
+        Ok(ids)
+    }
+
+    async fn get_dbs(&self) -> Vec<String> {
+        match self.get_dbs_from_api().await {
+            Ok(v) => v,
+            Err(e) => {
+                error!("FaceSearchWorker, get_dbs_from_api, err: {:?}", e);
+                vec![]
+            }
+        }
     }
 
     /// api 比对搜索，(有特征值, 并且dbs不为空)
@@ -121,7 +144,12 @@ impl FaceSearchService {
     async fn process_batch(&mut self, mut items: Vec<NotifyFaceQueueItem>) {
         let tops = vec![self.ctx.cfg.track.face.search_top as i64];
         let thresholds = vec![self.ctx.cfg.track.face.search_threshold as i64];
-        let dbs = self.get_dbs();
+        let dbs = if self.skip_search {
+            vec![]
+        } else {
+            self.get_dbs().await
+        };
+
         let mut persons = Vec::new();
 
         debug!(

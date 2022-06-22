@@ -28,7 +28,7 @@ pub struct PersonInfoFace {
     //base64
     pub fea: String,
     pub quality: f32,
-    //base64
+
     pub id: String, // face num
 }
 
