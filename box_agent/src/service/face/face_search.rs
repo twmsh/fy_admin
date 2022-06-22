@@ -75,28 +75,40 @@ impl FaceSearchService {
         for i in 0..count {
             let item = items.get_mut(i).unwrap();
 
-            // 取 top 1
-            let person = match persons.get(i).unwrap().get(0) {
-                Some(v) => v,
-                None => {
-                    debug!(
-                        "FaceSearchWorker[{}], search facetrack:{}, has no match",
-                        self.num, item.uuid
-                    );
-                    continue;
-                }
-            };
-
-            item.matches = Some(MatchPerson {
-                uuid: person.id.clone(),
-                score: person.score,
-            });
-
-            debug!(
-                "FaceSearchWorker[{}], facetrack:{}, matched:{}, score:{}",
-                self.num, item.uuid, person.id, person.score
-            );
+            self.fill_one_person(item, persons.get(i));
         }
+    }
+
+    fn fill_one_person(
+        &self,
+        item: &mut NotifyFaceQueueItem,
+        match_persons: Option<&Vec<SearchResPerson>>,
+    ) {
+        if match_persons.map_or(false, |x| x.is_empty()) {
+            debug!(
+                "FaceSearchWorker[{}], search facetrack:{}, has no match",
+                self.num, item.uuid
+            );
+            return;
+        }
+        let match_persons = match_persons.unwrap();
+
+        let matches = match_persons
+            .iter()
+            .map(|x| {
+                debug!(
+                    "FaceSearchWorker[{}], facetrack:{}, matched:{}, score:{}",
+                    self.num, item.uuid, x.id, x.score
+                );
+                MatchPerson {
+                    db_id: x.db.clone(),
+                    uuid: x.id.clone(),
+                    score: x.score,
+                }
+            })
+            .collect();
+
+        item.matches = Some(matches);
     }
 
     fn get_dbs(&self) -> Vec<String> {
@@ -107,8 +119,8 @@ impl FaceSearchService {
     /// api 比对搜索，(有特征值, 并且dbs不为空)
     /// 无论处理成功或失败，都提交到mpsc中
     async fn process_batch(&mut self, mut items: Vec<NotifyFaceQueueItem>) {
-        let tops = vec![1_i64];
-        let thresholds = vec![0_i64];
+        let tops = vec![self.ctx.cfg.track.face.search_top as i64];
+        let thresholds = vec![self.ctx.cfg.track.face.search_threshold as i64];
         let dbs = self.get_dbs();
         let mut persons = Vec::new();
 

@@ -252,10 +252,10 @@ impl FaceHandler {
         let mut newed = false;
         let mut appended = false;
         let mut delayed = false;
-        let ready_old;
+        // let ready_old;
 
         let mut data = holder_data.lock().await;
-        ready_old = data.ready_flag;
+        let ready_old = data.ready_flag;
 
         // debug!("sp process: {}, events len: {}, ready_old:{}", data.uuid, events.len(), ready_old);
         for event in events.into_iter() {

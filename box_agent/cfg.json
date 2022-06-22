@@ -17,6 +17,8 @@
     "local_address": "127.0.0.1:9090",
     "face": {
       "skip_search": false,
+      "search_top": 10,
+      "search_threshold": 50,
       "clear_delay": 300000,
       "ready_delay": 3000,
       "count": 3,

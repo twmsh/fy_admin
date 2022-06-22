@@ -4,3 +4,5 @@
 
 facesearch的db问题
 facesearch的top n问题
+
+在配置中设置阈值以及top n参数

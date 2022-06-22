@@ -12,6 +12,7 @@ pub type CarQueue = Queue<NotifyCarQueueItem>;
 // ------------------- queue structs (face) -------------------
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct MatchPerson {
+    pub db_id: String,
     pub uuid: String,
     pub score: i64,
 }
@@ -24,7 +25,7 @@ pub struct NotifyFaceQueueItem {
     #[serde(with = "long_ts_format")]
     pub ts: DateTime<Local>,
 
-    pub matches: Option<MatchPerson>,
+    pub matches: Option<Vec<MatchPerson>>,
 }
 
 // ------------------- queue structs (car) -------------------
