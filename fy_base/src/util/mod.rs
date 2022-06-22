@@ -9,3 +9,6 @@ pub mod utils;
 pub mod logger;
 pub mod rabbitmq;
 pub mod se5;
+
+pub mod image;
+pub mod multipart_form;

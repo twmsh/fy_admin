@@ -43,6 +43,9 @@ rust-ini = "0.17"
 
 jsonrpc-core = "18"
 
+image = "0.24"
+indexmap = "1.8"
+
 ## common
 chrono = { version = "0.4", features = ["serde"] }
 serde = { version = "1.0", features = ["derive"] }

@@ -6,3 +6,61 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+mysql_codegen = { path = "../mysql_codegen" }
+fy_base = { path = "../fy_base" }
+
+
+tokio = { version = "1.19.2", features = ["full"] }
+tokio-stream = "0.1"
+tokio-util = { version = "0.7", features = ["full"] }
+tracing = { version = "0.1", features = ["log"] }
+
+axum = { version = "0.5", features = ["ws", "multipart", "headers"] }
+tower = { version = "0.4", features = ["full"] }
+hyper = { version = "0.14", features = ["server"] }
+
+tower-http = { version = "0.3", features = ["full"] }
+headers = "0.3"
+
+# rabbitmq
+lapin = "2.1"
+tokio-executor-trait = "2.1"
+tokio-reactor-trait = "1.1"
+
+# minio
+rust-s3="0.31"
+
+log = "0.4"
+log4rs = "1.1.1"
+clap = "3.1.18"
+
+deadqueue = "0.2"
+build-time = "0.1.1"
+
+#mysql = "22.1"
+sqlx = { version = "0.5", features = ["runtime-tokio-native-tls", "mysql", "chrono", "decimal"] }
+
+url = "2.2.2"
+
+image = "0.24"
+indexmap = "1.8"
+dashmap = "5.3"
+base64 = "0.13"
+
+rust_decimal = "1.24"
+#rust_decimal_macros = "1.24"
+
+## common
+chrono = { version = "0.4", features = ["serde"] }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = { version = "1", features = ["preserve_order"] }
+
+## 条件判断
+[target.'cfg(not(any(target_os = "windows", target_os = "macos", target_os = "ios")))'.dependencies]
+openssl = { version = "0.10", features = ["vendored"] }
+
+[target.'cfg(windows)'.dependencies]
+ipconfig = "0.3.0"
+
+[target.'cfg(not(windows))'.dependencies]
+pnet = "0.28.0"

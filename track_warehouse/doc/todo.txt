@@ -1,0 +1,10 @@
+
+1) 接收box_agent的上传数据，图片数据存入到minio中
+2) 根据参数，确定是否要search
+如果要search，调用bm_api进行search
+
+3）track数据（含匹配数据）保存到mysql中
+4）发送消息到 rabbitmq队列中
+
+//-------------------
+图片直接用minio的 public url还是写一个接口来返回图片内容？
