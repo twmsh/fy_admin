@@ -1,6 +1,6 @@
 use box_agent::app_cfg::AppCfg;
 use box_agent::app_ctx::AppCtx;
-use box_agent::queue_item::{CarQueue, FaceQueue, QI};
+use box_agent::queue_item::{CarQueue, FaceQueue};
 use box_agent::service::car::car_notify::CarNotifyService;
 use box_agent::service::face::face_notify::FaceNotifyService;
 use box_agent::service::face::face_search::FaceSearchService;
