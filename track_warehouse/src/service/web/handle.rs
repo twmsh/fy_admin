@@ -1,45 +1,49 @@
 use fy_base::util::image as image_util;
-use axum::{body, Extension};
+use axum::{Extension};
 use std::sync::Arc;
 use tracing::{debug, error, info};
 
-use fy_base::api::upload_api::{NotifyCarQueueItem, NotifyFaceQueueItem};
+use fy_base::api::upload_api::{NotifyCarQueueItem, NotifyFaceQueueItem, ResponseData};
 use crate::service::web::WebState;
 use fy_base::util::multipart_form::{parse_multi_form, MultipartFormValues};
-use axum::body::BoxBody;
+
 use axum::extract::{ContentLengthLimit, Multipart};
-use axum::http::StatusCode;
-use axum::response::{IntoResponse, Response};
+
+
 use bytes::Bytes;
 use chrono::Local;
 use fy_base::api::bm_api::{CarNotifyParams, FaceNotifyParams};
-
 use serde_json::{self, Result as JsonResult};
 
 
 //----------------------------------------
-pub struct UploadRes(String);
+fn build_err_response(err_msg: &str) -> ResponseData {
 
-impl IntoResponse for UploadRes {
-    fn into_response(self) -> Response<BoxBody> {
-        let http_body = body::boxed(body::Full::from(self.0));
-        Response::builder()
-            .status(StatusCode::OK)
-            .body(http_body)
-            .unwrap()
+    ResponseData{
+        status: 500,
+        message: Some(err_msg.to_string())
     }
 }
+
+fn build_ok_response() -> ResponseData {
+
+    ResponseData{
+        status: 0,
+        message: Some("success".to_string())
+    }
+}
+
 
 //-----------------------------------
 pub async fn track_upload(
     Extension(web_state): Extension<Arc<WebState>>,
     ContentLengthLimit(parts): ContentLengthLimit<Multipart, { 1024 * 1024 * 10 }>,
-) -> UploadRes {
+) -> ResponseData {
     let part_values = match parse_multi_form(parts).await {
         Ok(v) => v,
         Err(e) => {
             error!("error, track_upload, parse_multi_form, err: {:?}", e);
-            return UploadRes(format!("error, {:?}", e));
+            return build_err_response(&format!("error, {:?}", e));
         }
     };
 
@@ -49,22 +53,22 @@ pub async fn track_upload(
             "vehicletrack" => handle_car(web_state, part_values).await,
             _ => {
                 error!("error, track_upload, unknown type: {}", track_type);
-                UploadRes(format!("error, unknown type: {}", track_type))
+                build_err_response(&format!("error, unknown type: {}", track_type))
             }
         }
     } else {
         error!("error, track_upload, field: type not found");
-        UploadRes("error, field: type not found".into())
+        build_err_response("error, field: type not found")
     }
 }
 
-async fn handle_face(data: Arc<WebState>, values: MultipartFormValues) -> UploadRes {
+async fn handle_face(data: Arc<WebState>, values: MultipartFormValues) -> ResponseData {
     let now = Local::now();
     let json_str = match values.get_string_value("json") {
         Some(v) => v,
         None => {
             error!("error, field: json not found");
-            return UploadRes("error, field: json not found".into());
+            return build_err_response("error, field: json not found");
         }
     };
 
@@ -80,7 +84,7 @@ async fn handle_face(data: Arc<WebState>, values: MultipartFormValues) -> Upload
             Some((_, v)) => v,
             None => {
                 error!("error, can't find para: {}", item.background.image_file);
-                return UploadRes(format!(
+                return build_err_response(&format!(
                     "error, can't find field: {}",
                     item.background.image_file
                 ));
@@ -92,7 +96,7 @@ async fn handle_face(data: Arc<WebState>, values: MultipartFormValues) -> Upload
                 Ok(v) => v,
                 Err(e) => {
                     error!("error, {}", e);
-                    return UploadRes(e);
+                    return build_err_response(&e);
                 }
             };
 
@@ -100,7 +104,7 @@ async fn handle_face(data: Arc<WebState>, values: MultipartFormValues) -> Upload
                 Ok(v) => v,
                 Err(e) => {
                     error!("error, {}", e);
-                    return UploadRes(e);
+                    return build_err_response(&e);
                 }
             };
 
@@ -110,7 +114,7 @@ async fn handle_face(data: Arc<WebState>, values: MultipartFormValues) -> Upload
                         Some((_, v)) => Some(v),
                         None => {
                             error!("error, can't find field: {}", feature_file);
-                            return UploadRes(format!("can't find field: {}", feature_file));
+                            return build_err_response(&format!("can't find field: {}", feature_file));
                         }
                     }
                 } else {
@@ -128,22 +132,22 @@ async fn handle_face(data: Arc<WebState>, values: MultipartFormValues) -> Upload
             ts: now,
             matches: None,
         });
-        debug!("track_upload, end push face");
-        UploadRes("ok".into())
+        debug!("track_upload, push face");
+        build_ok_response()
     } else {
         error!("error, {:?}", notify);
-        UploadRes("error, json parse fail".into())
+        build_err_response("error, json parse fail" )
     }
 }
 
-async fn handle_car(data: Arc<WebState>, values: MultipartFormValues) -> UploadRes {
+async fn handle_car(data: Arc<WebState>, values: MultipartFormValues) -> ResponseData {
     let now = Local::now();
 
     let json_str = match values.get_string_value("json") {
         Some(v) => v,
         None => {
             error!("error, field: json not found");
-            return UploadRes("error, field: json not found".into());
+            return build_err_response("error, field: json not found");
         }
     };
     debug!("->car:{}", json_str);
@@ -158,7 +162,7 @@ async fn handle_car(data: Arc<WebState>, values: MultipartFormValues) -> UploadR
             Some((_, v)) => v,
             None => {
                 error!("error, can't find field: {}", item.background.image_file);
-                return UploadRes(format!(
+                return build_err_response(&format!(
                     "error, can't find field: {}",
                     item.background.image_file
                 ));
@@ -170,7 +174,7 @@ async fn handle_car(data: Arc<WebState>, values: MultipartFormValues) -> UploadR
                 Ok(v) => v,
                 Err(e) => {
                     error!("error, {}", e);
-                    return UploadRes(e);
+                    return build_err_response(&e);
                 }
             };
         }
@@ -183,7 +187,7 @@ async fn handle_car(data: Arc<WebState>, values: MultipartFormValues) -> UploadR
                     Ok(v) => v,
                     Err(e) => {
                         error!("error, {}", e);
-                        return UploadRes(e);
+                        return build_err_response(&e);
                     }
                 };
             } else {
@@ -198,7 +202,7 @@ async fn handle_car(data: Arc<WebState>, values: MultipartFormValues) -> UploadR
                     Ok(v) => v,
                     Err(e) => {
                         error!("error, {}", e);
-                        return UploadRes(e);
+                        return build_err_response(&e);
                     }
                 };
             } else {
@@ -213,10 +217,10 @@ async fn handle_car(data: Arc<WebState>, values: MultipartFormValues) -> UploadR
             ts: now,
         });
         debug!("track_upload, end push car");
-        UploadRes("ok".into())
+        build_ok_response()
     } else {
         error!("error, {:?}", notify);
-        UploadRes("error, json parse fail".into())
+        build_err_response("error, json parse fail")
     }
 }
 

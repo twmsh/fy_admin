@@ -1,3 +1,5 @@
+use axum::Json;
+use axum::response::{IntoResponse, Response};
 use crate::api::bm_api::{CarNotifyParams, FaceNotifyParams};
 use crate::util::time_format::long_ts_format;
 use serde::{Deserialize, Serialize};
@@ -54,3 +56,8 @@ pub struct ResponseData {
     pub message: Option<String>,
 }
 
+impl IntoResponse for ResponseData {
+    fn into_response(self) -> Response {
+        Json(self).into_response()
+    }
+}

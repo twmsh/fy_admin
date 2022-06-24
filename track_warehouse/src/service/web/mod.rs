@@ -16,7 +16,7 @@ use tokio::task::JoinHandle;
 use tower::limit::GlobalConcurrencyLimitLayer;
 use tower::ServiceBuilder;
 use tower_http::add_extension::AddExtensionLayer;
-use tower_http::trace::TraceLayer;
+
 use tracing::{error, info};
 use fy_base::util::axum_log::access_log;
 
