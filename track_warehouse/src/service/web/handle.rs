@@ -1,35 +1,29 @@
-use fy_base::util::image as image_util;
-use axum::{Extension};
 use std::sync::Arc;
-use tracing::{debug, error, info};
 
-use fy_base::api::upload_api::{NotifyCarQueueItem, NotifyFaceQueueItem, ResponseData};
-use crate::service::web::WebState;
-use fy_base::util::multipart_form::{parse_multi_form, MultipartFormValues};
-
+use axum::Extension;
 use axum::extract::{ContentLengthLimit, Multipart};
-
-
 use bytes::Bytes;
 use chrono::Local;
-use fy_base::api::bm_api::{CarNotifyParams, FaceNotifyParams};
 use serde_json::{self, Result as JsonResult};
+use tracing::{debug, error, info};
+use fy_base::api::upload_api::{NotifyCarQueueItem, NotifyFaceQueueItem, ResponseData};
+use fy_base::util::image as image_util;
+use fy_base::util::multipart_form::{MultipartFormValues, parse_multi_form};
 
+use crate::service::web::WebState;
 
 //----------------------------------------
 fn build_err_response(err_msg: &str) -> ResponseData {
-
-    ResponseData{
+    ResponseData {
         status: 500,
-        message: Some(err_msg.to_string())
+        message: Some(err_msg.to_string()),
     }
 }
 
 fn build_ok_response() -> ResponseData {
-
-    ResponseData{
+    ResponseData {
         status: 0,
-        message: Some("success".to_string())
+        message: Some("success".to_string()),
     }
 }
 
@@ -74,70 +68,71 @@ async fn handle_face(data: Arc<WebState>, values: MultipartFormValues) -> Respon
 
     debug!("->face:{}", json_str);
 
-    let notify: JsonResult<FaceNotifyParams> = serde_json::from_reader(json_str.as_bytes());
-    if let Ok(mut item) = notify {
-        info!("recv track, {}, index:{}, ft", item.id, item.index);
+    let face_queue_item: JsonResult<NotifyFaceQueueItem> = serde_json::from_reader(json_str.as_bytes());
+    if let Err(e) = face_queue_item {
+        error!("error, json parse error, err: {:?}", e);
+        return build_err_response(&format!(
+            "json parse error, err: {:?}", e
+        ));
+    }
 
-        // 处理图片
-        item.background.image_buf = match values.get_file_value(item.background.image_file.as_str())
-        {
-            Some((_, v)) => v,
-            None => {
-                error!("error, can't find para: {}", item.background.image_file);
-                return build_err_response(&format!(
-                    "error, can't find field: {}",
-                    item.background.image_file
-                ));
+    let mut face_queue_item = face_queue_item.unwrap();
+    face_queue_item.ts = now;
+    let item = &mut face_queue_item.notify;
+
+    info!("recv track, {}, index:{}, ft", item.id, item.index);
+
+    // 处理图片
+    item.background.image_buf = match values.get_file_value(item.background.image_file.as_str())
+    {
+        Some((_, v)) => v,
+        None => {
+            error!("error, can't find para: {}", item.background.image_file);
+            return build_err_response(&format!(
+                "error, can't find field: {}",
+                item.background.image_file
+            ));
+        }
+    };
+
+    for x in item.faces.iter_mut() {
+        x.aligned_buf = match get_jpg_file_value(&values, x.aligned_file.as_str()) {
+            Ok(v) => v,
+            Err(e) => {
+                error!("error, {}", e);
+                return build_err_response(&e);
             }
         };
 
-        for x in item.faces.iter_mut() {
-            x.aligned_buf = match get_jpg_file_value(&values, x.aligned_file.as_str()) {
-                Ok(v) => v,
-                Err(e) => {
-                    error!("error, {}", e);
-                    return build_err_response(&e);
-                }
-            };
+        x.display_buf = match get_jpg_file_value(&values, x.display_file.as_str()) {
+            Ok(v) => v,
+            Err(e) => {
+                error!("error, {}", e);
+                return build_err_response(&e);
+            }
+        };
 
-            x.display_buf = match get_jpg_file_value(&values, x.display_file.as_str()) {
-                Ok(v) => v,
-                Err(e) => {
-                    error!("error, {}", e);
-                    return build_err_response(&e);
-                }
-            };
-
-            if let Some(ref feature_file) = x.feature_file {
-                if !feature_file.is_empty() {
-                    x.feature_buf = match values.get_file_value(feature_file.as_str()) {
-                        Some((_, v)) => Some(v),
-                        None => {
-                            error!("error, can't find field: {}", feature_file);
-                            return build_err_response(&format!("can't find field: {}", feature_file));
-                        }
+        if let Some(ref feature_file) = x.feature_file {
+            if !feature_file.is_empty() {
+                x.feature_buf = match values.get_file_value(feature_file.as_str()) {
+                    Some((_, v)) => Some(v),
+                    None => {
+                        error!("error, can't find field: {}", feature_file);
+                        return build_err_response(&format!("can't find field: {}", feature_file));
                     }
-                } else {
-                    x.feature_file = None;
-                    debug!("{}, has no feature", item.id);
                 }
             } else {
                 x.feature_file = None;
                 debug!("{}, has no feature", item.id);
             }
+        } else {
+            x.feature_file = None;
+            debug!("{}, has no feature", item.id);
         }
-        data.face_queue.push(NotifyFaceQueueItem {
-            uuid: item.id.clone(),
-            notify: item,
-            ts: now,
-            matches: None,
-        });
-        debug!("track_upload, push face");
-        build_ok_response()
-    } else {
-        error!("error, {:?}", notify);
-        build_err_response("error, json parse fail" )
     }
+    data.face_queue.push(face_queue_item);
+    debug!("track_upload, push face");
+    build_ok_response()
 }
 
 async fn handle_car(data: Arc<WebState>, values: MultipartFormValues) -> ResponseData {
@@ -152,76 +147,77 @@ async fn handle_car(data: Arc<WebState>, values: MultipartFormValues) -> Respons
     };
     debug!("->car:{}", json_str);
 
-    let notify: JsonResult<CarNotifyParams> = serde_json::from_reader(json_str.as_bytes());
-    if let Ok(mut item) = notify {
-        info!("recv track, {}, index:{}, ct", item.id, item.index);
+    let car_queue_item: JsonResult<NotifyCarQueueItem> = serde_json::from_reader(json_str.as_bytes());
+    if let Err(e) = car_queue_item {
+        error!("error, json parse error, err: {:?}", e);
+        return build_err_response(&format!(
+            "json parse error, err: {:?}", e
+        ));
+    }
+    let mut car_queue_item = car_queue_item.unwrap();
+    car_queue_item.ts = now;
+    let item = &mut car_queue_item.notify;
 
-        // 处理图片
-        item.background.image_buf = match values.get_file_value(item.background.image_file.as_str())
-        {
-            Some((_, v)) => v,
-            None => {
-                error!("error, can't find field: {}", item.background.image_file);
-                return build_err_response(&format!(
-                    "error, can't find field: {}",
-                    item.background.image_file
-                ));
+    info!("recv track, {}, index:{}, ct", item.id, item.index);
+
+    // 处理图片
+    item.background.image_buf = match values.get_file_value(item.background.image_file.as_str())
+    {
+        Some((_, v)) => v,
+        None => {
+            error!("error, can't find field: {}", item.background.image_file);
+            return build_err_response(&format!(
+                "error, can't find field: {}",
+                item.background.image_file
+            ));
+        }
+    };
+
+    for x in item.vehicles.iter_mut() {
+        x.img_buf = match get_jpg_file_value(&values, x.image_file.as_str()) {
+            Ok(v) => v,
+            Err(e) => {
+                error!("error, {}", e);
+                return build_err_response(&e);
             }
         };
+    }
 
-        for x in item.vehicles.iter_mut() {
-            x.img_buf = match get_jpg_file_value(&values, x.image_file.as_str()) {
+    // 有牌照号码
+    if item.has_plate_info() {
+        let x = item.plate_info.as_mut().unwrap();
+        if let Some(ref img) = x.image_file {
+            x.img_buf = match get_jpg_file_value(&values, img.as_str()) {
                 Ok(v) => v,
                 Err(e) => {
                     error!("error, {}", e);
                     return build_err_response(&e);
                 }
             };
+        } else {
+            error!("error, has plate text, but hasn't plate img");
         }
-
-        // 有牌照号码
-        if item.has_plate_info() {
-            let x = item.plate_info.as_mut().unwrap();
-            if let Some(ref img) = x.image_file {
-                x.img_buf = match get_jpg_file_value(&values, img.as_str()) {
-                    Ok(v) => v,
-                    Err(e) => {
-                        error!("error, {}", e);
-                        return build_err_response(&e);
-                    }
-                };
-            } else {
-                error!("error, has plate text, but hasn't plate img");
-            }
-        }
-
-        if item.has_plate_binary() {
-            let x = item.plate_info.as_mut().unwrap();
-            if let Some(ref img) = x.binary_file {
-                x.binary_buf = match get_jpg_file_value(&values, img.as_str()) {
-                    Ok(v) => v,
-                    Err(e) => {
-                        error!("error, {}", e);
-                        return build_err_response(&e);
-                    }
-                };
-            } else {
-                error!("error, has plate binary, but hasn't plate binary img");
-            }
-        }
-
-        debug!("track_upload, will push car");
-        data.car_queue.push(NotifyCarQueueItem {
-            uuid: item.id.clone(),
-            notify: item,
-            ts: now,
-        });
-        debug!("track_upload, end push car");
-        build_ok_response()
-    } else {
-        error!("error, {:?}", notify);
-        build_err_response("error, json parse fail")
     }
+
+    if item.has_plate_binary() {
+        let x = item.plate_info.as_mut().unwrap();
+        if let Some(ref img) = x.binary_file {
+            x.binary_buf = match get_jpg_file_value(&values, img.as_str()) {
+                Ok(v) => v,
+                Err(e) => {
+                    error!("error, {}", e);
+                    return build_err_response(&e);
+                }
+            };
+        } else {
+            error!("error, has plate binary, but hasn't plate binary img");
+        }
+    }
+
+    debug!("track_upload, will push car");
+    data.car_queue.push(car_queue_item);
+    debug!("track_upload, end push car");
+    build_ok_response()
 }
 
 fn get_jpg_file_value(
