@@ -6,7 +6,7 @@ use track_warehouse::{app_cfg::AppCfg, app_ctx::AppCtx, service::signal_service:
 use tokio::sync::watch;
 use tracing::{error, info};
 
-use fy_base::util::{logger, mysql_util, se5, service::ServiceRepo, utils};
+use fy_base::util::{logger, mysql_util, service::ServiceRepo};
 use track_warehouse::dao::Dao;
 use track_warehouse::queue_item::{CarQueue, FaceQueue};
 use track_warehouse::service::web::WebService;
