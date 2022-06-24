@@ -126,8 +126,8 @@ pub async fn get_db_update(
         }
     };
 
-    debug!("get_db_update, update: {}", db_update.len());
-    debug!("get_db_update, del_update: {}", db_del_update.len());
+    debug!("get_db_update, {}, update: {}", hw_id, db_update.len());
+    debug!("get_db_update, {}, del_update: {}", hw_id, db_del_update.len());
 
     // 合并 db和 db_del的记录
     let mut list: Vec<Db> = vec![];
@@ -226,8 +226,8 @@ pub async fn get_person_update(
     };
 
 
-    debug!("get_person_update, update: {}", list_update.len());
-    debug!("get_person_update, del_update: {}", list_del_update.len());
+    debug!("get_person_update, {}, update: {}", hw_id,  list_update.len());
+    debug!("get_person_update, {}, del_update: {}", hw_id, list_del_update.len());
 
 
     // 合并 db和 db_del的记录
@@ -329,8 +329,8 @@ pub async fn get_camera_update(
         }
     };
 
-    debug!("get_camera_update, update: {}", list_update.len());
-    debug!("get_camera_update, del_update: {}", list_del_update.len());
+    debug!("get_camera_update, {}, update: {}", hw_id, list_update.len());
+    debug!("get_camera_update, {}, del_update: {}", hw_id, list_del_update.len());
 
 
     // 合并 db和 db_del的记录
