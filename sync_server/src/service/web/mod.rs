@@ -60,7 +60,7 @@ impl WebService {
                         };
                         access_log(req, next, f).await
                     }))
-                    .layer(TraceLayer::new_for_http()),
+                    // .layer(TraceLayer::new_for_http()),
             )
     }
 

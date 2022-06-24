@@ -10,16 +10,16 @@
     "lib_level": "warn"
   },
   "api": {
-    "grab_url": "http://192.168.1.220:7001",
-    "recg_url": "http://192.168.1.220:7002"
+    "grab_url": "http://localhost:7001",
+    "recg_url": "http://localhost:7002"
   },
   "sync": {
     "sync_log": "sync_log.json",
     "camera_upload": "http://localhost:8090/trackupload",
     "server": {
-      "db_sync": "http://127.0.0.1:8091/db_sync",
-      "person_sync": "http://127.0.0.1:8091/person_sync",
-      "camera_sync": "http://127.0.0.1:8091/camera_sync"
+      "db_sync": "http://192.168.1.26:8091/db_sync",
+      "person_sync": "http://192.168.1.26:8091/person_sync",
+      "camera_sync": "http://192.168.1.26:8091/camera_sync"
     },
     "heartbeat": 3,
     "sync_ttl": 5

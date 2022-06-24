@@ -33,6 +33,6 @@
   },
   "up_link": {
     "max_queue": 100,
-    "server": "http://127.0.0.1:8091/upload"
+    "server": "http://192.168.1.26:8092/upload"
   }
 }

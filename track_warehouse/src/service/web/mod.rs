@@ -18,6 +18,7 @@ use tower::ServiceBuilder;
 use tower_http::add_extension::AddExtensionLayer;
 use tower_http::trace::TraceLayer;
 use tracing::{error, info};
+use fy_base::util::axum_log::access_log;
 
 pub struct WebState {
     pub ctx: Arc<AppCtx>,
@@ -50,7 +51,7 @@ impl WebService {
         });
 
         Router::new()
-            .route("/trackupload", post(track_upload))
+            .route("/upload", post(track_upload))
             .layer(
                 ServiceBuilder::new()
                     // 限制请求的并发数量
@@ -60,7 +61,14 @@ impl WebService {
                     // 接口调用时间
                     .layer(middleware::from_fn(time_use))
                     // access log日志
-                    .layer(TraceLayer::new_for_http()),
+                    .layer(middleware::from_fn(|req, next| async {
+                        let f = |line: String| {
+                            info!(target:"access_log","{}",line);
+                        };
+                        access_log(req, next, f).await
+                    }))
+
+                    // .layer(TraceLayer::new_for_http()),
             )
     }
 
