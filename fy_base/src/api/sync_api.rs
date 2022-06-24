@@ -11,6 +11,7 @@ use reqwest::{Client, Error as Reqwest_Error};
 use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
 use serde_json::Error as Serde_Error;
+use tracing::{debug, error};
 
 use crate::util::time_format::long_ts_format;
 use crate::util::utils;
@@ -256,7 +257,7 @@ impl Api {
 }
 
 async fn do_get<T: DeserializeOwned>(client: &Client, url: &str) -> ApiResult<T> {
-    println!("--> url: {:?}", url);
+    debug!("url: {:?}", url);
 
     let response = client.get(url).send().await?;
 
@@ -270,14 +271,15 @@ async fn do_get<T: DeserializeOwned>(client: &Client, url: &str) -> ApiResult<T>
     let body = response.bytes().await?;
 
     // debug
-    {
+    let debug_it = false;
+    if debug_it {
         let body_str = std::str::from_utf8(&body);
         match body_str {
             Ok(v) => {
-                println!("--> body: {}", v);
+                debug!("http body: {}", v);
             }
             Err(e) => {
-                println!("--> from_utf8, err: {:?}", e);
+                error!("http body from_utf8, err: {:?}", e);
             }
         }
     }

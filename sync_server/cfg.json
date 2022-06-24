@@ -21,7 +21,7 @@
     "ttl_day": 14,
     "interval_hour": 6
   },
-  "sync_batch": 100,
+  "sync_batch": 500,
   "http": {
     "addr": "0.0.0.0:8091",
     "max_conn": 1000
