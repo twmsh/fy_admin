@@ -108,7 +108,6 @@ pub async fn get_db_update(
         }
     };
 
-    debug!("last_update: {}", last_update);
 
     let limit = state.ctx.cfg.sync_batch;
     let db_update = match state.ctx.dao.get_db_list(last_update, limit).await {
@@ -118,6 +117,7 @@ pub async fn get_db_update(
             return Err(e.into());
         }
     };
+
     let db_del_update = match state.ctx.dao.get_dbdel_list(last_update, limit).await {
         Ok(v) => v,
         Err(e) => {
@@ -125,6 +125,9 @@ pub async fn get_db_update(
             return Err(e.into());
         }
     };
+
+    debug!("get_db_update, update: {}", db_update.len());
+    debug!("get_db_update, del_update: {}", db_del_update.len());
 
     // 合并 db和 db_del的记录
     let mut list: Vec<Db> = vec![];
@@ -140,6 +143,8 @@ pub async fn get_db_update(
 
     // 取前N条记录
     list.truncate(limit as usize);
+
+    debug!("get_db_update, final list: {}", list.len());
 
     // 返回值
     Ok(build_success_response(list))
@@ -176,7 +181,6 @@ pub async fn get_person_update(
     let last_update =
         utils::parse_localtime_str(paras.last_update.unwrap().as_str(), DATETIME_FMT_LONG).unwrap();
 
-    debug!("last_update: {}", last_update);
 
     // 检查 box，是否需要同步 person
     let base_box = match state.ctx.dao.find_box(hw_id.clone()).await {
@@ -208,11 +212,10 @@ pub async fn get_person_update(
         }
     };
 
-    debug!("list_update: {:?}", list_update);
 
     // 从fea_map 转成 Person
     let mut list_update = get_personinfo_from_map(list_update);
-    debug!("list_update: {:?}", list_update);
+
 
     let list_del_update = match state.ctx.dao.get_feadel_list(last_update, limit).await {
         Ok(v) => v,
@@ -221,7 +224,11 @@ pub async fn get_person_update(
             return Err(e.into());
         }
     };
-    debug!("list_del_update: {:?}", list_del_update);
+
+
+    debug!("get_person_update, update: {}", list_update.len());
+    debug!("get_person_update, del_update: {}", list_del_update.len());
+
 
     // 合并 db和 db_del的记录
     let mut list: Vec<Person> = vec![];
@@ -237,6 +244,7 @@ pub async fn get_person_update(
 
     // 取前N条记录
     list.truncate(limit as usize);
+    debug!("get_person_update, final list: {}", list.len());
 
     Ok(build_success_response(list))
 }
@@ -272,7 +280,6 @@ pub async fn get_camera_update(
     let last_update =
         utils::parse_localtime_str(paras.last_update.unwrap().as_str(), DATETIME_FMT_LONG).unwrap();
 
-    debug!("last_update: {}", last_update);
 
     // 检查 box，是否需要同步 camera
     let base_box = match state.ctx.dao.find_box(hw_id.clone()).await {
@@ -322,6 +329,10 @@ pub async fn get_camera_update(
         }
     };
 
+    debug!("get_camera_update, update: {}", list_update.len());
+    debug!("get_camera_update, del_update: {}", list_del_update.len());
+
+
     // 合并 db和 db_del的记录
     let mut list: Vec<Camera> = vec![];
     for v in list_update {
@@ -336,6 +347,7 @@ pub async fn get_camera_update(
 
     // 取前N条记录
     list.truncate(limit as usize);
+    debug!("get_camera_update, final list: {}", list.len());
 
     // 返回值
     Ok(build_success_response(list))
