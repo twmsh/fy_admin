@@ -393,20 +393,29 @@ pub async fn do_sync_db_batch(ctx: Arc<AppCtx>, list: Vec<Db>) -> Result<bool, A
         if db.op == SYNC_OP_DEL {
             // 删除
             let deled = ctx.recg_api.delete_db(db.uuid.clone()).await?;
-            debug!("WorkerService, delete db:{}, return: {:?}", db.uuid, deled);
+            info!("WorkerService, delete db:{}, return: {:?}", db.uuid, deled);
         } else {
             //新增
 
-            let res = ctx
-                .recg_api
-                .create_db(Some(db.uuid.clone()), db.capacity as i64)
-                .await?;
+            // 先检查 db存在与否？ 无论capacity是否相同
+            let db_old = ctx.recg_api.get_db_info(db.uuid.clone()).await?;
+            if db_old.code == 0 {
+                // 已经存在，忽略之
+                info!("WorkerService, create db:{}, db is exsit, skip ", db.uuid);
+            } else {
+                // 不存在，新建
+                let res = ctx
+                    .recg_api
+                    .create_db(Some(db.uuid.clone()), db.capacity as i64)
+                    .await?;
 
-            if res.code != 0 {
-                return Err(AppError::new(&format!(
-                    "create_db:{}, return code:{}, msg:{}",
-                    db.uuid, res.code, res.msg
-                )));
+
+                if res.code != 0 {
+                    return Err(AppError::new(&format!(
+                        "create_db:{}, return code:{}, msg:{}",
+                        db.uuid, res.code, res.msg
+                    )));
+                }
             }
         }
 
