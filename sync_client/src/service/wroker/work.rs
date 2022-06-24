@@ -495,14 +495,14 @@ pub async fn do_sync_person_batch(ctx: Arc<AppCtx>, list: Vec<Person>) -> Result
                 )));
             }
 
-            let deled = ctx
+            let _deled = ctx
                 .recg_api
                 .delete_person(person.db_id.clone(), person.uuid.clone())
                 .await?;
-            debug!(
-                "WorkerService, for modify, delete person:{}, return: {:?}",
-                person.uuid, deled
-            );
+            // debug!(
+            //     "WorkerService, for modify, delete person:{}, return: {:?}",
+            //     person.uuid, deled
+            // );
 
             let detail = person.detail.as_ref().unwrap();
             let fea_list: Vec<_> = detail
