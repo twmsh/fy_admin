@@ -14,7 +14,7 @@
     "recg_url": "http://localhost:7002"
   },
   "track": {
-    "local_address": "127.0.0.1:9090",
+    "local_address": "0.0.0.0:8090",
     "face": {
       "skip_search": false,
       "search_top": 10,
