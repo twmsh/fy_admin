@@ -20,8 +20,8 @@ use fy_base::util::service::Service;
 use crate::app_ctx::AppCtx;
 
 use crate::error::AppResult;
-use fy_base::api::upload_api::{NotifyCarQueueItem, QI};
 use crate::queue_item::CarQueue;
+use fy_base::api::upload_api::{NotifyCarQueueItem, QI};
 
 use super::{SerialPool, SpHolder};
 

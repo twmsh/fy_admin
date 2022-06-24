@@ -24,8 +24,8 @@ use tracing::{debug, error, info};
 use crate::app_ctx::AppCtx;
 use crate::error::AppError;
 use crate::service::rabbitmq::process_message::process_boxlog_message;
-use fy_base::util::{rabbitmq::init_conn_props, service::Service};
 use fy_base::util::rabbitmq::shutdown_rabbitmq;
+use fy_base::util::{rabbitmq::init_conn_props, service::Service};
 
 pub struct RabbitmqService {
     pub ctx: Arc<AppCtx>,
@@ -173,8 +173,6 @@ impl RabbitmqService {
         Ok(())
     }
 
-
-
     // rabbitmq报错要重新开始，要等待一定时长
     // 等待时候，需要关注退出信号
     async fn do_run(mut self, conn_props: ConnectionProperties, exit_rx: Receiver<i64>) {
@@ -189,7 +187,7 @@ impl RabbitmqService {
                 let wait = self.increate_wait();
                 let exited = Self::wait_a_moment(Duration::from_secs(wait), exit_rx.clone()).await;
                 if exited {
-                     break;
+                    break;
                 } else {
                     continue;
                 }
@@ -208,7 +206,7 @@ impl RabbitmqService {
                 let wait = self.increate_wait();
                 let exited = Self::wait_a_moment(Duration::from_secs(wait), exit_rx.clone()).await;
                 if exited {
-                    shutdown_rabbitmq(None,Some(conn)).await;
+                    shutdown_rabbitmq(None, Some(conn)).await;
                     break;
                 } else {
                     continue;
@@ -237,17 +235,16 @@ impl RabbitmqService {
                 let wait = self.increate_wait();
                 let exited = Self::wait_a_moment(Duration::from_secs(wait), exit_rx.clone()).await;
                 if exited {
-                    shutdown_rabbitmq(Some(channel),Some(conn)).await;
+                    shutdown_rabbitmq(Some(channel), Some(conn)).await;
                     break;
                 } else {
                     continue;
                 }
             } else {
                 // 收到退出信号，退出
-                shutdown_rabbitmq(Some(channel),Some(conn)).await;
+                shutdown_rabbitmq(Some(channel), Some(conn)).await;
                 break;
             }
-
         }
 
         info!("RabbitmqService exit.");

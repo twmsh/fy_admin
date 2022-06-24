@@ -17,8 +17,8 @@ use tower::limit::GlobalConcurrencyLimitLayer;
 use tower::ServiceBuilder;
 use tower_http::add_extension::AddExtensionLayer;
 
-use tracing::{error, info};
 use fy_base::util::axum_log::access_log;
+use tracing::{error, info};
 
 pub struct WebState {
     pub ctx: Arc<AppCtx>,
@@ -50,26 +50,22 @@ impl WebService {
             car_queue: self.car_queue.clone(),
         });
 
-        Router::new()
-            .route("/upload", post(track_upload))
-            .layer(
-                ServiceBuilder::new()
-                    // 限制请求的并发数量
-                    .layer(GlobalConcurrencyLimitLayer::new(max_request_conn))
-                    // 设置 web state
-                    .layer(AddExtensionLayer::new(web_state))
-                    // 接口调用时间
-                    .layer(middleware::from_fn(time_use))
-                    // access log日志
-                    .layer(middleware::from_fn(|req, next| async {
-                        let f = |line: String| {
-                            info!(target:"access_log","{}",line);
-                        };
-                        access_log(req, next, f).await
-                    }))
-
-                    // .layer(TraceLayer::new_for_http()),
-            )
+        Router::new().route("/upload", post(track_upload)).layer(
+            ServiceBuilder::new()
+                // 限制请求的并发数量
+                .layer(GlobalConcurrencyLimitLayer::new(max_request_conn))
+                // 设置 web state
+                .layer(AddExtensionLayer::new(web_state))
+                // 接口调用时间
+                .layer(middleware::from_fn(time_use))
+                // access log日志
+                .layer(middleware::from_fn(|req, next| async {
+                    let f = |line: String| {
+                        info!(target:"access_log","{}",line);
+                    };
+                    access_log(req, next, f).await
+                })), // .layer(TraceLayer::new_for_http()),
+        )
     }
 
     pub fn init_socket_addr(&self) -> Result<SocketAddr, AddrParseError> {
@@ -106,9 +102,9 @@ impl WebService {
 impl Service for WebService {
     fn run(self, exit_rx: Receiver<i64>) -> JoinHandle<()> {
         // 绑定http端口
-        let addr = self.init_socket_addr().unwrap_or_else(|_| {
-            panic!("cant parse http addr: {}", self.ctx.cfg.http.addr)
-        });
+        let addr = self
+            .init_socket_addr()
+            .unwrap_or_else(|_| panic!("cant parse http addr: {}", self.ctx.cfg.http.addr));
         info!("http bind: {:?}", addr);
 
         let server = Server::try_bind(&addr).unwrap_or_else(|e| {

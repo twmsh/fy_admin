@@ -19,10 +19,10 @@ use fy_base::util::service::Service;
 
 use crate::app_ctx::AppCtx;
 
-use crate::error::AppResult;
-use crate::queue_item::{FaceQueue};
-use fy_base::api::upload_api::NotifyFaceQueueItem;
 use super::{SerialPool, SpHolder};
+use crate::error::AppResult;
+use crate::queue_item::FaceQueue;
+use fy_base::api::upload_api::NotifyFaceQueueItem;
 
 // ------------------- structs -------------------
 pub struct Track {

@@ -1,11 +1,11 @@
+use crate::app_ctx::AppCtx;
+use crate::queue_item::{CarQueue, FaceQueue};
+use fy_base::api::upload_api::{NotifyCarQueueItem, NotifyFaceQueueItem};
+use fy_base::util::service::Service;
 use std::sync::Arc;
 use tokio::sync::watch::Receiver;
 use tokio::task::JoinHandle;
 use tracing::{debug, info};
-use fy_base::api::upload_api::{NotifyCarQueueItem, NotifyFaceQueueItem};
-use fy_base::util::service::Service;
-use crate::app_ctx::AppCtx;
-use crate::queue_item::{CarQueue, FaceQueue};
 
 pub struct MinioService {
     pub ctx: Arc<AppCtx>,
@@ -23,11 +23,11 @@ impl MinioService {
     }
 
     async fn process_face(&self, item: NotifyFaceQueueItem) {
-        debug!("MinioService, process_face: {}",item.uuid);
+        debug!("MinioService, process_face: {}", item.uuid);
     }
 
     async fn process_car(&self, item: NotifyCarQueueItem) {
-        debug!("MinioService, process_car: {}",item.uuid);
+        debug!("MinioService, process_car: {}", item.uuid);
     }
 
     pub async fn do_run(self, mut exit_rx: Receiver<i64>) {

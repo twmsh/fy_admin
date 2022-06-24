@@ -251,8 +251,7 @@ pub async fn do_sync_camera(ctx: Arc<AppCtx>) -> Result<bool, AppError> {
 
 pub async fn do_sync_camera_batch(ctx: Arc<AppCtx>, list: Vec<Camera>) -> Result<bool, AppError> {
     for camera in list.iter() {
-
-        debug!("process sync_camera, {}, {}",camera.uuid,camera.op);
+        debug!("process sync_camera, {}, {}", camera.uuid, camera.op);
 
         if camera.op == SYNC_OP_DEL {
             // 删除
@@ -393,8 +392,7 @@ pub async fn do_sync_db(ctx: Arc<AppCtx>) -> Result<bool, AppError> {
 // 修改不支持
 pub async fn do_sync_db_batch(ctx: Arc<AppCtx>, list: Vec<Db>) -> Result<bool, AppError> {
     for db in list.iter() {
-
-        debug!("process sync_db, {}, {}",db.uuid,db.op);
+        debug!("process sync_db, {}, {}", db.uuid, db.op);
 
         if db.op == SYNC_OP_DEL {
             // 删除
@@ -488,8 +486,7 @@ pub async fn do_sync_person(ctx: Arc<AppCtx>) -> Result<bool, AppError> {
 
 pub async fn do_sync_person_batch(ctx: Arc<AppCtx>, list: Vec<Person>) -> Result<bool, AppError> {
     for person in list.iter() {
-
-        debug!("process sync_person, {}, {}",person.uuid,person.op);
+        debug!("process sync_person, {}, {}", person.uuid, person.op);
 
         if person.op == SYNC_OP_DEL {
             // 删除

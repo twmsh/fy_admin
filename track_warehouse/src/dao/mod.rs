@@ -174,8 +174,6 @@ impl Dao {
         Ok(list)
     }
 
-
-
     pub async fn update_latest_online(
         &self,
         hw_id: &str,

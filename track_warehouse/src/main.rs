@@ -2,15 +2,14 @@ use build_time::build_time_local;
 use clap::{arg, Command};
 use deadqueue::unlimited::Queue;
 use std::sync::Arc;
-use track_warehouse::{app_cfg::AppCfg, app_ctx::AppCtx, service::signal_service::SignalService};
 use tokio::sync::watch;
 use tracing::{error, info};
+use track_warehouse::{app_cfg::AppCfg, app_ctx::AppCtx, service::signal_service::SignalService};
 
 use fy_base::util::{logger, mysql_util, service::ServiceRepo};
 use track_warehouse::dao::Dao;
 use track_warehouse::queue_item::{CarQueue, FaceQueue};
 use track_warehouse::service::web::WebService;
-
 
 const APP_NAME: &str = "track_warehouse";
 const APP_VER_NUM: &str = "0.1.0";
@@ -106,7 +105,6 @@ async fn main() {
     // 创建队列
     let car_queue: Arc<CarQueue> = Arc::new(Queue::new());
     let face_queue: Arc<FaceQueue> = Arc::new(Queue::new());
-
 
     // 初始退出信号服务
     let exit_service = SignalService::new(exit_tx);

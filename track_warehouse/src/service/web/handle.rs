@@ -1,14 +1,14 @@
 use std::sync::Arc;
 
-use axum::Extension;
 use axum::extract::{ContentLengthLimit, Multipart};
+use axum::Extension;
 use bytes::Bytes;
 use chrono::Local;
-use serde_json::{self, Result as JsonResult};
-use tracing::{debug, error, info};
 use fy_base::api::upload_api::{NotifyCarQueueItem, NotifyFaceQueueItem, ResponseData};
 use fy_base::util::image as image_util;
-use fy_base::util::multipart_form::{MultipartFormValues, parse_multi_form};
+use fy_base::util::multipart_form::{parse_multi_form, MultipartFormValues};
+use serde_json::{self, Result as JsonResult};
+use tracing::{debug, error, info};
 
 use crate::service::web::WebState;
 
@@ -26,7 +26,6 @@ fn build_ok_response() -> ResponseData {
         message: Some("success".to_string()),
     }
 }
-
 
 //-----------------------------------
 pub async fn track_upload(
@@ -68,12 +67,11 @@ async fn handle_face(data: Arc<WebState>, values: MultipartFormValues) -> Respon
 
     debug!("->face:{}", json_str);
 
-    let face_queue_item: JsonResult<NotifyFaceQueueItem> = serde_json::from_reader(json_str.as_bytes());
+    let face_queue_item: JsonResult<NotifyFaceQueueItem> =
+        serde_json::from_reader(json_str.as_bytes());
     if let Err(e) = face_queue_item {
         error!("error, json parse error, err: {:?}", e);
-        return build_err_response(&format!(
-            "json parse error, err: {:?}", e
-        ));
+        return build_err_response(&format!("json parse error, err: {:?}", e));
     }
 
     let mut face_queue_item = face_queue_item.unwrap();
@@ -83,8 +81,7 @@ async fn handle_face(data: Arc<WebState>, values: MultipartFormValues) -> Respon
     info!("recv track, {}, index:{}, ft", item.id, item.index);
 
     // 处理图片
-    item.background.image_buf = match values.get_file_value(item.background.image_file.as_str())
-    {
+    item.background.image_buf = match values.get_file_value(item.background.image_file.as_str()) {
         Some((_, v)) => v,
         None => {
             error!("error, can't find para: {}", item.background.image_file);
@@ -147,12 +144,11 @@ async fn handle_car(data: Arc<WebState>, values: MultipartFormValues) -> Respons
     };
     debug!("->car:{}", json_str);
 
-    let car_queue_item: JsonResult<NotifyCarQueueItem> = serde_json::from_reader(json_str.as_bytes());
+    let car_queue_item: JsonResult<NotifyCarQueueItem> =
+        serde_json::from_reader(json_str.as_bytes());
     if let Err(e) = car_queue_item {
         error!("error, json parse error, err: {:?}", e);
-        return build_err_response(&format!(
-            "json parse error, err: {:?}", e
-        ));
+        return build_err_response(&format!("json parse error, err: {:?}", e));
     }
     let mut car_queue_item = car_queue_item.unwrap();
     car_queue_item.ts = now;
@@ -161,8 +157,7 @@ async fn handle_car(data: Arc<WebState>, values: MultipartFormValues) -> Respons
     info!("recv track, {}, index:{}, ct", item.id, item.index);
 
     // 处理图片
-    item.background.image_buf = match values.get_file_value(item.background.image_file.as_str())
-    {
+    item.background.image_buf = match values.get_file_value(item.background.image_file.as_str()) {
         Some((_, v)) => v,
         None => {
             error!("error, can't find field: {}", item.background.image_file);

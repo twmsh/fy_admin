@@ -15,7 +15,7 @@ use tokio::task::JoinHandle;
 use tower::limit::GlobalConcurrencyLimitLayer;
 use tower::ServiceBuilder;
 use tower_http::add_extension::AddExtensionLayer;
-use tower_http::trace::TraceLayer;
+
 use tracing::{error, info};
 
 pub mod model;
@@ -59,8 +59,7 @@ impl WebService {
                             info!(target:"access_log","{}",line);
                         };
                         access_log(req, next, f).await
-                    }))
-                    // .layer(TraceLayer::new_for_http()),
+                    })), // .layer(TraceLayer::new_for_http()),
             )
     }
 

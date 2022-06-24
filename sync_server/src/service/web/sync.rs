@@ -108,7 +108,6 @@ pub async fn get_db_update(
         }
     };
 
-
     let limit = state.ctx.cfg.sync_batch;
     let db_update = match state.ctx.dao.get_db_list(last_update, limit).await {
         Ok(v) => v,
@@ -127,7 +126,11 @@ pub async fn get_db_update(
     };
 
     debug!("get_db_update, {}, update: {}", hw_id, db_update.len());
-    debug!("get_db_update, {}, del_update: {}", hw_id, db_del_update.len());
+    debug!(
+        "get_db_update, {}, del_update: {}",
+        hw_id,
+        db_del_update.len()
+    );
 
     // 合并 db和 db_del的记录
     let mut list: Vec<Db> = vec![];
@@ -181,7 +184,6 @@ pub async fn get_person_update(
     let last_update =
         utils::parse_localtime_str(paras.last_update.unwrap().as_str(), DATETIME_FMT_LONG).unwrap();
 
-
     // 检查 box，是否需要同步 person
     let base_box = match state.ctx.dao.find_box(hw_id.clone()).await {
         Ok(v) => v,
@@ -212,10 +214,8 @@ pub async fn get_person_update(
         }
     };
 
-
     // 从fea_map 转成 Person
     let mut list_update = get_personinfo_from_map(list_update);
-
 
     let list_del_update = match state.ctx.dao.get_feadel_list(last_update, limit).await {
         Ok(v) => v,
@@ -225,10 +225,16 @@ pub async fn get_person_update(
         }
     };
 
-
-    debug!("get_person_update, {}, update: {}", hw_id,  list_update.len());
-    debug!("get_person_update, {}, del_update: {}", hw_id, list_del_update.len());
-
+    debug!(
+        "get_person_update, {}, update: {}",
+        hw_id,
+        list_update.len()
+    );
+    debug!(
+        "get_person_update, {}, del_update: {}",
+        hw_id,
+        list_del_update.len()
+    );
 
     // 合并 db和 db_del的记录
     let mut list: Vec<Person> = vec![];
@@ -280,7 +286,6 @@ pub async fn get_camera_update(
     let last_update =
         utils::parse_localtime_str(paras.last_update.unwrap().as_str(), DATETIME_FMT_LONG).unwrap();
 
-
     // 检查 box，是否需要同步 camera
     let base_box = match state.ctx.dao.find_box(hw_id.clone()).await {
         Ok(v) => v,
@@ -329,9 +334,16 @@ pub async fn get_camera_update(
         }
     };
 
-    debug!("get_camera_update, {}, update: {}", hw_id, list_update.len());
-    debug!("get_camera_update, {}, del_update: {}", hw_id, list_del_update.len());
-
+    debug!(
+        "get_camera_update, {}, update: {}",
+        hw_id,
+        list_update.len()
+    );
+    debug!(
+        "get_camera_update, {}, del_update: {}",
+        hw_id,
+        list_del_update.len()
+    );
 
     // 合并 db和 db_del的记录
     let mut list: Vec<Camera> = vec![];

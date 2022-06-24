@@ -1,15 +1,12 @@
-
-
 use tokio::sync::watch::Receiver;
 
+use crate::app_cfg::AppCfg;
 
-use crate::app_cfg::{AppCfg};
-
+use crate::dao::Dao;
 use fy_base::{
     api::bm_api::{AnalysisApi, RecognitionApi},
     util::service::SignalProduce,
 };
-use crate::dao::Dao;
 
 //---------------------
 
@@ -43,8 +40,6 @@ impl AppCtx {
         let value = self.exit_rx.borrow();
         *value == 100
     }
-
-
 }
 
 impl SignalProduce for AppCtx {

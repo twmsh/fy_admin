@@ -10,10 +10,10 @@ use box_agent::uplink::upload::UplinkService;
 use build_time::build_time_local;
 use clap::{arg, Command};
 use deadqueue::unlimited::Queue;
+use fy_base::api::upload_api::QI;
 use std::sync::Arc;
 use tokio::sync::watch;
 use tracing::info;
-use fy_base::api::upload_api::QI;
 
 use fy_base::util::{logger, service::ServiceRepo};
 

@@ -14,8 +14,8 @@ use fy_base::api::bm_api::{CarNotifyParams, FaceNotifyParams};
 use fy_base::util::image as image_util;
 use fy_base::util::multipart_form::{parse_multi_form, MultipartFormValues};
 
-use fy_base::api::upload_api::{NotifyCarQueueItem, NotifyFaceQueueItem};
 use crate::service::web::WebState;
+use fy_base::api::upload_api::{NotifyCarQueueItem, NotifyFaceQueueItem};
 
 //----------------------------------------
 pub struct UploadRes(String);

@@ -9,7 +9,7 @@ use std::ops::Deref;
 use reqwest::header;
 use reqwest::Client;
 
-use fy_base::api::upload_api::{ResponseData,NotifyCarQueueItem, NotifyFaceQueueItem};
+use fy_base::api::upload_api::{NotifyCarQueueItem, NotifyFaceQueueItem, ResponseData};
 
 #[derive(Debug)]
 pub enum ApiError {

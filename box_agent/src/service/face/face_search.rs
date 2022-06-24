@@ -11,8 +11,8 @@ use fy_base::util::utils;
 
 use crate::app_ctx::AppCtx;
 use crate::error::AppError;
-use fy_base::api::upload_api::{MatchPerson, NotifyFaceQueueItem, QI};
 use crate::queue_item::FaceQueue;
+use fy_base::api::upload_api::{MatchPerson, NotifyFaceQueueItem, QI};
 use fy_base::util::service::Service;
 
 pub struct FaceSearchService {
