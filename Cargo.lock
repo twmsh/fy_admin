@@ -1106,6 +1106,7 @@ dependencies = [
  "pnet",
  "reqwest",
  "rust-ini 0.17.0",
+ "rust-s3",
  "rust_decimal",
  "serde",
  "serde_json",

@@ -22,15 +22,37 @@ pub struct AppCfgLog {
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-pub struct AppCfgApi {
-    pub need_search: bool,
-    // 是否倒查，倒查的话，
-    // 需要将track特征值保存到facetrack_db中
-    pub need_dc: bool,
-    pub facetrack_db: String,
-    pub grab_url: String,
-    pub recg_url: String,
+pub struct AppCfgDb {
+    pub url: String,
+    pub tz: String,
+    pub max_conn: u64,
+    pub min_conn: u64,
+    pub idle: u64,
 }
+
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct AppCfgSearch {
+    // 是否比对，
+    pub enable: bool,
+    pub recg_url: String,
+    pub ignore_dbs: Vec<String>,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct AppCfgTrackDb {
+    // facetrack是否加入到路人库，
+    pub enable: bool,
+    pub recg_url: String,
+    pub facetrack_db: String,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct AppCfgHttp {
+    pub addr: String,
+    pub max_conn: u64,
+}
+
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct AppCfgRabbitMqItem {
@@ -48,18 +70,19 @@ pub struct AppCfgRabbitMq {
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-pub struct AppCfgHttp {
-    pub addr: String,
-    pub max_conn: u64,
+pub struct AppCfgMinio {
+    pub endpoint: String,
+    pub access_key: String,
+    pub secret_key: string,
+    pub facetrack_bucket: String,
+    pub cartrack_bucket: String,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-pub struct AppCfgDb {
-    pub url: String,
-    pub tz: String,
-    pub max_conn: u64,
-    pub min_conn: u64,
-    pub idle: u64,
+pub struct AppCfgClean {
+    pub ttl_days: u64,
+    pub batch_size: u64,
+    pub interval_hour: u64,
 }
 
 //----------------------------
@@ -68,9 +91,12 @@ pub struct AppCfg {
     pub version: AppCfgVersion,
     pub log: AppCfgLog,
     pub db: AppCfgDb,
-    pub api: AppCfgApi,
+    pub search: AppCfgSearch,
+    pub track_db: AppCfgTrackDb,
     pub http: AppCfgHttp,
     pub rabbitmq: AppCfgRabbitMq,
+    pub minio: AppCfgMinio,
+    pub clean: AppCfgClean,
 }
 
 impl AppCfg {

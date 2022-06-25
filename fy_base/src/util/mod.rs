@@ -12,3 +12,5 @@ pub mod se5;
 
 pub mod image;
 pub mod multipart_form;
+
+pub mod minio;

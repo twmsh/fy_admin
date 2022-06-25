@@ -16,12 +16,15 @@
     "min_conn": 4,
     "idle": 600
   },
-  "api": {
-    "need_search": false,
-    "need_dc": false,
-    "facetrack_db": "11111111",
-    "grab_url": "http://192.168.1.220:7001",
-    "recg_url": "http://192.168.1.220:7002"
+  "search": {
+    "enable": false,
+    "recg_url": "http://192.168.1.220:7002",
+    "ignore_dbs": ["1111"]
+  },
+  "track_db": {
+    "enable": true,
+    "recg_url": "http://192.168.1.220:7002",
+    "facetrack_db": "11111"
   },
   "http": {
     "addr": "0.0.0.0:8092",
@@ -41,5 +44,17 @@
       "route_key": "cartrack",
       "expire": 720
     }
+  },
+  "minio": {
+    "endpoint": "http://192.168.1.26:9000",
+    "access_key": "admin",
+    "secret_key": "admin123",
+    "facetrack_bucket": "facetrack",
+    "cartrack_bucket": "cartrack"
+  },
+  "clean": {
+    "ttl_days": 90,
+    "batch_size": 10000,
+    "interval_hour": 1
   }
 }

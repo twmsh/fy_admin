@@ -1,13 +1,34 @@
 
-face_upload  handle程序，写队列（ 存放http接口的推送）, minio程序，读队列，存到minio中
-face_search minio程序写队列，人脸比对程序读队列
-face_mysql 人脸比对程序写队列，数据库保存程序读队列，
+/facetrack/2022/06/25/abcdef/
+acdef_bg.jpg
 
-face_trackdb  数据库程序写队列，路人库程序读队列
-rabbit_queue 数据库程序写队列 ，rabbitmq提交程序，读队列
+acdef_1_s.jpg
+acdef_1_l.jpg
+acdef_1_fea.txt
+
+acdef_2_s.jpg
+acdef_2_l.jpg
+acdef_2_fea.txt
+
+/cartrack/2022/06/25/abcdef/
+acdef_bg.jpg
+
+acdef_1.jpg
+acdef_2.jpg
+acdef_3.jpg
+
+acdef_plate.jpg
 
 
+//------------------------
+ts问题，是以小盒子的ts为准，还是以warehouse的时间为准？
 
+//------------------------
+cleanservice 删除 minio图片，mysql中数据，trackdb中数据
+
+track_db和search使用的算法，可能是两台机器
+
+//-----------------------------------
 
 1) 接收box_agent的上传数据，图片数据存入到minio中
 对象中的图片buf可以清掉，减少内存占用，只留下特征值
