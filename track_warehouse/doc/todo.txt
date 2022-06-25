@@ -1,11 +1,31 @@
 
-1) 接收box_agent的上传数据，图片数据存入到minio中
-2) 根据参数，确定是否要search
-如果要search，调用bm_api进行search
+face_upload  handle程序，写队列（ 存放http接口的推送）, minio程序，读队列，存到minio中
+face_search minio程序写队列，人脸比对程序读队列
+face_mysql 人脸比对程序写队列，数据库保存程序读队列，
 
-3.1）track数据（含匹配数据）保存到mysql中
+face_trackdb  数据库程序写队列，路人库程序读队列
+rabbit_queue 数据库程序写队列 ，rabbitmq提交程序，读队列
+
+
+
+
+1) 接收box_agent的上传数据，图片数据存入到minio中
+对象中的图片buf可以清掉，减少内存占用，只留下特征值
+特征值是否要存入到minio中？
+如果存入到minio中，路人库可以通过这个数据重建。
+
+人脸的track，还会进行比对处理（如果需要），车辆不需要
+2) 根据参数，确定是否要search
+如果要search，调用bm_api进行search，更新对象中的matches数据
+对象中的特征值buf可以清掉，减少内存占用。
+
+3.1）track数据（人脸的含匹配数据，车辆）保存到mysql中
+然后将数据，送到两个队列中，一个送到路人库处理程序(3.2)，一个送到rabbitmq处理队列。
+
 3.2) track数据可以保存到倒查底库中去(根据配置要求) ，和 3.1并行运行
+
 4）发送face/car消息到 rabbitmq队列中，设置expire，供扩展程序使用。
 
 //-------------------
 图片直接用 minio 的 public url 还是写一个接口来返回图片内容？
+
