@@ -9,6 +9,7 @@ use track_warehouse::{app_cfg::AppCfg, app_ctx::AppCtx, service::signal_service:
 use fy_base::util::{logger, mysql_util, service::ServiceRepo};
 use track_warehouse::dao::Dao;
 use track_warehouse::queue_item::{CarQueue, FaceQueue};
+use track_warehouse::service::minio::MinioService;
 use track_warehouse::service::web::WebService;
 
 const APP_NAME: &str = "track_warehouse";
@@ -112,9 +113,13 @@ async fn main() {
     // 初始web服务
     let web_service = WebService::new(app_context.clone(), face_queue.clone(), car_queue.clone());
 
+    // 初始 minio 服务
+    let minio_service = MinioService::new(app_context.clone(), face_queue.clone(), car_queue.clone());
+
     // 启动服务
     service_repo.start_service(exit_service);
     service_repo.start_service(web_service);
+    service_repo.start_service(minio_service);
 
     // 等待退出
     service_repo.join().await;
