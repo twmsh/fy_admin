@@ -73,7 +73,7 @@ pub struct AppCfgRabbitMq {
 pub struct AppCfgMinio {
     pub endpoint: String,
     pub access_key: String,
-    pub secret_key: string,
+    pub secret_key: String,
     pub facetrack_bucket: String,
     pub cartrack_bucket: String,
 }

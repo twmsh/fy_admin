@@ -3,11 +3,15 @@ use crate::queue_item::{CarQueue, FaceQueue};
 use fy_base::api::upload_api::{NotifyCarQueueItem, NotifyFaceQueueItem};
 use fy_base::util::service::Service;
 use std::sync::Arc;
+use bytes::Bytes;
 use s3::Bucket;
+
 use tokio::sync::watch::Receiver;
 use tokio::task::JoinHandle;
 use tracing::{debug, info};
+use fy_base::util::minio;
 use fy_base::util::minio::new_bucket;
+use crate::error::AppError;
 
 pub struct MinioService {
     pub ctx: Arc<AppCtx>,
@@ -92,5 +96,97 @@ impl MinioService {
 impl Service for MinioService {
     fn run(self, exit_rx: Receiver<i64>) -> JoinHandle<()> {
         tokio::spawn(self.do_run(exit_rx))
+    }
+}
+
+//--------------------------------------------
+
+impl MinioService {
+    async fn save_minio_from_bytes(
+        bucket: &Bucket,
+        path: &str,
+        content: &mut Bytes,
+        clean: bool,
+    ) -> Result<(), AppError> {
+        let rst = minio::save_to_minio(bucket, path, content).await;
+
+        if clean && !content.is_empty() {
+            *content = Bytes::new();
+        }
+
+        let rst = match rst {
+            Ok(v) => v,
+            Err(e) => {
+                return Err(e.into());
+            }
+        };
+
+        if rst.1 != 200 {
+            return Err(AppError::new(&format!("minio put_object return: {},{}", rst.1, rst.0)));
+        }
+        Ok(())
+    }
+
+    // 保存只minio，修改 item的 file name
+    async fn save_facetrack_to_minio(&self, item: &mut NotifyFaceQueueItem) -> Result<(), AppError> {
+        let uuid = item.uuid.as_str();
+        let ts = item.ts;
+
+        // 先将 image_file置空，后赋值为minio path，然后清掉 Bytes
+
+        // 保存背景图
+        item.notify.background.image_file = "".into();
+        let path = minio::get_facetrack_relate_bg_path(uuid, ts);
+        let _saved = Self::save_minio_from_bytes(
+            &self.facetrack_bucket,
+            &path,
+            &mut item.notify.background.image_buf,
+            true,
+        ).await?;
+        item.notify.background.image_file = path;
+
+        for (face_id, face) in item.notify.faces.iter_mut().enumerate() {
+
+            // 小图
+            face.aligned_file = "".into();
+            let path = minio::get_facetrack_relate_small_path(uuid, ts, face_id as u8 + 1);
+            let _saved = Self::save_minio_from_bytes(
+                &self.facetrack_bucket,
+                &path,
+                &mut face.aligned_buf,
+                true,
+            ).await?;
+            face.aligned_file = path;
+
+            // 大图
+            face.display_file = "".into();
+            let path = minio::get_facetrack_relate_large_path(uuid, ts, face_id as u8 + 1);
+            let _saved = Self::save_minio_from_bytes(
+                &self.facetrack_bucket,
+                &path,
+                &mut face.display_buf,
+                true,
+            ).await?;
+            face.display_file = path;
+
+            // 特征值
+            if face.feature_file.is_some() && face.feature_buf.is_some() {
+                let feature_file = face.feature_file.as_mut().unwrap();
+                let feature_buf = face.feature_buf.as_mut().unwrap();
+
+                *feature_file = "".into();
+                let path = minio::get_facetrack_relate_fea_path(uuid, ts, face_id as u8 + 1);
+                let _saved = Self::save_minio_from_bytes(
+                    &self.facetrack_bucket,
+                    &path,
+                     feature_buf,
+                    false,
+                ).await?;
+                *feature_file = path;
+            }
+        }
+
+
+        Ok(())
     }
 }

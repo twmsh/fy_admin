@@ -1,5 +1,6 @@
 use std::error::Error;
 use std::fmt::{Debug, Display, Formatter};
+use s3::error::S3Error;
 
 use tokio::task::JoinError;
 
@@ -86,8 +87,8 @@ impl From<fy_base::api::bm_api::ApiError> for AppError {
     }
 }
 
-impl From<fy_base::api::sync_api::ApiError> for AppError {
-    fn from(e: fy_base::api::sync_api::ApiError) -> Self {
+impl From<S3Error> for AppError {
+    fn from(e: S3Error) -> Self {
         AppError::from_debug(e)
     }
 }

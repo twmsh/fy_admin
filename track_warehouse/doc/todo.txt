@@ -1,5 +1,6 @@
 
-/facetrack/2022/06/25/abcdef/
+facetrack
+/2022/06/25/abcdef/
 acdef_bg.jpg
 
 acdef_1_s.jpg
@@ -10,7 +11,8 @@ acdef_2_s.jpg
 acdef_2_l.jpg
 acdef_2_fea.txt
 
-/cartrack/2022/06/25/abcdef/
+cartrack
+/2022/06/25/abcdef/
 acdef_bg.jpg
 
 acdef_1.jpg
