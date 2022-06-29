@@ -4,6 +4,7 @@ use fy_base::api::upload_api::{NotifyCarQueueItem, NotifyFaceQueueItem};
 use fy_base::util::service::Service;
 use std::sync::Arc;
 use bytes::Bytes;
+use log::error;
 use s3::Bucket;
 
 use tokio::sync::watch::Receiver;
@@ -59,7 +60,7 @@ impl MinioService {
         }
     }
 
-    async fn process_face(&self, item: NotifyFaceQueueItem) {
+    async fn process_face(&self, mut item: NotifyFaceQueueItem) {
 
         // 保存图片,特征值
         // 更改图片名为 minio url
@@ -67,6 +68,17 @@ impl MinioService {
         // 传入到后续队列
 
         debug!("MinioService, process_face: {}", item.uuid);
+        let saved = self.save_facetrack_to_minio(&mut item).await;
+        if let Err(e) = saved {
+            error!("error, MinioService, save_facetrack_to_minio, err: {:?}", e);
+        }else{
+            debug!("MinioService, save_facetrack_to_minio, ok");
+        }
+
+
+
+
+
     }
 
     async fn process_car(&self, item: NotifyCarQueueItem) {

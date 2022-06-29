@@ -178,7 +178,7 @@ impl WorkerService {
             self.ctx.reset_synclog_for_db();
         }
 
-        //
+        // 保存 sync_log
         self.ctx.save_sync_log();
     }
 
