@@ -4,7 +4,7 @@ use crate::app_cfg::AppCfg;
 
 use crate::dao::Dao;
 use fy_base::{
-    api::bm_api::{AnalysisApi, RecognitionApi},
+    api::bm_api::{ RecognitionApi},
     util::service::SignalProduce,
 };
 
@@ -14,21 +14,23 @@ pub struct AppCtx {
     pub cfg: AppCfg,
     pub exit_rx: Receiver<i64>,
 
-    pub ana_api: AnalysisApi,
-    pub recg_api: RecognitionApi,
+    pub search_recg_api: RecognitionApi,
+    pub trackdb_recg_api: RecognitionApi,
+
     pub dao: Dao,
 }
 
 impl AppCtx {
     pub fn new(cfg: AppCfg, exit_rx: Receiver<i64>, dao: Dao) -> Self {
-        let ana_api = AnalysisApi::new(&cfg.api.grab_url);
-        let recg_api = RecognitionApi::new(&cfg.api.recg_url);
+        let search_recg_api = RecognitionApi::new(&cfg.search.recg_url);
+        let trackdb_recg_api = RecognitionApi::new(&cfg.track_db.recg_url);
 
         Self {
             cfg,
             exit_rx,
-            ana_api,
-            recg_api,
+
+            search_recg_api,
+            trackdb_recg_api,
             dao,
         }
     }

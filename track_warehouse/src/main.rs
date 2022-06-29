@@ -107,6 +107,10 @@ async fn main() {
     let car_queue: Arc<CarQueue> = Arc::new(Queue::new());
     let face_queue: Arc<FaceQueue> = Arc::new(Queue::new());
 
+    let car_mysql_queue: Arc<CarQueue> = Arc::new(Queue::new());
+    let face_search_queue: Arc<FaceQueue> = Arc::new(Queue::new());
+
+
     // 初始退出信号服务
     let exit_service = SignalService::new(exit_tx);
 
@@ -114,7 +118,14 @@ async fn main() {
     let web_service = WebService::new(app_context.clone(), face_queue.clone(), car_queue.clone());
 
     // 初始 minio 服务
-    let minio_service = MinioService::new(app_context.clone(), face_queue.clone(), car_queue.clone());
+    let minio_service = MinioService::new(
+        app_context.clone(),
+        face_queue.clone(),
+        car_queue.clone(),
+        face_search_queue.clone(),
+        car_mysql_queue.clone()
+
+    );
 
     // 启动服务
     service_repo.start_service(exit_service);
