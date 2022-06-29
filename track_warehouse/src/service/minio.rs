@@ -71,14 +71,12 @@ impl MinioService {
         let saved = self.save_facetrack_to_minio(&mut item).await;
         if let Err(e) = saved {
             error!("error, MinioService, save_facetrack_to_minio, err: {:?}", e);
-        }else{
+        } else {
             debug!("MinioService, save_facetrack_to_minio, ok");
         }
 
-
-
-
-
+        debug!("MinioService, put to next queue, {}",item.uuid);
+        self.face_out_queue.push(item);
     }
 
     async fn process_car(&self, item: NotifyCarQueueItem) {
@@ -191,7 +189,7 @@ impl MinioService {
                 let _saved = Self::save_minio_from_bytes(
                     &self.facetrack_bucket,
                     &path,
-                     feature_buf,
+                    feature_buf,
                     false,
                 ).await?;
                 *feature_file = path;

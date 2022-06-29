@@ -10,6 +10,7 @@ use fy_base::util::{logger, mysql_util, service::ServiceRepo};
 use track_warehouse::dao::Dao;
 use track_warehouse::queue_item::{CarQueue, FaceQueue};
 use track_warehouse::service::minio::MinioService;
+use track_warehouse::service::mysql_service::MysqlService;
 use track_warehouse::service::web::WebService;
 
 const APP_NAME: &str = "track_warehouse";
@@ -104,11 +105,18 @@ async fn main() {
     let mut service_repo = ServiceRepo::new(app_context.clone());
 
     // 创建队列
-    let car_queue: Arc<CarQueue> = Arc::new(Queue::new());
     let face_queue: Arc<FaceQueue> = Arc::new(Queue::new());
+    let car_queue: Arc<CarQueue> = Arc::new(Queue::new());
 
-    let car_mysql_queue: Arc<CarQueue> = Arc::new(Queue::new());
     let face_search_queue: Arc<FaceQueue> = Arc::new(Queue::new());
+
+    // todo for test
+    let face_mysql_queue: Arc<FaceQueue> = face_search_queue.clone();
+    let car_mysql_queue: Arc<CarQueue> = Arc::new(Queue::new());
+
+    let face_trackdb_queue: Arc<FaceQueue> = Arc::new(Queue::new());
+    let rabbitmq_face_queue: Arc<FaceQueue> = Arc::new(Queue::new());
+    let rabbitmq_car_queue: Arc<CarQueue> = Arc::new(Queue::new());
 
 
     // 初始退出信号服务
@@ -127,10 +135,21 @@ async fn main() {
 
     );
 
+    // 初始 mysql 服务
+    let mysql_service = MysqlService::new(
+        app_context.clone(),
+        face_mysql_queue.clone(),
+        car_mysql_queue.clone(),
+        face_trackdb_queue.clone(),
+        rabbitmq_face_queue.clone(),
+        rabbitmq_car_queue.clone()
+    );
+
     // 启动服务
     service_repo.start_service(exit_service);
     service_repo.start_service(web_service);
     service_repo.start_service(minio_service);
+    service_repo.start_service(mysql_service);
 
     // 等待退出
     service_repo.join().await;
