@@ -55,6 +55,18 @@ impl AppCtx {
         guard.clone()
     }
 
+    pub fn reset_synclog_for_camera(&self) {
+        let mut guard = self.sync_log.lock().unwrap();
+        guard.camera = Default::default();
+    }
+
+    pub fn reset_synclog_for_db(&self) {
+        let mut guard = self.sync_log.lock().unwrap();
+        guard.db = Default::default();
+        guard.person = Default::default();
+    }
+
+
     pub fn update_synclog_for_db(&self, last_id: &str, last_ts: DateTime<Local>) {
         let mut guard = self.sync_log.lock().unwrap();
         guard.db.last_id = last_id.to_string();

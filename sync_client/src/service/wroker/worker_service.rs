@@ -158,6 +158,9 @@ impl WorkerService {
                 }
             };
             info!("WorkerService, delete_all_cameras, deleted: {}", deleted);
+
+            //
+            self.ctx.reset_synclog_for_camera();
         }
 
         if reset_payload.db {
@@ -170,7 +173,13 @@ impl WorkerService {
                 }
             };
             info!("WorkerService, delete_all_dbs, deleted: {}", deleted);
+
+            //
+            self.ctx.reset_synclog_for_db();
         }
+
+        //
+        self.ctx.save_sync_log();
     }
 
     async fn process_task_reboot(&self, _item: TaskItem) {
