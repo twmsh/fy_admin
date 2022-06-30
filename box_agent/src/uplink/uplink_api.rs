@@ -8,6 +8,7 @@ use std::ops::Deref;
 
 use reqwest::header;
 use reqwest::Client;
+use tracing::debug;
 
 use fy_base::api::upload_api::{NotifyCarQueueItem, NotifyFaceQueueItem, ResponseData};
 
@@ -101,8 +102,9 @@ impl UplinkApi {
     // 上传人脸
     pub async fn upload_face(&self, url: &str, item: NotifyFaceQueueItem) -> ApiResult<()> {
         let json_content = serde_json::to_string(&item)?;
-        let mut form = Form::new().text("json", json_content);
+        debug!("--> face json: {}",json_content);
 
+        let mut form = Form::new().text("json", json_content);
         form = form.text("type", "facetrack");
 
         // 背景图
