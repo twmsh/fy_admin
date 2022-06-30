@@ -47,6 +47,7 @@
   },
   "minio": {
     "endpoint": "http://192.168.1.26:9000",
+    "img_prefix": "http://192.168.1.26:9000",
     "access_key": "admin",
     "secret_key": "admin123",
     "facetrack_bucket": "facetrack",

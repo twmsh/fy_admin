@@ -164,7 +164,7 @@ impl MinioService {
             "image/jpeg",
             true,
         ).await?;
-        item.notify.background.image_file = path;
+        item.notify.background.image_file = self.get_facetrack_minio_url(&path);
 
         for (face_id, face) in item.notify.faces.iter_mut().enumerate() {
 
@@ -178,7 +178,7 @@ impl MinioService {
                 "image/jpeg",
                 true,
             ).await?;
-            face.aligned_file = path;
+            face.aligned_file =self.get_facetrack_minio_url(&path);
 
             // 大图
             face.display_file = "".into();
@@ -190,7 +190,7 @@ impl MinioService {
                 "image/jpeg",
                 true,
             ).await?;
-            face.display_file = path;
+            face.display_file = self.get_facetrack_minio_url(&path);
 
             // 特征值
             if face.feature_file.is_some() && face.feature_buf.is_some() {
@@ -206,7 +206,7 @@ impl MinioService {
                     "text/plain",
                     false,
                 ).await?;
-                *feature_file = path;
+                *feature_file = self.get_facetrack_minio_url(&path);
             }
         }
 
@@ -230,7 +230,7 @@ impl MinioService {
             "image/jpeg",
             true,
         ).await?;
-        item.notify.background.image_file = path;
+        item.notify.background.image_file = self.get_cartrack_minio_url(&path);
 
         // 车辆图
         for (car_id, car) in item.notify.vehicles.iter_mut().enumerate() {
@@ -243,7 +243,7 @@ impl MinioService {
                 "image/jpeg",
                 true,
             ).await?;
-            car.image_file = path;
+            car.image_file = self.get_cartrack_minio_url(&path);
         }
 
         // 车牌图
@@ -259,7 +259,7 @@ impl MinioService {
                     "image/jpeg",
                     true,
                 ).await?;
-                plate_info.image_file = Some(path);
+                plate_info.image_file = Some(self.get_cartrack_minio_url(&path));
 
                 // 车牌二值图
                 plate_info.binary_file = Some("".into());
@@ -271,7 +271,7 @@ impl MinioService {
                     "image/jpeg",
                     true,
                 ).await?;
-                plate_info.binary_file = Some(path);
+                plate_info.binary_file = Some(self.get_cartrack_minio_url(&path));
 
             }
         }
@@ -279,4 +279,16 @@ impl MinioService {
         Ok(())
     }
 
+    fn get_facetrack_minio_url(&self,  path:&str) -> String {
+        // http://192.168.1.26:9000/cartrack/2022/06/30/014ca2a9-5646-413e-b588-17874e83caa9/014ca2a9-5646-413e-b588-17874e83caa9_bg.jpg
+        let bucket_name = self.ctx.cfg.minio.facetrack_bucket.as_str();
+        format!("{}/{}{}",self.ctx.cfg.minio.img_prefix,bucket_name,path)
+    }
+
+    fn get_cartrack_minio_url(&self,  path:&str) -> String {
+        // http://192.168.1.26:9000/cartrack/2022/06/30/014ca2a9-5646-413e-b588-17874e83caa9/014ca2a9-5646-413e-b588-17874e83caa9_bg.jpg
+        let bucket_name = self.ctx.cfg.minio.cartrack_bucket.as_str();
+        format!("{}/{}{}",self.ctx.cfg.minio.img_prefix,bucket_name,path)
+    }
 }
+
