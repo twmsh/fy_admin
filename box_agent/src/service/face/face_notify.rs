@@ -306,7 +306,6 @@ impl FaceHandler {
     }
 }
 
-
 //-----------------------
 // 将facetrack中 face按照抓拍+有特征值的原则排序，
 // file name也修改，不重复，没有特征值的face排在后面
@@ -325,14 +324,11 @@ fn sort_track_faces(item: &mut NotifyFaceQueueItem) {
     });
 
     // 修改 aligned_file , display_file, feature_file
-    for (id,face) in item.notify.faces.iter_mut().enumerate() {
-        face.aligned_file = format!("align_{}.bmp",id+1);
-        face.display_file = format!("display_{}.bmp",id+1);
+    for (id, face) in item.notify.faces.iter_mut().enumerate() {
+        face.aligned_file = format!("align_{}.bmp", id + 1);
+        face.display_file = format!("display_{}.bmp", id + 1);
         if let Some(ref mut v) = face.feature_file {
-            *v = format!("feature_{}.data",id+1);
+            *v = format!("feature_{}.data", id + 1);
         }
     }
-
-
-
 }

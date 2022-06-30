@@ -102,7 +102,7 @@ impl UplinkApi {
     // 上传人脸
     pub async fn upload_face(&self, url: &str, item: NotifyFaceQueueItem) -> ApiResult<()> {
         let json_content = serde_json::to_string(&item)?;
-        debug!("--> face json: {}",json_content);
+        debug!("--> face json: {}", json_content);
 
         let mut form = Form::new().text("json", json_content);
         form = form.text("type", "facetrack");
@@ -185,7 +185,6 @@ impl UplinkApi {
                 let part = fill_part(&plate.binary_buf, img_fn.clone(), "image/bmp")?;
                 form = form.part(img_fn.clone(), part);
             }
-
         }
 
         let res = self.client.post(url).multipart(form).send().await?;

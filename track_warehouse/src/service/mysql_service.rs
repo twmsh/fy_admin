@@ -1,10 +1,10 @@
-use std::sync::Arc;
 use chrono::Local;
+use fy_base::api::upload_api::{NotifyCarQueueItem, NotifyFaceQueueItem};
 use fy_base::util::service::Service;
+use std::sync::Arc;
 use tokio::sync::watch::Receiver;
 use tokio::task::JoinHandle;
 use tracing::{debug, error, info};
-use fy_base::api::upload_api::{NotifyCarQueueItem, NotifyFaceQueueItem};
 
 use crate::app_ctx::AppCtx;
 use crate::dao::base_model::{Cartrack, Facetrack};
@@ -19,7 +19,6 @@ pub struct MysqlService {
     pub face_trackdb_queue: Arc<FaceQueue>,
     pub rabbitmq_face_queue: Arc<FaceQueue>,
     pub rabbitmq_car_queue: Arc<CarQueue>,
-
 }
 
 impl MysqlService {
@@ -48,23 +47,21 @@ impl MysqlService {
         debug!("MysqlService, process_face: {}", item.uuid);
 
         if let Err(e) = self.save_facetrack_to_mysql(&item).await {
-            error!("error, MysqlService, save_facetrack_to_mysql, err: {:?}",e);
+            error!("error, MysqlService, save_facetrack_to_mysql, err: {:?}", e);
         }
 
         self.rabbitmq_face_queue.push(item);
 
         // todo 提交到trackdb处理
-
     }
 
     async fn process_car(&self, item: NotifyCarQueueItem) {
         debug!("MysqlService, process_car: {}", item.uuid);
         if let Err(e) = self.save_cartrack_to_mysql(&item).await {
-            error!("error, MysqlService, save_cartrack_to_mysql, err: {:?}",e);
+            error!("error, MysqlService, save_cartrack_to_mysql, err: {:?}", e);
         }
         self.rabbitmq_car_queue.push(item);
     }
-
 
     pub async fn do_run(self, mut exit_rx: Receiver<i64>) {
         loop {
@@ -92,14 +89,16 @@ impl Service for MysqlService {
     }
 }
 
-
 impl MysqlService {
     async fn save_facetrack_to_mysql(&self, item: &NotifyFaceQueueItem) -> Result<(), AppError> {
         let facetrack = Self::from_queueitem_to_facetrack(item);
 
         let id = self.ctx.dao.save_facetrack(&facetrack).await?;
 
-        debug!("MysqlService, save facetrack ok, {}, {}", id, facetrack.uuid);
+        debug!(
+            "MysqlService, save facetrack ok, {}, {}",
+            id, facetrack.uuid
+        );
 
         Ok(())
     }
@@ -127,10 +126,13 @@ impl MysqlService {
             glasses = props.glasses as i16;
         }
 
-        let img_list: Vec<String> = item.notify.faces.iter().enumerate()
-            .map(|(id, face)| {
-                format!("{}:{}", id + 1, face.quality)
-            }).collect();
+        let img_list: Vec<String> = item
+            .notify
+            .faces
+            .iter()
+            .enumerate()
+            .map(|(id, face)| format!("{}:{}", id + 1, face.quality))
+            .collect();
         let img_ids = img_list.join(",");
 
         // feature_file字段不为空
@@ -162,10 +164,13 @@ impl MysqlService {
     fn from_queueitem_to_cartrack(item: &NotifyCarQueueItem) -> Cartrack {
         let now = Local::now();
 
-        let img_list: Vec<String> = item.notify.vehicles.iter().enumerate()
-            .map(|(id, _face)| {
-                format!("{}:{}", id + 1, 1.0)
-            }).collect();
+        let img_list: Vec<String> = item
+            .notify
+            .vehicles
+            .iter()
+            .enumerate()
+            .map(|(id, _face)| format!("{}:{}", id + 1, 1.0))
+            .collect();
         let img_ids = img_list.join(",");
 
         let mut plate_judged = 0;
@@ -178,10 +183,17 @@ impl MysqlService {
             vehicle_judged = 1;
         }
 
-
         let (plate_content, plate_type) = item.notify.get_plate_tuple();
-        let (move_direct, car_direct, car_color, car_brand,
-            car_top_series, car_series, car_top_type, car_mid_type) = item.notify.get_props_tuple();
+        let (
+            move_direct,
+            car_direct,
+            car_color,
+            car_brand,
+            car_top_series,
+            car_series,
+            car_top_type,
+            car_mid_type,
+        ) = item.notify.get_props_tuple();
 
         let plate_confidence = item.notify.get_plate_confidence().map(|x| x as f32);
 

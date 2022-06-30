@@ -30,7 +30,6 @@ pub struct AppCfgDb {
     pub idle: u64,
 }
 
-
 #[derive(Serialize, Deserialize, Debug)]
 pub struct AppCfgSearch {
     // 是否比对，
@@ -52,7 +51,6 @@ pub struct AppCfgHttp {
     pub addr: String,
     pub max_conn: u64,
 }
-
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct AppCfgRabbitMqItem {

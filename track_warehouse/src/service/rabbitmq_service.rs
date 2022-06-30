@@ -1,4 +1,3 @@
-
 use std::sync::Arc;
 use std::time::Duration;
 
@@ -9,10 +8,7 @@ use fy_base::util::service::Service;
 use tokio::sync::watch::Receiver;
 use tokio::task::JoinHandle;
 
-
-use lapin::options::{
-    BasicPublishOptions, ConfirmSelectOptions,
-};
+use lapin::options::{BasicPublishOptions, ConfirmSelectOptions};
 use lapin::{
     options::{ExchangeDeclareOptions, QueueBindOptions, QueueDeclareOptions},
     types::FieldTable,
@@ -20,9 +16,9 @@ use lapin::{
 };
 use tokio::time::sleep;
 
-use tracing::{debug, error, info};
-use fy_base::api::upload_api::{NotifyCarQueueItem, NotifyFaceQueueItem};
 use crate::queue_item::{CarQueue, FaceQueue};
+use fy_base::api::upload_api::{NotifyCarQueueItem, NotifyFaceQueueItem};
+use tracing::{debug, error, info};
 
 pub struct RabbitmqService {
     pub ctx: Arc<AppCtx>,
@@ -32,11 +28,7 @@ pub struct RabbitmqService {
 }
 
 impl RabbitmqService {
-    pub fn new(
-        ctx: Arc<AppCtx>,
-        face_queue: Arc<FaceQueue>,
-        car_queue: Arc<CarQueue>,
-    ) -> Self {
+    pub fn new(ctx: Arc<AppCtx>, face_queue: Arc<FaceQueue>, car_queue: Arc<CarQueue>) -> Self {
         Self {
             ctx,
             face_queue,
@@ -192,7 +184,6 @@ impl RabbitmqService {
     }
 
     pub async fn do_run(mut self, conn_props: ConnectionProperties, exit_rx: Receiver<i64>) {
-
         loop {
             // init connecton
             let conn = self.init_rabbitmq_connection(conn_props.clone()).await;
@@ -229,9 +220,7 @@ impl RabbitmqService {
             debug!("RabbitmqService, rabbitmq inited");
 
             // loop message
-            let loop_rst = self
-                .loop_message(&channel, exit_rx.clone())
-                .await;
+            let loop_rst = self.loop_message(&channel, exit_rx.clone()).await;
 
             let (rst, _) = self
                 .check_rabbitmq_error("loop_message", loop_rst, exit_rx.clone())
@@ -277,7 +266,6 @@ impl RabbitmqService {
         Ok(())
     }
 
-
     async fn process_out_face_rabbitmsg(
         &mut self,
         channel: &Channel,
@@ -307,7 +295,10 @@ impl RabbitmqService {
             )
             .await?
             .await?;
-        debug!("RabbitmqService, publish_confirm, {:?}, {}", publish_confirm,item.uuid);
+        debug!(
+            "RabbitmqService, publish_confirm, {:?}, {}",
+            publish_confirm, item.uuid
+        );
 
         Ok(())
     }
@@ -341,7 +332,10 @@ impl RabbitmqService {
             )
             .await?
             .await?;
-        debug!("RabbitmqService, publish_confirm, {:?}, {}", publish_confirm,item.uuid);
+        debug!(
+            "RabbitmqService, publish_confirm, {:?}, {}",
+            publish_confirm, item.uuid
+        );
 
         Ok(())
     }

@@ -66,7 +66,6 @@ impl AppCtx {
         guard.person = Default::default();
     }
 
-
     pub fn update_synclog_for_db(&self, last_id: &str, last_ts: DateTime<Local>) {
         let mut guard = self.sync_log.lock().unwrap();
         guard.db.last_id = last_id.to_string();

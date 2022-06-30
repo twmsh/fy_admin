@@ -1,4 +1,4 @@
-use chrono::{  FixedOffset};
+use chrono::FixedOffset;
 
 use std::sync::Arc;
 
@@ -18,21 +18,14 @@ pub struct Dao {
 //--------------------------------
 
 impl Dao {
-
-    pub async fn save_facetrack(
-        &self,
-        facetrack: &Facetrack
-    ) -> Result<u64, AppError> {
-        let new_id = facetrack.insert(&self.pool,&self.tz).await?;
+    pub async fn save_facetrack(&self, facetrack: &Facetrack) -> Result<u64, AppError> {
+        let new_id = facetrack.insert(&self.pool, &self.tz).await?;
 
         Ok(new_id)
     }
 
-    pub async fn save_cartrack(
-        &self,
-        cartrack: &Cartrack
-    ) -> Result<u64, AppError> {
-        let new_id = cartrack.insert(&self.pool,&self.tz).await?;
+    pub async fn save_cartrack(&self, cartrack: &Cartrack) -> Result<u64, AppError> {
+        let new_id = cartrack.insert(&self.pool, &self.tz).await?;
 
         Ok(new_id)
     }

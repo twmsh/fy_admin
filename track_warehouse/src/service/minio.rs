@@ -1,18 +1,18 @@
 use crate::app_ctx::AppCtx;
 use crate::queue_item::{CarQueue, FaceQueue};
+use bytes::Bytes;
 use fy_base::api::upload_api::{NotifyCarQueueItem, NotifyFaceQueueItem};
 use fy_base::util::service::Service;
-use std::sync::Arc;
-use bytes::Bytes;
 use log::error;
 use s3::Bucket;
+use std::sync::Arc;
 
+use crate::error::AppError;
+use fy_base::util::minio;
+use fy_base::util::minio::new_bucket;
 use tokio::sync::watch::Receiver;
 use tokio::task::JoinHandle;
 use tracing::{debug, info};
-use fy_base::util::minio;
-use fy_base::util::minio::new_bucket;
-use crate::error::AppError;
 
 pub struct MinioService {
     pub ctx: Arc<AppCtx>,
@@ -24,7 +24,6 @@ pub struct MinioService {
 
     pub facetrack_bucket: Bucket,
     pub cartrack_bucket: Bucket,
-
 }
 
 impl MinioService {
@@ -40,14 +39,16 @@ impl MinioService {
             &ctx.cfg.minio.access_key,
             &ctx.cfg.minio.secret_key,
             &ctx.cfg.minio.facetrack_bucket,
-        ).unwrap();
+        )
+        .unwrap();
 
         let cartrack_bucket = new_bucket(
             &ctx.cfg.minio.endpoint,
             &ctx.cfg.minio.access_key,
             &ctx.cfg.minio.secret_key,
             &ctx.cfg.minio.cartrack_bucket,
-        ).unwrap();
+        )
+        .unwrap();
 
         Self {
             ctx,
@@ -61,7 +62,6 @@ impl MinioService {
     }
 
     async fn process_face(&self, mut item: NotifyFaceQueueItem) {
-
         // 保存图片,特征值
         // 更改图片名为 minio url
         // 删除 图片buf
@@ -70,12 +70,15 @@ impl MinioService {
         debug!("MinioService, process_face: {}", item.uuid);
         let saved = self.save_facetrack_to_minio(&mut item).await;
         if let Err(e) = saved {
-            error!("error, MinioService, save_facetrack_to_minio:{}, err: {:?}", item.uuid,e);
+            error!(
+                "error, MinioService, save_facetrack_to_minio:{}, err: {:?}",
+                item.uuid, e
+            );
         } else {
-            debug!("MinioService, save_facetrack_to_minio, ok, {}",item.uuid);
+            debug!("MinioService, save_facetrack_to_minio, ok, {}", item.uuid);
         }
 
-        debug!("MinioService, face put to next queue, {}",item.uuid);
+        debug!("MinioService, face put to next queue, {}", item.uuid);
         self.face_out_queue.push(item);
     }
 
@@ -83,12 +86,15 @@ impl MinioService {
         debug!("MinioService, process_car: {}", item.uuid);
         let saved = self.save_cartrack_to_minio(&mut item).await;
         if let Err(e) = saved {
-            error!("error, MinioService, save_cartrack_to_minio:{}, err: {:?}",item.uuid, e);
+            error!(
+                "error, MinioService, save_cartrack_to_minio:{}, err: {:?}",
+                item.uuid, e
+            );
         } else {
-            debug!("MinioService, save_cartrack_to_minio, ok, {}",item.uuid);
+            debug!("MinioService, save_cartrack_to_minio, ok, {}", item.uuid);
         }
 
-        debug!("MinioService, car put to next queue, {}",item.uuid);
+        debug!("MinioService, car put to next queue, {}", item.uuid);
         self.car_out_queue.push(item);
     }
 
@@ -128,7 +134,7 @@ impl MinioService {
         content_type: &str,
         clean: bool,
     ) -> Result<(), AppError> {
-        let rst = minio::save_to_minio(bucket, path, content,content_type).await;
+        let rst = minio::save_to_minio(bucket, path, content, content_type).await;
 
         if clean && !content.is_empty() {
             *content = Bytes::new();
@@ -142,13 +148,19 @@ impl MinioService {
         };
 
         if rst.1 != 200 {
-            return Err(AppError::new(&format!("minio put_object return: {},{}", rst.1, rst.0)));
+            return Err(AppError::new(&format!(
+                "minio put_object return: {},{}",
+                rst.1, rst.0
+            )));
         }
         Ok(())
     }
 
     // 保存只minio，修改 item的 file name
-    async fn save_facetrack_to_minio(&self, item: &mut NotifyFaceQueueItem) -> Result<(), AppError> {
+    async fn save_facetrack_to_minio(
+        &self,
+        item: &mut NotifyFaceQueueItem,
+    ) -> Result<(), AppError> {
         let uuid = item.uuid.as_str();
         let ts = item.ts;
 
@@ -163,11 +175,11 @@ impl MinioService {
             &mut item.notify.background.image_buf,
             "image/jpeg",
             true,
-        ).await?;
+        )
+        .await?;
         item.notify.background.image_file = self.get_facetrack_minio_url(&path);
 
         for (face_id, face) in item.notify.faces.iter_mut().enumerate() {
-
             // 小图
             face.aligned_file = "".into();
             let path = minio::get_facetrack_relate_small_path(uuid, ts, face_id as u8 + 1);
@@ -177,8 +189,9 @@ impl MinioService {
                 &mut face.aligned_buf,
                 "image/jpeg",
                 true,
-            ).await?;
-            face.aligned_file =self.get_facetrack_minio_url(&path);
+            )
+            .await?;
+            face.aligned_file = self.get_facetrack_minio_url(&path);
 
             // 大图
             face.display_file = "".into();
@@ -189,7 +202,8 @@ impl MinioService {
                 &mut face.display_buf,
                 "image/jpeg",
                 true,
-            ).await?;
+            )
+            .await?;
             face.display_file = self.get_facetrack_minio_url(&path);
 
             // 特征值
@@ -205,11 +219,11 @@ impl MinioService {
                     feature_buf,
                     "text/plain",
                     false,
-                ).await?;
+                )
+                .await?;
                 *feature_file = self.get_facetrack_minio_url(&path);
             }
         }
-
 
         Ok(())
     }
@@ -229,7 +243,8 @@ impl MinioService {
             &mut item.notify.background.image_buf,
             "image/jpeg",
             true,
-        ).await?;
+        )
+        .await?;
         item.notify.background.image_file = self.get_cartrack_minio_url(&path);
 
         // 车辆图
@@ -242,13 +257,14 @@ impl MinioService {
                 &mut car.img_buf,
                 "image/jpeg",
                 true,
-            ).await?;
+            )
+            .await?;
             car.image_file = self.get_cartrack_minio_url(&path);
         }
 
         // 车牌图
         if item.notify.has_plate_info() {
-            if let Some(ref mut plate_info) =  item.notify.plate_info {
+            if let Some(ref mut plate_info) = item.notify.plate_info {
                 // 车牌图
                 plate_info.image_file = Some("".into());
                 let path = minio::get_cartrack_relate_plate_path(uuid, ts);
@@ -258,7 +274,8 @@ impl MinioService {
                     &mut plate_info.img_buf,
                     "image/jpeg",
                     true,
-                ).await?;
+                )
+                .await?;
                 plate_info.image_file = Some(self.get_cartrack_minio_url(&path));
 
                 // 车牌二值图
@@ -270,25 +287,24 @@ impl MinioService {
                     &mut plate_info.binary_buf,
                     "image/jpeg",
                     true,
-                ).await?;
+                )
+                .await?;
                 plate_info.binary_file = Some(self.get_cartrack_minio_url(&path));
-
             }
         }
 
         Ok(())
     }
 
-    fn get_facetrack_minio_url(&self,  path:&str) -> String {
+    fn get_facetrack_minio_url(&self, path: &str) -> String {
         // http://192.168.1.26:9000/cartrack/2022/06/30/014ca2a9-5646-413e-b588-17874e83caa9/014ca2a9-5646-413e-b588-17874e83caa9_bg.jpg
         let bucket_name = self.ctx.cfg.minio.facetrack_bucket.as_str();
-        format!("{}/{}{}",self.ctx.cfg.minio.img_prefix,bucket_name,path)
+        format!("{}/{}{}", self.ctx.cfg.minio.img_prefix, bucket_name, path)
     }
 
-    fn get_cartrack_minio_url(&self,  path:&str) -> String {
+    fn get_cartrack_minio_url(&self, path: &str) -> String {
         // http://192.168.1.26:9000/cartrack/2022/06/30/014ca2a9-5646-413e-b588-17874e83caa9/014ca2a9-5646-413e-b588-17874e83caa9_bg.jpg
         let bucket_name = self.ctx.cfg.minio.cartrack_bucket.as_str();
-        format!("{}/{}{}",self.ctx.cfg.minio.img_prefix,bucket_name,path)
+        format!("{}/{}{}", self.ctx.cfg.minio.img_prefix, bucket_name, path)
     }
 }
-

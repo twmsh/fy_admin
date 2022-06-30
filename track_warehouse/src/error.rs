@@ -1,6 +1,6 @@
+use s3::error::S3Error;
 use std::error::Error;
 use std::fmt::{Debug, Display, Formatter};
-use s3::error::S3Error;
 
 use tokio::task::JoinError;
 

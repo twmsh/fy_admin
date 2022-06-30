@@ -3,10 +3,7 @@ use tokio::sync::watch::Receiver;
 use crate::app_cfg::AppCfg;
 
 use crate::dao::Dao;
-use fy_base::{
-    api::bm_api::{ RecognitionApi},
-    util::service::SignalProduce,
-};
+use fy_base::{api::bm_api::RecognitionApi, util::service::SignalProduce};
 
 //---------------------
 

@@ -119,7 +119,6 @@ async fn main() {
     let rabbitmq_face_queue: Arc<FaceQueue> = Arc::new(Queue::new());
     let rabbitmq_car_queue: Arc<CarQueue> = Arc::new(Queue::new());
 
-
     // 初始退出信号服务
     let exit_service = SignalService::new(exit_tx);
 
@@ -132,8 +131,7 @@ async fn main() {
         face_queue.clone(),
         car_queue.clone(),
         face_search_queue.clone(),
-        car_mysql_queue.clone()
-
+        car_mysql_queue.clone(),
     );
 
     // 初始 mysql 服务
@@ -143,14 +141,14 @@ async fn main() {
         car_mysql_queue.clone(),
         face_trackdb_queue.clone(),
         rabbitmq_face_queue.clone(),
-        rabbitmq_car_queue.clone()
+        rabbitmq_car_queue.clone(),
     );
 
     // 初始 rabbitmq 服务
     let rabbitmq_service = RabbitmqService::new(
-      app_context.clone(),
-      rabbitmq_face_queue.clone(),
-      rabbitmq_car_queue.clone()
+        app_context.clone(),
+        rabbitmq_face_queue.clone(),
+        rabbitmq_car_queue.clone(),
     );
 
     // 启动服务

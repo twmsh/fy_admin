@@ -1,10 +1,14 @@
-
 use chrono::{DateTime, Local};
-use s3::{Bucket, Region};
 use s3::creds::Credentials;
 use s3::error::S3Error;
+use s3::{Bucket, Region};
 
-pub fn new_bucket(endpoint: &str, user: &str, password: &str, bucket_name: &str) -> Result<Bucket, S3Error> {
+pub fn new_bucket(
+    endpoint: &str,
+    user: &str,
+    password: &str,
+    bucket_name: &str,
+) -> Result<Bucket, S3Error> {
     let region = Region::Custom {
         region: "minio".to_string(),
         endpoint: endpoint.to_string(),
@@ -21,11 +25,17 @@ pub fn new_bucket(endpoint: &str, user: &str, password: &str, bucket_name: &str)
     Ok(bucket.with_path_style())
 }
 
-
 //-----------
 // 网络失败 S3Error
-pub async fn save_to_minio(bucket: &Bucket, path: &str, content: &[u8], content_type:&str) -> Result<(String, u16), S3Error> {
-    let rst = bucket.put_object_with_content_type(path, content,content_type).await?;
+pub async fn save_to_minio(
+    bucket: &Bucket,
+    path: &str,
+    content: &[u8],
+    content_type: &str,
+) -> Result<(String, u16), S3Error> {
+    let rst = bucket
+        .put_object_with_content_type(path, content, content_type)
+        .await?;
     let code = rst.1;
     let etag = match String::from_utf8(rst.0) {
         Ok(v) => v,
@@ -36,7 +46,6 @@ pub async fn save_to_minio(bucket: &Bucket, path: &str, content: &[u8], content_
 
     Ok((etag, code))
 }
-
 
 //---------------------------------
 /*
