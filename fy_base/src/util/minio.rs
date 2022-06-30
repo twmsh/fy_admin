@@ -106,3 +106,7 @@ pub fn get_cartrack_relate_plate_path(uuid: &str, ts: DateTime<Local>) -> String
     format!("{}/{}/{}_plate.jpg", ts_prefix, uuid, uuid)
 }
 
+pub fn get_cartrack_relate_binary_path(uuid: &str, ts: DateTime<Local>) -> String {
+    let ts_prefix = get_ts_prefix(ts);
+    format!("{}/{}/{}_binary.jpg", ts_prefix, uuid, uuid)
+}

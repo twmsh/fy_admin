@@ -242,6 +242,7 @@ impl MinioService {
         // 车牌图
         if item.notify.has_plate_info() {
             if let Some(ref mut plate_info) =  item.notify.plate_info {
+                // 车牌图
                 plate_info.image_file = Some("".into());
                 let path = minio::get_cartrack_relate_plate_path(uuid, ts);
                 let _saved = Self::save_minio_from_bytes(
@@ -251,6 +252,18 @@ impl MinioService {
                     true,
                 ).await?;
                 plate_info.image_file = Some(path);
+
+                // 车牌二值图
+                plate_info.binary_file = Some("".into());
+                let path = minio::get_cartrack_relate_binary_path(uuid, ts);
+                let _saved = Self::save_minio_from_bytes(
+                    &self.cartrack_bucket,
+                    &path,
+                    &mut plate_info.binary_buf,
+                    true,
+                ).await?;
+                plate_info.binary_file = Some(path);
+
             }
         }
 

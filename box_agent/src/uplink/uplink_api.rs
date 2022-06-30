@@ -180,6 +180,12 @@ impl UplinkApi {
                 let part = fill_part(&plate.img_buf, img_fn.clone(), "image/bmp")?;
                 form = form.part(img_fn.clone(), part);
             }
+
+            if let Some(ref img_fn) = plate.binary_file {
+                let part = fill_part(&plate.binary_buf, img_fn.clone(), "image/bmp")?;
+                form = form.part(img_fn.clone(), part);
+            }
+
         }
 
         let res = self.client.post(url).multipart(form).send().await?;
