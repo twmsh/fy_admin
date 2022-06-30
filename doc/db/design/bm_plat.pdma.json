@@ -4,7 +4,7 @@
   "avatar": "",
   "version": "4.1.1",
   "createdTime": "2022-5-20 20:11:51",
-  "updatedTime": "2022-6-17 22:17:35",
+  "updatedTime": "2022-6-30 11:20:42",
   "dbConns": [],
   "profile": {
     "default": {
@@ -344,7 +344,7 @@
     "generatorDoc": {
       "docTemplate": ""
     },
-    "relationFieldSize": "15",
+    "relationFieldSize": 30,
     "uiHint": [
       {
         "defKey": "Input",
@@ -3077,6 +3077,477 @@
             }
           ],
           "id": "35939635-7D10-469D-9CD2-A0F8E0FAC008"
+        }
+      ]
+    },
+    {
+      "id": "3EB23CBE-2A5D-49B0-80EF-494ED05EDD04",
+      "env": {
+        "base": {
+          "nameSpace": "",
+          "codeRoot": ""
+        }
+      },
+      "defKey": "cartrack",
+      "defName": "车辆抓拍记录",
+      "comment": "",
+      "properties": {
+        "partitioned by": "(date string)",
+        "row format delimited": "",
+        "fields terminated by ','": "",
+        "collection items terminated by '-'": "",
+        "map keys terminated by ':'": "",
+        "store as textfile;": ""
+      },
+      "nameTemplate": "{defKey}[{defName}]",
+      "headers": [
+        {
+          "refKey": "hideInGraph",
+          "hideInGraph": true
+        },
+        {
+          "refKey": "defKey",
+          "hideInGraph": false
+        },
+        {
+          "refKey": "defName",
+          "hideInGraph": false
+        },
+        {
+          "refKey": "primaryKey",
+          "hideInGraph": false
+        },
+        {
+          "refKey": "notNull",
+          "hideInGraph": true
+        },
+        {
+          "refKey": "autoIncrement",
+          "hideInGraph": true
+        },
+        {
+          "refKey": "domain",
+          "hideInGraph": true
+        },
+        {
+          "refKey": "type",
+          "hideInGraph": false
+        },
+        {
+          "refKey": "len",
+          "hideInGraph": false
+        },
+        {
+          "refKey": "scale",
+          "hideInGraph": false
+        },
+        {
+          "refKey": "comment",
+          "hideInGraph": true
+        },
+        {
+          "refKey": "refDict",
+          "hideInGraph": true
+        },
+        {
+          "refKey": "defaultValue",
+          "hideInGraph": true
+        },
+        {
+          "refKey": "isStandard",
+          "hideInGraph": false
+        },
+        {
+          "refKey": "uiHint",
+          "hideInGraph": true
+        },
+        {
+          "refKey": "extProps",
+          "hideInGraph": true
+        }
+      ],
+      "fields": [
+        {
+          "defKey": "id",
+          "defName": "id",
+          "comment": "",
+          "type": "",
+          "len": "",
+          "scale": "",
+          "primaryKey": true,
+          "notNull": true,
+          "autoIncrement": true,
+          "defaultValue": "",
+          "hideInGraph": false,
+          "domain": "2F4B9A67-455B-4A65-9510-4019DFA5CABC",
+          "refDict": "",
+          "uiHint": "",
+          "id": "2A69F1FD-3672-4B4C-A8FC-F6058D583458"
+        },
+        {
+          "defKey": "uuid",
+          "defName": "uuid",
+          "comment": "",
+          "domain": "",
+          "type": "VARCHAR",
+          "len": 50,
+          "scale": "",
+          "primaryKey": false,
+          "notNull": true,
+          "autoIncrement": false,
+          "defaultValue": "",
+          "hideInGraph": false,
+          "refDict": "",
+          "uiHint": "",
+          "id": "34066918-7EC7-4F40-A524-0421964B4FE8"
+        },
+        {
+          "defKey": "camera_uuid",
+          "defName": "摄像头uuid",
+          "comment": "",
+          "domain": "",
+          "type": "VARCHAR",
+          "len": 50,
+          "scale": "",
+          "primaryKey": false,
+          "notNull": true,
+          "autoIncrement": false,
+          "defaultValue": "",
+          "hideInGraph": false,
+          "refDict": "",
+          "uiHint": "",
+          "id": "84A7E820-5D0B-4D93-8897-5E0B51B34520"
+        },
+        {
+          "defKey": "img_ids",
+          "defName": "图片ids",
+          "comment": "index:quality,index:quality",
+          "domain": "",
+          "type": "VARCHAR",
+          "len": 400,
+          "scale": "",
+          "primaryKey": false,
+          "notNull": true,
+          "autoIncrement": false,
+          "defaultValue": "",
+          "hideInGraph": false,
+          "refDict": "",
+          "uiHint": "",
+          "id": "E71DAB73-4BA2-4B8E-83FA-613FC5A491D3"
+        },
+        {
+          "defKey": "plate_judged",
+          "defName": "车牌是否识别出",
+          "comment": "0：否，1：是",
+          "type": "",
+          "len": "",
+          "scale": "",
+          "primaryKey": false,
+          "notNull": true,
+          "autoIncrement": false,
+          "defaultValue": "0",
+          "hideInGraph": false,
+          "refDict": "",
+          "extProps": {},
+          "domain": "BC3C15EB-D6D4-415F-B0DF-9F4988184595",
+          "id": "B5DC20CB-4ACB-445A-ADCE-DD6B03666B4B"
+        },
+        {
+          "defKey": "vehicle_judged",
+          "defName": "车型是否识别出来",
+          "comment": "0：否，1：是",
+          "type": "",
+          "len": "",
+          "scale": "",
+          "primaryKey": false,
+          "notNull": true,
+          "autoIncrement": false,
+          "defaultValue": "0",
+          "hideInGraph": false,
+          "refDict": "",
+          "extProps": {},
+          "domain": "BC3C15EB-D6D4-415F-B0DF-9F4988184595",
+          "id": "3AE45376-4FA7-4A62-80AE-A15A40F443BD"
+        },
+        {
+          "defKey": "move_direct",
+          "defName": "运动方向",
+          "comment": "0 未知；1 向上；2 向下",
+          "type": "",
+          "len": "",
+          "scale": "",
+          "primaryKey": false,
+          "notNull": true,
+          "autoIncrement": false,
+          "defaultValue": "0",
+          "hideInGraph": false,
+          "refDict": "",
+          "extProps": {},
+          "domain": "BC3C15EB-D6D4-415F-B0DF-9F4988184595",
+          "id": "F0B9B9DA-7946-4441-8343-17554AB4553E"
+        },
+        {
+          "defKey": "car_direct",
+          "defName": "车辆方位",
+          "comment": "uuid:score,uuid:score",
+          "type": "VARCHAR",
+          "len": 50,
+          "scale": "",
+          "primaryKey": false,
+          "notNull": false,
+          "autoIncrement": false,
+          "defaultValue": "",
+          "hideInGraph": false,
+          "refDict": "",
+          "extProps": {},
+          "domain": "",
+          "id": "4965F144-54F3-46D5-A9BD-FED1AA535753"
+        },
+        {
+          "defKey": "plate_content",
+          "defName": "车牌号",
+          "comment": "",
+          "type": "VARCHAR",
+          "len": 50,
+          "scale": "",
+          "primaryKey": false,
+          "notNull": false,
+          "autoIncrement": false,
+          "defaultValue": "",
+          "hideInGraph": false,
+          "refDict": "",
+          "extProps": {},
+          "domain": "",
+          "id": "E7E72572-AFF6-4ABF-80B0-109B2D41628C"
+        },
+        {
+          "defKey": "plate_confidence",
+          "defName": "车牌置信度",
+          "comment": "",
+          "type": "FLOAT",
+          "len": "",
+          "scale": "",
+          "primaryKey": false,
+          "notNull": false,
+          "autoIncrement": false,
+          "defaultValue": "",
+          "hideInGraph": false,
+          "refDict": "",
+          "extProps": {},
+          "domain": "",
+          "id": "B52554DC-BE4C-4896-B3BB-21147802DA79"
+        },
+        {
+          "defKey": "plate_type",
+          "defName": "车牌类型",
+          "comment": "",
+          "type": "VARCHAR",
+          "len": 50,
+          "scale": "",
+          "primaryKey": false,
+          "notNull": false,
+          "autoIncrement": false,
+          "defaultValue": "",
+          "hideInGraph": false,
+          "refDict": "",
+          "extProps": {},
+          "domain": "",
+          "id": "B1844A10-E470-4CBD-9707-17D374433559"
+        },
+        {
+          "defKey": "car_color",
+          "defName": "车身颜色",
+          "comment": "",
+          "type": "VARCHAR",
+          "len": 50,
+          "scale": "",
+          "primaryKey": false,
+          "notNull": false,
+          "autoIncrement": false,
+          "defaultValue": "",
+          "hideInGraph": false,
+          "refDict": "",
+          "extProps": {},
+          "domain": "",
+          "id": "FD37D989-5312-44FC-AE1F-D24A173E9E96"
+        },
+        {
+          "defKey": "car_brand",
+          "defName": "品牌",
+          "comment": "",
+          "type": "VARCHAR",
+          "len": 50,
+          "scale": "",
+          "primaryKey": false,
+          "notNull": false,
+          "autoIncrement": false,
+          "defaultValue": "",
+          "hideInGraph": false,
+          "refDict": "",
+          "extProps": {},
+          "domain": "",
+          "id": "8D52DA56-D313-457B-BF5B-363F08BED86A"
+        },
+        {
+          "defKey": "car_top_series",
+          "defName": "车系",
+          "comment": "",
+          "type": "VARCHAR",
+          "len": 50,
+          "scale": "",
+          "primaryKey": false,
+          "notNull": false,
+          "autoIncrement": false,
+          "defaultValue": "",
+          "hideInGraph": false,
+          "refDict": "",
+          "extProps": {},
+          "domain": "",
+          "id": "98D65603-1898-468C-8C2E-63A40BBDB1E2"
+        },
+        {
+          "defKey": "car_series",
+          "defName": "车款",
+          "comment": "",
+          "type": "VARCHAR",
+          "len": 50,
+          "scale": "",
+          "primaryKey": false,
+          "notNull": false,
+          "autoIncrement": false,
+          "defaultValue": "",
+          "hideInGraph": false,
+          "refDict": "",
+          "extProps": {},
+          "domain": "",
+          "id": "D7B33B37-022D-4C82-86DF-C9048BE5ED35"
+        },
+        {
+          "defKey": "car_top_type",
+          "defName": "车粗分类别",
+          "comment": "",
+          "type": "VARCHAR",
+          "len": 50,
+          "scale": "",
+          "primaryKey": false,
+          "notNull": false,
+          "autoIncrement": false,
+          "defaultValue": "",
+          "hideInGraph": false,
+          "refDict": "",
+          "extProps": {},
+          "domain": "",
+          "id": "3BCEE7C9-36C0-4E7C-9FE3-BBB8EB2E4560"
+        },
+        {
+          "defKey": "car_mid_type",
+          "defName": "车类别",
+          "comment": "",
+          "type": "VARCHAR",
+          "len": 50,
+          "scale": "",
+          "primaryKey": false,
+          "notNull": false,
+          "autoIncrement": false,
+          "defaultValue": "",
+          "hideInGraph": false,
+          "refDict": "",
+          "extProps": {},
+          "domain": "",
+          "id": "D29B51FB-D9E8-47FE-B0D4-1B9FAD3D24D6"
+        },
+        {
+          "defKey": "capture_time",
+          "defName": "抓拍时间",
+          "comment": "",
+          "domain": "",
+          "type": "DATETIME",
+          "len": 3,
+          "scale": "",
+          "primaryKey": false,
+          "notNull": true,
+          "autoIncrement": false,
+          "defaultValue": "",
+          "hideInGraph": false,
+          "refDict": "",
+          "uiHint": "",
+          "id": "C4305619-7F7F-42E5-B8C6-C03F091E467B"
+        },
+        {
+          "defKey": "create_time",
+          "defName": "创建时间",
+          "comment": "",
+          "type": "DATETIME",
+          "len": 3,
+          "scale": "",
+          "primaryKey": false,
+          "notNull": true,
+          "autoIncrement": false,
+          "defaultValue": "",
+          "hideInGraph": false,
+          "refDict": "",
+          "extProps": {},
+          "domain": "",
+          "id": "30D7BDEA-CC1E-4A56-B316-23ECED907BF4"
+        }
+      ],
+      "correlations": [],
+      "indexes": [
+        {
+          "defKey": "idx_cartrack_uuid",
+          "defName": null,
+          "unique": true,
+          "comment": "",
+          "fields": [
+            {
+              "fieldDefKey": "34066918-7EC7-4F40-A524-0421964B4FE8",
+              "ascOrDesc": "A",
+              "id": "E5FF54A6-93C8-4230-BC25-84C59D545916"
+            }
+          ],
+          "id": "38877384-4404-4AD8-80B7-0B5F7518C793"
+        },
+        {
+          "defKey": "idx_cartrack_cameraid",
+          "defName": null,
+          "unique": false,
+          "comment": "",
+          "fields": [
+            {
+              "fieldDefKey": "84A7E820-5D0B-4D93-8897-5E0B51B34520",
+              "ascOrDesc": "A",
+              "id": "A298A413-2746-47E6-A422-2F48525BB35E"
+            }
+          ],
+          "id": "2A740C0A-2EED-40A1-81BE-81CDD3F76E05"
+        },
+        {
+          "defKey": "idx_cartrack_capturetime",
+          "defName": null,
+          "unique": false,
+          "comment": "",
+          "fields": [
+            {
+              "fieldDefKey": "C4305619-7F7F-42E5-B8C6-C03F091E467B",
+              "ascOrDesc": "A",
+              "id": "51434D0B-01A2-41BA-B7D9-2E409145657A"
+            }
+          ],
+          "id": "337D13F6-3AB7-4AEE-9095-ED1CD887D77C"
+        },
+        {
+          "defKey": "indx_cartrack_platecontent",
+          "defName": null,
+          "unique": false,
+          "comment": "",
+          "fields": [
+            {
+              "fieldDefKey": "E7E72572-AFF6-4ABF-80B0-109B2D41628C",
+              "ascOrDesc": "A",
+              "id": "44453CD0-D559-4D96-8FC3-07EBC72D003A"
+            }
+          ],
+          "id": "1EA9E568-847D-4573-A018-F0AABF3C1996"
         }
       ]
     }

@@ -254,6 +254,68 @@ pub struct BaseFeaMap {
     /* 更新时间 */
     pub modify_time: DateTime<Local>,
 }
+/* 车辆抓拍记录 */
+#[derive(sqlx::FromRow, MysqlEntity, Serialize, Deserialize, Debug, Clone)]
+#[table = "cartrack"]
+pub struct Cartrack {
+    /* id */
+    #[pk]
+    pub id: i64,
+
+    /* uuid */
+    pub uuid: String,
+
+    /* 摄像头uuid */
+    pub camera_uuid: String,
+
+    /* 图片ids;index:quality,index:quality */
+    pub img_ids: String,
+
+    /* 车牌是否识别出;0：否，1：是 */
+    pub plate_judged: i16,
+
+    /* 车型是否识别出来;0：否，1：是 */
+    pub vehicle_judged: i16,
+
+    /* 运动方向;0 未知；1 向上；2 向下 */
+    pub move_direct: i16,
+
+    /* 车辆方位;uuid:score,uuid:score */
+    pub car_direct: Option<String>,
+
+    /* 车牌号 */
+    pub plate_content: Option<String>,
+
+    /* 车牌置信度 */
+    pub plate_confidence: Option<f32>,
+
+    /* 车牌类型 */
+    pub plate_type: Option<String>,
+
+    /* 车身颜色 */
+    pub car_color: Option<String>,
+
+    /* 品牌 */
+    pub car_brand: Option<String>,
+
+    /* 车系 */
+    pub car_top_series: Option<String>,
+
+    /* 车款 */
+    pub car_series: Option<String>,
+
+    /* 车粗分类别 */
+    pub car_top_type: Option<String>,
+
+    /* 车类别 */
+    pub car_mid_type: Option<String>,
+
+    /* 抓拍时间 */
+    pub capture_time: DateTime<Local>,
+
+    /* 创建时间 */
+    pub create_time: DateTime<Local>,
+}
 /* 人脸抓拍记录 */
 #[derive(sqlx::FromRow, MysqlEntity, Serialize, Deserialize, Debug, Clone)]
 #[table = "facetrack"]
