@@ -125,9 +125,10 @@ impl MinioService {
         bucket: &Bucket,
         path: &str,
         content: &mut Bytes,
+        content_type: &str,
         clean: bool,
     ) -> Result<(), AppError> {
-        let rst = minio::save_to_minio(bucket, path, content).await;
+        let rst = minio::save_to_minio(bucket, path, content,content_type).await;
 
         if clean && !content.is_empty() {
             *content = Bytes::new();
@@ -160,6 +161,7 @@ impl MinioService {
             &self.facetrack_bucket,
             &path,
             &mut item.notify.background.image_buf,
+            "image/jpeg",
             true,
         ).await?;
         item.notify.background.image_file = path;
@@ -173,6 +175,7 @@ impl MinioService {
                 &self.facetrack_bucket,
                 &path,
                 &mut face.aligned_buf,
+                "image/jpeg",
                 true,
             ).await?;
             face.aligned_file = path;
@@ -184,6 +187,7 @@ impl MinioService {
                 &self.facetrack_bucket,
                 &path,
                 &mut face.display_buf,
+                "image/jpeg",
                 true,
             ).await?;
             face.display_file = path;
@@ -199,6 +203,7 @@ impl MinioService {
                     &self.facetrack_bucket,
                     &path,
                     feature_buf,
+                    "text/plain",
                     false,
                 ).await?;
                 *feature_file = path;
@@ -222,6 +227,7 @@ impl MinioService {
             &self.cartrack_bucket,
             &path,
             &mut item.notify.background.image_buf,
+            "image/jpeg",
             true,
         ).await?;
         item.notify.background.image_file = path;
@@ -234,6 +240,7 @@ impl MinioService {
                 &self.cartrack_bucket,
                 &path,
                 &mut car.img_buf,
+                "image/jpeg",
                 true,
             ).await?;
             car.image_file = path;
@@ -249,6 +256,7 @@ impl MinioService {
                     &self.cartrack_bucket,
                     &path,
                     &mut plate_info.img_buf,
+                    "image/jpeg",
                     true,
                 ).await?;
                 plate_info.image_file = Some(path);
@@ -260,6 +268,7 @@ impl MinioService {
                     &self.cartrack_bucket,
                     &path,
                     &mut plate_info.binary_buf,
+                    "image/jpeg",
                     true,
                 ).await?;
                 plate_info.binary_file = Some(path);

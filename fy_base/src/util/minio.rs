@@ -24,8 +24,8 @@ pub fn new_bucket(endpoint: &str, user: &str, password: &str, bucket_name: &str)
 
 //-----------
 // 网络失败 S3Error
-pub async fn save_to_minio(bucket: &Bucket, path: &str, content: &[u8]) -> Result<(String, u16), S3Error> {
-    let rst = bucket.put_object(path, content).await?;
+pub async fn save_to_minio(bucket: &Bucket, path: &str, content: &[u8], content_type:&str) -> Result<(String, u16), S3Error> {
+    let rst = bucket.put_object_with_content_type(path, content,content_type).await?;
     let code = rst.1;
     let etag = match String::from_utf8(rst.0) {
         Ok(v) => v,
