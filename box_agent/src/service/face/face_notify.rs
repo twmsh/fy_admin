@@ -1,3 +1,4 @@
+use std::cmp::Ordering;
 use std::sync::Arc;
 use std::time::Duration;
 
@@ -195,12 +196,16 @@ impl FaceNotifyService {
                 (guard.ts, guard.notify.clone())
             };
 
-            self.out.push(NotifyFaceQueueItem {
+            let mut item = NotifyFaceQueueItem {
                 uuid: uuid.clone(),
                 notify,
                 ts,
                 matches: None,
-            })
+            };
+
+            sort_track_faces(&mut item);
+
+            self.out.push(item);
         }
     }
 }
@@ -299,4 +304,35 @@ impl FaceHandler {
             }
         }
     }
+}
+
+
+//-----------------------
+// 将facetrack中 face按照抓拍+有特征值的原则排序，
+// file name也修改，不重复，没有特征值的face排在后面
+fn sort_track_faces(item: &mut NotifyFaceQueueItem) {
+    item.notify.faces.sort_by(|a, b| {
+        // 先比较 是否有fea,再比较 fram_num
+        if a.feature_file.is_some() && b.feature_file.is_none() {
+            return Ordering::Less;
+        }
+
+        if a.feature_file.is_none() && b.feature_file.is_some() {
+            return Ordering::Greater;
+        }
+
+        a.frame_num.cmp(&b.frame_num)
+    });
+
+    // 修改 aligned_file , display_file, feature_file
+    for (id,face) in item.notify.faces.iter_mut().enumerate() {
+        face.aligned_file = format!("align_{}.bmp",id+1);
+        face.display_file = format!("display_{}.bmp",id+1);
+        if let Some(ref mut v) = face.feature_file {
+            *v = format!("feature_{}.data",id+1);
+        }
+    }
+
+
+
 }
