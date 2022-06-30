@@ -70,17 +70,26 @@ impl MinioService {
         debug!("MinioService, process_face: {}", item.uuid);
         let saved = self.save_facetrack_to_minio(&mut item).await;
         if let Err(e) = saved {
-            error!("error, MinioService, save_facetrack_to_minio, err: {:?}", e);
+            error!("error, MinioService, save_facetrack_to_minio:{}, err: {:?}", item.uuid,e);
         } else {
-            debug!("MinioService, save_facetrack_to_minio, ok");
+            debug!("MinioService, save_facetrack_to_minio, ok, {}",item.uuid);
         }
 
-        debug!("MinioService, put to next queue, {}",item.uuid);
+        debug!("MinioService, face put to next queue, {}",item.uuid);
         self.face_out_queue.push(item);
     }
 
-    async fn process_car(&self, item: NotifyCarQueueItem) {
+    async fn process_car(&self, mut item: NotifyCarQueueItem) {
         debug!("MinioService, process_car: {}", item.uuid);
+        let saved = self.save_cartrack_to_minio(&mut item).await;
+        if let Err(e) = saved {
+            error!("error, MinioService, save_cartrack_to_minio:{}, err: {:?}",item.uuid, e);
+        } else {
+            debug!("MinioService, save_cartrack_to_minio, ok, {}",item.uuid);
+        }
+
+        debug!("MinioService, car put to next queue, {}",item.uuid);
+        self.car_out_queue.push(item);
     }
 
     pub async fn do_run(self, mut exit_rx: Receiver<i64>) {
@@ -199,4 +208,53 @@ impl MinioService {
 
         Ok(())
     }
+
+    async fn save_cartrack_to_minio(&self, item: &mut NotifyCarQueueItem) -> Result<(), AppError> {
+        let uuid = item.uuid.as_str();
+        let ts = item.ts;
+
+        // 先将 image_file置空，后赋值为minio path，然后清掉 Bytes
+
+        // 保存背景图
+        item.notify.background.image_file = "".into();
+        let path = minio::get_cartrack_relate_bg_path(uuid, ts);
+        let _saved = Self::save_minio_from_bytes(
+            &self.cartrack_bucket,
+            &path,
+            &mut item.notify.background.image_buf,
+            true,
+        ).await?;
+        item.notify.background.image_file = path;
+
+        // 车辆图
+        for (car_id, car) in item.notify.vehicles.iter_mut().enumerate() {
+            car.image_file = "".into();
+            let path = minio::get_cartrack_relate_car_path(uuid, ts, car_id as u8 + 1);
+            let _saved = Self::save_minio_from_bytes(
+                &self.cartrack_bucket,
+                &path,
+                &mut car.img_buf,
+                true,
+            ).await?;
+            car.image_file = path;
+        }
+
+        // 车牌图
+        if item.notify.has_plate_info() {
+            if let Some(ref mut plate_info) =  item.notify.plate_info {
+                plate_info.image_file = Some("".into());
+                let path = minio::get_cartrack_relate_plate_path(uuid, ts);
+                let _saved = Self::save_minio_from_bytes(
+                    &self.cartrack_bucket,
+                    &path,
+                    &mut plate_info.img_buf,
+                    true,
+                ).await?;
+                plate_info.image_file = Some(path);
+            }
+        }
+
+        Ok(())
+    }
+
 }

@@ -11,6 +11,7 @@ use track_warehouse::dao::Dao;
 use track_warehouse::queue_item::{CarQueue, FaceQueue};
 use track_warehouse::service::minio::MinioService;
 use track_warehouse::service::mysql_service::MysqlService;
+use track_warehouse::service::rabbitmq_service::RabbitmqService;
 use track_warehouse::service::web::WebService;
 
 const APP_NAME: &str = "track_warehouse";
@@ -145,11 +146,19 @@ async fn main() {
         rabbitmq_car_queue.clone()
     );
 
+    // 初始 rabbitmq 服务
+    let rabbitmq_service = RabbitmqService::new(
+      app_context.clone(),
+      rabbitmq_face_queue.clone(),
+      rabbitmq_car_queue.clone()
+    );
+
     // 启动服务
     service_repo.start_service(exit_service);
     service_repo.start_service(web_service);
     service_repo.start_service(minio_service);
     service_repo.start_service(mysql_service);
+    service_repo.start_service(rabbitmq_service);
 
     // 等待退出
     service_repo.join().await;

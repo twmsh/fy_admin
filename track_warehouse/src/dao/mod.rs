@@ -2,7 +2,7 @@ use chrono::{  FixedOffset};
 
 use std::sync::Arc;
 
-use crate::dao::base_model::{ Facetrack};
+use crate::dao::base_model::{Cartrack, Facetrack};
 use crate::error::AppError;
 
 use sqlx::{MySql, Pool};
@@ -28,5 +28,12 @@ impl Dao {
         Ok(new_id)
     }
 
+    pub async fn save_cartrack(
+        &self,
+        cartrack: &Cartrack
+    ) -> Result<u64, AppError> {
+        let new_id = cartrack.insert(&self.pool,&self.tz).await?;
 
+        Ok(new_id)
+    }
 }

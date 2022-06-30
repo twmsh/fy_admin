@@ -36,13 +36,13 @@
       "queue": "facetrack_queue",
       "exchange": "facetrack_exchange",
       "route_key": "facetrack",
-      "expire": 720
+      "expire": 60
     },
     "car": {
       "queue": "cartrack_queue",
       "exchange": "cartrack_exchange",
       "route_key": "cartrack",
-      "expire": 720
+      "expire": 60
     }
   },
   "minio": {
