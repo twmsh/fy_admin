@@ -35,6 +35,7 @@ pub struct AppCfgTrackFace {
 
     pub search_top: u64,
     pub search_threshold: u64,
+    pub cache_ttl: u64,
 }
 
 #[derive(Serialize, Deserialize, Debug)]

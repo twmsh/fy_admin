@@ -19,7 +19,10 @@
   "search": {
     "enable": false,
     "recg_url": "http://192.168.1.220:7002",
-    "ignore_dbs": ["1111"]
+    "ignore_dbs": ["1111"],
+    "cache_ttl": 5,
+    "top": 10,
+    "threshold": 50
   },
   "track_db": {
     "enable": true,

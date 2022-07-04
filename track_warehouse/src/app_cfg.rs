@@ -36,6 +36,9 @@ pub struct AppCfgSearch {
     pub enable: bool,
     pub recg_url: String,
     pub ignore_dbs: Vec<String>,
+    pub cache_ttl: u64,
+    pub top: u64,
+    pub threshold: u64,
 }
 
 #[derive(Serialize, Deserialize, Debug)]

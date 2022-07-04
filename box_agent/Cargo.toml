@@ -38,6 +38,9 @@ indexmap = "1.8"
 dashmap = "5.3"
 base64 = "0.13"
 
+# cache
+moka = { version = "0.8", features = ["future"] }
+
 ## common
 chrono = { version = "0.4", features = ["serde"] }
 serde = { version = "1.0", features = ["derive"] }

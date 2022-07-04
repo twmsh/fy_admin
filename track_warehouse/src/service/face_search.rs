@@ -1,8 +1,8 @@
-use deadqueue::unlimited::Queue;
 use log::{debug, error, info};
 use moka::future::Cache;
 use std::sync::Arc;
-use std::time::{Duration, Instant};
+use std::time::Duration;
+use std::time::Instant;
 
 use tokio::sync::watch::Receiver;
 use tokio::task::JoinHandle as TkJoinHandle;
@@ -13,7 +13,7 @@ use fy_base::util::utils;
 use crate::app_ctx::AppCtx;
 use crate::error::AppError;
 use crate::queue_item::FaceQueue;
-use fy_base::api::upload_api::{MatchPerson, NotifyFaceQueueItem, QI};
+use fy_base::api::upload_api::{MatchPerson, NotifyFaceQueueItem};
 use fy_base::util::service::Service;
 
 pub struct FaceSearchService {
@@ -23,7 +23,7 @@ pub struct FaceSearchService {
 
     skip_search: bool,
 
-    out: Arc<Queue<QI>>,
+    out: Arc<FaceQueue>,
     api: RecognitionApi,
 
     last_cache_ts: Instant,
@@ -31,10 +31,9 @@ pub struct FaceSearchService {
 }
 
 impl FaceSearchService {
-    pub fn new(num: i64, ctx: Arc<AppCtx>, queue: Arc<FaceQueue>, out: Arc<Queue<QI>>) -> Self {
-        let api = RecognitionApi::new(ctx.cfg.api.recg_url.as_str());
-        let skip_search = ctx.cfg.track.face.skip_search;
-
+    pub fn new(num: i64, ctx: Arc<AppCtx>, queue: Arc<FaceQueue>, out: Arc<FaceQueue>) -> Self {
+        let api = RecognitionApi::new(ctx.cfg.search.recg_url.as_str());
+        let skip_search = !ctx.cfg.search.enable;
         let last_cache_ts = Instant::now();
         let dbs_cache = Cache::new(10);
 
@@ -42,11 +41,11 @@ impl FaceSearchService {
             num,
             ctx,
             api,
-            last_cache_ts,
             queue,
             skip_search,
 
             out,
+            last_cache_ts,
             dbs_cache,
         }
     }
@@ -136,6 +135,7 @@ impl FaceSearchService {
             Some(v) => v,
         };
         debug!("FaceSearchService, get_dbs, len: {}", ids.len());
+
         Ok(ids)
     }
 
@@ -149,7 +149,7 @@ impl FaceSearchService {
             if self
                 .last_cache_ts
                 .elapsed()
-                .lt(&Duration::from_secs(self.ctx.cfg.track.face.cache_ttl))
+                .lt(&Duration::from_secs(self.ctx.cfg.search.cache_ttl))
             {
                 // 在ttl周期内，直接返回
                 return v;
@@ -164,20 +164,26 @@ impl FaceSearchService {
     }
 
     async fn get_dbs_for_real(&self) -> Vec<String> {
-        match self.get_dbs_from_api().await {
+        let mut dbs = match self.get_dbs_from_api().await {
             Ok(v) => v,
             Err(e) => {
                 error!("FaceSearchWorker, get_dbs_from_api, err: {:?}", e);
                 vec![]
             }
-        }
+        };
+
+        // 过滤掉忽略的db，（比如忽略路人库)
+        let ignore_dbs = &self.ctx.cfg.search.ignore_dbs;
+        dbs.retain(|x| !ignore_dbs.contains(x));
+
+        dbs
     }
 
     /// api 比对搜索，(有特征值, 并且dbs不为空)
     /// 无论处理成功或失败，都提交到mpsc中
     async fn process_batch(&mut self, mut items: Vec<NotifyFaceQueueItem>) {
-        let tops = vec![self.ctx.cfg.track.face.search_top as i64];
-        let thresholds = vec![self.ctx.cfg.track.face.search_threshold as i64];
+        let tops = vec![self.ctx.cfg.search.top as i64];
+        let thresholds = vec![self.ctx.cfg.search.threshold as i64];
         let dbs = if self.skip_search {
             vec![]
         } else {
@@ -249,7 +255,7 @@ impl FaceSearchService {
 
         // 放入 queue 中
         for v in items {
-            self.out.push(QI::FT(Box::new(v)));
+            self.out.push(v);
         }
     }
 }

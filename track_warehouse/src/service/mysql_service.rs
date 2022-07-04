@@ -50,9 +50,8 @@ impl MysqlService {
             error!("error, MysqlService, save_facetrack_to_mysql, err: {:?}", e);
         }
 
-        self.rabbitmq_face_queue.push(item);
-
-        // todo 提交到trackdb处理
+        self.rabbitmq_face_queue.push(item.clone());
+        self.face_trackdb_queue.push(item);
     }
 
     async fn process_car(&self, item: NotifyCarQueueItem) {

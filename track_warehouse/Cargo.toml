@@ -27,6 +27,9 @@ lapin = "2.1"
 tokio-executor-trait = "2.1"
 tokio-reactor-trait = "1.1"
 
+# cache
+moka = { version = "0.8", features = ["future"] }
+
 # minio
 rust-s3="0.31"
 

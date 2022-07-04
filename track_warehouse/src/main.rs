@@ -9,6 +9,7 @@ use track_warehouse::{app_cfg::AppCfg, app_ctx::AppCtx, service::signal_service:
 use fy_base::util::{logger, mysql_util, service::ServiceRepo};
 use track_warehouse::dao::Dao;
 use track_warehouse::queue_item::{CarQueue, FaceQueue};
+use track_warehouse::service::face_search::FaceSearchService;
 use track_warehouse::service::minio::MinioService;
 use track_warehouse::service::mysql_service::MysqlService;
 use track_warehouse::service::rabbitmq_service::RabbitmqService;
@@ -111,8 +112,8 @@ async fn main() {
 
     let face_search_queue: Arc<FaceQueue> = Arc::new(Queue::new());
 
-    // todo for test
-    let face_mysql_queue: Arc<FaceQueue> = face_search_queue.clone();
+    //
+    let face_mysql_queue: Arc<FaceQueue> = Arc::new(Queue::new());
     let car_mysql_queue: Arc<CarQueue> = Arc::new(Queue::new());
 
     let face_trackdb_queue: Arc<FaceQueue> = Arc::new(Queue::new());
@@ -132,6 +133,14 @@ async fn main() {
         car_queue.clone(),
         face_search_queue.clone(),
         car_mysql_queue.clone(),
+    );
+
+    // 初始化 facesearch服务
+    let facesearch_service = FaceSearchService::new(
+        0,
+        app_context.clone(),
+        face_search_queue.clone(),
+        face_mysql_queue.clone(),
     );
 
     // 初始 mysql 服务
@@ -155,6 +164,7 @@ async fn main() {
     service_repo.start_service(exit_service);
     service_repo.start_service(web_service);
     service_repo.start_service(minio_service);
+    service_repo.start_service(facesearch_service);
     service_repo.start_service(mysql_service);
     service_repo.start_service(rabbitmq_service);
 

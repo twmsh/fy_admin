@@ -1,3 +1,9 @@
+face_search代码
+db id查询问题
+
+
+//----------------
+
 facetrack多次推送
 例如：第一推送有3个face,只有一个feature
 第二次推送有1个face，一个feature，这样进行合并的时候，feature是不连贯的，
