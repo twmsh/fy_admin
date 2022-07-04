@@ -13,6 +13,7 @@ use track_warehouse::service::face_search::FaceSearchService;
 use track_warehouse::service::minio::MinioService;
 use track_warehouse::service::mysql_service::MysqlService;
 use track_warehouse::service::rabbitmq_service::RabbitmqService;
+use track_warehouse::service::trackdb_service::TrackDbService;
 use track_warehouse::service::web::WebService;
 
 const APP_NAME: &str = "track_warehouse";
@@ -160,6 +161,13 @@ async fn main() {
         rabbitmq_car_queue.clone(),
     );
 
+    // 初始 trackdb 服务
+    let trackdb_service = TrackDbService::new(
+        app_context.clone(),
+        face_trackdb_queue.clone(),
+    );
+
+
     // 启动服务
     service_repo.start_service(exit_service);
     service_repo.start_service(web_service);
@@ -167,6 +175,7 @@ async fn main() {
     service_repo.start_service(facesearch_service);
     service_repo.start_service(mysql_service);
     service_repo.start_service(rabbitmq_service);
+    service_repo.start_service(trackdb_service);
 
     // 等待退出
     service_repo.join().await;
