@@ -135,7 +135,7 @@ impl FaceSearchService {
             None => vec![],
             Some(v) => v,
         };
-        debug!("FaceSearchService, get_dbs, len: {}", ids.len());
+        debug!("FaceSearchWorker, get_dbs, len: {}", ids.len());
         Ok(ids)
     }
 
