@@ -149,7 +149,7 @@ impl FaceSearchService {
             if self
                 .last_cache_ts
                 .elapsed()
-                .lt(&Duration::from_secs(self.ctx.cfg.track.face.cache_ttl))
+                .lt(&Duration::from_secs(self.ctx.cfg.track.face.cache_ttl*60))
             {
                 // 在ttl周期内，直接返回
                 return v;

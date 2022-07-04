@@ -134,7 +134,7 @@ impl FaceSearchService {
             None => vec![],
             Some(v) => v,
         };
-        debug!("FaceSearchService, get_dbs, len: {}", ids.len());
+        debug!("FaceSearchWorker, get_dbs, len: {}", ids.len());
 
         Ok(ids)
     }
@@ -149,7 +149,7 @@ impl FaceSearchService {
             if self
                 .last_cache_ts
                 .elapsed()
-                .lt(&Duration::from_secs(self.ctx.cfg.search.cache_ttl))
+                .lt(&Duration::from_secs(self.ctx.cfg.search.cache_ttl*60))
             {
                 // 在ttl周期内，直接返回
                 return v;

@@ -17,7 +17,7 @@
     "idle": 600
   },
   "search": {
-    "enable": false,
+    "enable": true,
     "recg_url": "http://192.168.1.220:7002",
     "ignore_dbs": ["1111"],
     "cache_ttl": 5,
@@ -25,7 +25,7 @@
     "threshold": 50
   },
   "track_db": {
-    "enable": true,
+    "enable": false,
     "recg_url": "http://192.168.1.220:7002",
     "facetrack_db": "11111"
   },
