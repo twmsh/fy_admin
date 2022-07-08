@@ -292,8 +292,10 @@ pub async fn do_sync_camera_batch(ctx: Arc<AppCtx>, list: Vec<Camera>) -> Result
             match camera.c_type {
                 1 => {
                     camera_config.enable_face = true;
+                    camera_config.enable_vehicle = false;
                 }
                 2 => {
+                    camera_config.enable_face = false;
                     camera_config.enable_vehicle = true;
                 }
                 3 => {
