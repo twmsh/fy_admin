@@ -127,7 +127,9 @@ async fn handle_face(data: Arc<WebState>, values: MultipartFormValues) -> Respon
             debug!("{}, has no feature", item.id);
         }
     }
-    data.face_queue.push(face_queue_item);
+
+    // data.face_queue.push(face_queue_item);
+
     debug!("track_upload, push face");
     build_ok_response()
 }
@@ -209,9 +211,9 @@ async fn handle_car(data: Arc<WebState>, values: MultipartFormValues) -> Respons
         }
     }
 
-    debug!("track_upload, will push car");
-    data.car_queue.push(car_queue_item);
-    debug!("track_upload, end push car");
+    // data.car_queue.push(car_queue_item);
+
+    debug!("track_upload, push car");
     build_ok_response()
 }
 
