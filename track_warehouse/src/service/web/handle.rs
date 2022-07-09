@@ -1,4 +1,5 @@
 use std::sync::Arc;
+use std::time::Instant;
 
 use axum::extract::{ContentLengthLimit, Multipart};
 use axum::Extension;
@@ -32,6 +33,9 @@ pub async fn track_upload(
     Extension(web_state): Extension<Arc<WebState>>,
     ContentLengthLimit(parts): ContentLengthLimit<Multipart, { 1024 * 1024 * 10 }>,
 ) -> ResponseData {
+
+    let begin_ts = Instant::now();
+
     let part_values = match parse_multi_form(parts).await {
         Ok(v) => v,
         Err(e) => {
@@ -42,8 +46,8 @@ pub async fn track_upload(
 
     if let Some(track_type) = part_values.get_string_value("type") {
         match track_type.as_str() {
-            "facetrack" => handle_face(web_state, part_values).await,
-            "vehicletrack" => handle_car(web_state, part_values).await,
+            "facetrack" => handle_face(web_state, part_values,begin_ts).await,
+            "vehicletrack" => handle_car(web_state, part_values,begin_ts).await,
             _ => {
                 error!("error, track_upload, unknown type: {}", track_type);
                 build_err_response(&format!("error, unknown type: {}", track_type))
@@ -55,7 +59,7 @@ pub async fn track_upload(
     }
 }
 
-async fn handle_face(data: Arc<WebState>, values: MultipartFormValues) -> ResponseData {
+async fn handle_face(_data: Arc<WebState>, values: MultipartFormValues,begin_ts: Instant) -> ResponseData {
     let now = Local::now();
     let json_str = match values.get_string_value("json") {
         Some(v) => v,
@@ -78,7 +82,7 @@ async fn handle_face(data: Arc<WebState>, values: MultipartFormValues) -> Respon
     face_queue_item.ts = now;
     let item = &mut face_queue_item.notify;
 
-    info!("recv track, {}, index:{}, ft", item.id, item.index);
+    debug!("recv track, {}, index:{}, ft", item.id, item.index);
 
     // 处理图片
     item.background.image_buf = match values.get_file_value(item.background.image_file.as_str()) {
@@ -128,13 +132,13 @@ async fn handle_face(data: Arc<WebState>, values: MultipartFormValues) -> Respon
         }
     }
 
-    // data.face_queue.push(face_queue_item);
+    data.face_queue.push(face_queue_item);
 
-    debug!("track_upload, push face");
+    info!("track_upload, process face, use: {}",begin_ts.elapsed().as_millis() );
     build_ok_response()
 }
 
-async fn handle_car(data: Arc<WebState>, values: MultipartFormValues) -> ResponseData {
+async fn handle_car(_data: Arc<WebState>, values: MultipartFormValues,begin_ts: Instant) -> ResponseData {
     let now = Local::now();
 
     let json_str = match values.get_string_value("json") {
@@ -156,7 +160,7 @@ async fn handle_car(data: Arc<WebState>, values: MultipartFormValues) -> Respons
     car_queue_item.ts = now;
     let item = &mut car_queue_item.notify;
 
-    info!("recv track, {}, index:{}, ct", item.id, item.index);
+    debug!("recv track, {}, index:{}, ct", item.id, item.index);
 
     // 处理图片
     item.background.image_buf = match values.get_file_value(item.background.image_file.as_str()) {
@@ -211,9 +215,9 @@ async fn handle_car(data: Arc<WebState>, values: MultipartFormValues) -> Respons
         }
     }
 
-    // data.car_queue.push(car_queue_item);
+    data.car_queue.push(car_queue_item);
+    info!("track_upload, process car, use: {}",begin_ts.elapsed().as_millis());
 
-    debug!("track_upload, push car");
     build_ok_response()
 }
 

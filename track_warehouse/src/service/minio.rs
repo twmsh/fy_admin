@@ -6,6 +6,7 @@ use fy_base::util::service::Service;
 use log::error;
 use s3::Bucket;
 use std::sync::Arc;
+use std::time::Instant;
 
 use crate::error::AppError;
 use fy_base::util::minio;
@@ -40,7 +41,7 @@ impl MinioService {
             &ctx.cfg.minio.secret_key,
             &ctx.cfg.minio.facetrack_bucket,
         )
-        .unwrap();
+            .unwrap();
 
         let cartrack_bucket = new_bucket(
             &ctx.cfg.minio.endpoint,
@@ -48,7 +49,7 @@ impl MinioService {
             &ctx.cfg.minio.secret_key,
             &ctx.cfg.minio.cartrack_bucket,
         )
-        .unwrap();
+            .unwrap();
 
         Self {
             ctx,
@@ -67,6 +68,8 @@ impl MinioService {
         // 删除 图片buf
         // 传入到后续队列
 
+        let begin_ts = Instant::now();
+
         debug!("MinioService, process_face: {}", item.uuid);
         let saved = self.save_facetrack_to_minio(&mut item).await;
         if let Err(e) = saved {
@@ -78,11 +81,13 @@ impl MinioService {
             debug!("MinioService, save_facetrack_to_minio, ok, {}", item.uuid);
         }
 
-        debug!("MinioService, face put to next queue, {}", item.uuid);
-        self.face_out_queue.push(item);
+        // self.face_out_queue.push(item);
+
+        info!("MinioService, process face, use: {}", begin_ts.elapsed().as_millis());
     }
 
     async fn process_car(&self, mut item: NotifyCarQueueItem) {
+        let begin_ts = Instant::now();
         debug!("MinioService, process_car: {}", item.uuid);
         let saved = self.save_cartrack_to_minio(&mut item).await;
         if let Err(e) = saved {
@@ -94,8 +99,10 @@ impl MinioService {
             debug!("MinioService, save_cartrack_to_minio, ok, {}", item.uuid);
         }
 
-        debug!("MinioService, car put to next queue, {}", item.uuid);
-        self.car_out_queue.push(item);
+
+        // self.car_out_queue.push(item);
+
+        info!("MinioService, process car, use: {}", begin_ts.elapsed().as_millis());
     }
 
     pub async fn do_run(self, mut exit_rx: Receiver<i64>) {
@@ -176,7 +183,7 @@ impl MinioService {
             "image/jpeg",
             true,
         )
-        .await?;
+            .await?;
         item.notify.background.image_file = self.get_facetrack_minio_url(&path);
 
         for (face_id, face) in item.notify.faces.iter_mut().enumerate() {
@@ -190,7 +197,7 @@ impl MinioService {
                 "image/jpeg",
                 true,
             )
-            .await?;
+                .await?;
             face.aligned_file = self.get_facetrack_minio_url(&path);
 
             // 大图
@@ -203,7 +210,7 @@ impl MinioService {
                 "image/jpeg",
                 true,
             )
-            .await?;
+                .await?;
             face.display_file = self.get_facetrack_minio_url(&path);
 
             // 特征值
@@ -220,7 +227,7 @@ impl MinioService {
                     "text/plain",
                     false,
                 )
-                .await?;
+                    .await?;
                 *feature_file = self.get_facetrack_minio_url(&path);
             }
         }
@@ -244,7 +251,7 @@ impl MinioService {
             "image/jpeg",
             true,
         )
-        .await?;
+            .await?;
         item.notify.background.image_file = self.get_cartrack_minio_url(&path);
 
         // 车辆图
@@ -258,7 +265,7 @@ impl MinioService {
                 "image/jpeg",
                 true,
             )
-            .await?;
+                .await?;
             car.image_file = self.get_cartrack_minio_url(&path);
         }
 
@@ -275,7 +282,7 @@ impl MinioService {
                     "image/jpeg",
                     true,
                 )
-                .await?;
+                    .await?;
                 plate_info.image_file = Some(self.get_cartrack_minio_url(&path));
 
                 // 车牌二值图
@@ -288,7 +295,7 @@ impl MinioService {
                     "image/jpeg",
                     true,
                 )
-                .await?;
+                    .await?;
                 plate_info.binary_file = Some(self.get_cartrack_minio_url(&path));
             }
         }
