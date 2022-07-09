@@ -59,7 +59,7 @@ pub async fn track_upload(
     }
 }
 
-async fn handle_face(_data: Arc<WebState>, values: MultipartFormValues,begin_ts: Instant) -> ResponseData {
+async fn handle_face(data: Arc<WebState>, values: MultipartFormValues,begin_ts: Instant) -> ResponseData {
     let now = Local::now();
     let json_str = match values.get_string_value("json") {
         Some(v) => v,
@@ -138,7 +138,7 @@ async fn handle_face(_data: Arc<WebState>, values: MultipartFormValues,begin_ts:
     build_ok_response()
 }
 
-async fn handle_car(_data: Arc<WebState>, values: MultipartFormValues,begin_ts: Instant) -> ResponseData {
+async fn handle_car(data: Arc<WebState>, values: MultipartFormValues,begin_ts: Instant) -> ResponseData {
     let now = Local::now();
 
     let json_str = match values.get_string_value("json") {
