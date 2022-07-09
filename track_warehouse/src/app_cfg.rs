@@ -72,6 +72,7 @@ pub struct AppCfgRabbitMq {
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct AppCfgMinio {
+    pub worker: u64,
     pub endpoint: String,
     pub img_prefix: String,
     pub access_key: String,

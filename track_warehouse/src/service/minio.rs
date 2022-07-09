@@ -16,6 +16,7 @@ use tokio::task::JoinHandle;
 use tracing::{debug, info};
 
 pub struct MinioService {
+    pub num: u64,
     pub ctx: Arc<AppCtx>,
     pub face_in_queue: Arc<FaceQueue>,
     pub car_in_queue: Arc<CarQueue>,
@@ -29,6 +30,7 @@ pub struct MinioService {
 
 impl MinioService {
     pub fn new(
+        num: u64,
         ctx: Arc<AppCtx>,
         face_in_queue: Arc<FaceQueue>,
         car_in_queue: Arc<CarQueue>,
@@ -52,6 +54,7 @@ impl MinioService {
             .unwrap();
 
         Self {
+            num,
             ctx,
             face_in_queue,
             car_in_queue,
@@ -83,7 +86,7 @@ impl MinioService {
 
         // self.face_out_queue.push(item);
 
-        info!("MinioService, process face, use: {}", begin_ts.elapsed().as_millis());
+        info!("MinioService {}, process face, use: {}", self.num ,begin_ts.elapsed().as_millis());
     }
 
     async fn process_car(&self, mut item: NotifyCarQueueItem) {
@@ -102,7 +105,7 @@ impl MinioService {
 
         // self.car_out_queue.push(item);
 
-        info!("MinioService, process car, use: {}", begin_ts.elapsed().as_millis());
+        info!("MinioService {}, process car, use: {}", self.num,begin_ts.elapsed().as_millis());
     }
 
     pub async fn do_run(self, mut exit_rx: Receiver<i64>) {

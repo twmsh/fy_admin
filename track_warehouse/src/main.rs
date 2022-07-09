@@ -127,30 +127,19 @@ async fn main() {
     // 初始web服务
     let web_service = WebService::new(app_context.clone(), face_queue.clone(), car_queue.clone());
 
-    // 初始 minio 服务
-    let minio_service = MinioService::new(
-        app_context.clone(),
-        face_queue.clone(),
-        car_queue.clone(),
-        face_search_queue.clone(),
-        car_mysql_queue.clone(),
-    );
-
-    let minio_service2 = MinioService::new(
-        app_context.clone(),
-        face_queue.clone(),
-        car_queue.clone(),
-        face_search_queue.clone(),
-        car_mysql_queue.clone(),
-    );
-
-    let minio_service3 = MinioService::new(
-        app_context.clone(),
-        face_queue.clone(),
-        car_queue.clone(),
-        face_search_queue.clone(),
-        car_mysql_queue.clone(),
-    );
+    // 初始 minio 服务 ，多个worker
+    let mut minio_workers = vec![];
+    for i in 0..app_config.minio.worker {
+        let worker = MinioService::new(
+            i,
+            app_context.clone(),
+            face_queue.clone(),
+            car_queue.clone(),
+            face_search_queue.clone(),
+            car_mysql_queue.clone(),
+        );
+        minio_workers.push(worker);
+    }
 
 
     // 初始化 facesearch服务
@@ -189,9 +178,9 @@ async fn main() {
     service_repo.start_service(exit_service);
     service_repo.start_service(web_service);
 
-    service_repo.start_service(minio_service);
-    service_repo.start_service(minio_service2);
-    service_repo.start_service(minio_service3);
+    for v in minio_workers {
+        service_repo.start_service(v);
+    }
 
     service_repo.start_service(facesearch_service);
     service_repo.start_service(mysql_service);
