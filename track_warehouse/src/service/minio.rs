@@ -118,13 +118,13 @@ impl MinioService {
                     self.process_car(car).await;
                 }
                 _ = exit_rx.changed() => {
-                    info!("MinioService recv exit");
+                    info!("MinioService {} recv exit",self.num);
                     break;
                 }
             }
         }
 
-        info!("MinioService exit");
+        info!("MinioService {} exit",self.num);
     }
 }
 
