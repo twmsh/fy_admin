@@ -129,7 +129,7 @@ async fn main() {
 
     // 初始 minio 服务 ，多个worker
     let mut minio_workers = vec![];
-    for i in 0..app_config.minio.worker {
+    for i in 0 .. app_context.cfg.minio.worker {
         let worker = MinioService::new(
             i,
             app_context.clone(),
