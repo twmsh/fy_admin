@@ -84,7 +84,7 @@ impl MinioService {
             debug!("MinioService, save_facetrack_to_minio, ok, {}", item.uuid);
         }
 
-        // self.face_out_queue.push(item);
+        self.face_out_queue.push(item);
 
         info!("MinioService {}, process face, use: {}", self.num ,begin_ts.elapsed().as_millis());
     }
@@ -103,7 +103,7 @@ impl MinioService {
         }
 
 
-        // self.car_out_queue.push(item);
+        self.car_out_queue.push(item);
 
         info!("MinioService {}, process car, use: {}", self.num,begin_ts.elapsed().as_millis());
     }

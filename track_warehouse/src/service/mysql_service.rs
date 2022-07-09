@@ -2,6 +2,7 @@ use chrono::Local;
 use fy_base::api::upload_api::{NotifyCarQueueItem, NotifyFaceQueueItem};
 use fy_base::util::service::Service;
 use std::sync::Arc;
+use std::time::Instant;
 use tokio::sync::watch::Receiver;
 use tokio::task::JoinHandle;
 use tracing::{debug, error, info};
@@ -44,22 +45,26 @@ impl MysqlService {
         // 保存到数据库中，如果要倒查，放入到路人库队列中
         // 放入rabbitmq相关队列中.
 
+        let begin_ts = Instant::now();
         debug!("MysqlService, process_face: {}", item.uuid);
 
         if let Err(e) = self.save_facetrack_to_mysql(&item).await {
             error!("error, MysqlService, save_facetrack_to_mysql, err: {:?}", e);
         }
 
-        self.rabbitmq_face_queue.push(item.clone());
-        self.face_trackdb_queue.push(item);
+        // self.face_trackdb_queue.push(item.clone());
+        self.rabbitmq_face_queue.push(item);
+        info!("MysqlService, process face, use: {}", begin_ts.elapsed().as_millis());
     }
 
     async fn process_car(&self, item: NotifyCarQueueItem) {
+        let begin_ts = Instant::now();
         debug!("MysqlService, process_car: {}", item.uuid);
         if let Err(e) = self.save_cartrack_to_mysql(&item).await {
             error!("error, MysqlService, save_cartrack_to_mysql, err: {:?}", e);
         }
         self.rabbitmq_car_queue.push(item);
+        info!("MysqlService, process car, use: {}", begin_ts.elapsed().as_millis());
     }
 
     pub async fn do_run(self, mut exit_rx: Receiver<i64>) {
