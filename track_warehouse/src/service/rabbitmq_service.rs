@@ -1,5 +1,5 @@
 use std::sync::Arc;
-use std::time::Duration;
+use std::time::{Duration, Instant};
 
 use crate::app_ctx::AppCtx;
 
@@ -271,6 +271,9 @@ impl RabbitmqService {
         channel: &Channel,
         item: NotifyFaceQueueItem,
     ) -> Result<(), lapin::Error> {
+
+        let begin_ts = Instant::now();
+
         let exchange = self.ctx.cfg.rabbitmq.face.exchange.as_str();
         let route_key = self.ctx.cfg.rabbitmq.face.route_key.as_str();
         let payload = serde_json::to_string(&item);
@@ -299,6 +302,7 @@ impl RabbitmqService {
             "RabbitmqService, publish_confirm, {:?}, {}",
             publish_confirm, item.uuid
         );
+        info!("RabbitmqService, process face, use: {}",begin_ts.elapsed().as_millis());
 
         Ok(())
     }
@@ -308,6 +312,7 @@ impl RabbitmqService {
         channel: &Channel,
         item: NotifyCarQueueItem,
     ) -> Result<(), lapin::Error> {
+        let begin_ts = Instant::now();
         let exchange = self.ctx.cfg.rabbitmq.car.exchange.as_str();
         let route_key = self.ctx.cfg.rabbitmq.car.route_key.as_str();
         let payload = serde_json::to_string(&item);
@@ -336,7 +341,7 @@ impl RabbitmqService {
             "RabbitmqService, publish_confirm, {:?}, {}",
             publish_confirm, item.uuid
         );
-
+        info!("RabbitmqService, process car, use: {}",begin_ts.elapsed().as_millis());
         Ok(())
     }
 }
