@@ -144,6 +144,14 @@ async fn main() {
         car_mysql_queue.clone(),
     );
 
+    let minio_service3 = MinioService::new(
+        app_context.clone(),
+        face_queue.clone(),
+        car_queue.clone(),
+        face_search_queue.clone(),
+        car_mysql_queue.clone(),
+    );
+
 
     // 初始化 facesearch服务
     let facesearch_service = FaceSearchService::new(
@@ -180,8 +188,10 @@ async fn main() {
     // 启动服务
     service_repo.start_service(exit_service);
     service_repo.start_service(web_service);
+
     service_repo.start_service(minio_service);
     service_repo.start_service(minio_service2);
+    service_repo.start_service(minio_service3);
 
     service_repo.start_service(facesearch_service);
     service_repo.start_service(mysql_service);
